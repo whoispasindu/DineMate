@@ -27,6 +27,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - TypeScript strict; Python 3.12 with type hints; ruff (lint + black-compatible format); eslint + prettier.
 - Clean code without inline comments.
 - Conventional commits. Never add a "Co-Authored-By" line to commit messages.
+- One branch per roadmap phase (`phase-<n>-<slug>`, from up-to-date main). Merge to main only when the owner says so.
 - Every PR: tests pass, lint clean, no secrets committed.
 
 ## Commands
