@@ -67,7 +67,7 @@ Notes from Phase 1:
 - [x] Student app polls every 15 s (WebSocket `/ws/live` deferred; see Cut first)
 
 **Done when:** you sit in a marked zone in front of the webcam and the Home screen's free seats change within about 60 s. Stopping the worker shows "No info right now" after 10 min.
-Checked 28 Oct on a looping test clip (2 people): video → worker → API → "Pilot (webcam)" on Home, ~2 of 4 seats free. **Still to do by you:** the same with your webcam (steps in `services/vision/README.md`).
+✅ 28 Oct: checked on a looping test clip, then with the laptop webcam: sitting in the desk zone took "Pilot (webcam)" on Home from 2 free to ~1 free (0–2) within one post after the 10 s dwell. Windows needs both camera privacy switches on for desktop apps.
 
 ## Phase 3 — Crowding & accuracy (Week 5)
 

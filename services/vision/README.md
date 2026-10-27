@@ -36,6 +36,10 @@ Run everything from `services/vision` unless noted. The API must be running (`pn
 
 6. Open the student app in API mode (`pnpm dev:student:api` from the repo root). Sit in a zone: after the dwell and the next post, "Pilot (webcam)" shows about one seat taken. Stop the worker: the zone turns grey after 2 min and shows "No info right now" after 10 min.
 
+A ready-made zone covering most of the frame is in `layouts/webcam-desk.json` if you want to skip step 2.
+
+**Camera won't open on Windows** ("can't be used to capture by index"): open Settings → Privacy & security → Camera and turn on both **Camera access** and **Let desktop apps access your camera** (near the bottom of the page). Also close other apps using the camera.
+
 ## Canteen videos
 
 Keep videos in `data/videos/` at the repo root (git-ignored). Use the same steps with `--source path/to/video.mp4`; add `--loop` to keep a short clip running, or `--fast` to process it as fast as the CPU allows. Draw zones from a frame of the same video (`--at 12` picks the frame 12 s in).
