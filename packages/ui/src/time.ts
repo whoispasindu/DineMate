@@ -74,7 +74,8 @@ export function formatLocalRange(opens: string, closes: string, spaced = false):
   return `${twelveHour(start.hour, start.minute)}${dash}${twelveHour(end.hour, end.minute)}`;
 }
 
-export function formatAgo(value: TimeInput, now: number): string {
+export function formatAgo(value: TimeInput | null, now: number): string {
+  if (value === null) return "no readings yet";
   const seconds = Math.max(0, Math.round((now - toMs(value)) / 1000));
   if (seconds < 60) return `${seconds} s ago`;
   const minutes = Math.floor(seconds / 60);

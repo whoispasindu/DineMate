@@ -27,7 +27,7 @@ export interface CanteenSummary {
   shops_total: number;
   shops_open: number;
   walk: WalkTime | null;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 export type ShopState = "open" | "closes_soon" | "closed" | "temporarily_closed" | "unknown";
@@ -117,7 +117,7 @@ export interface ZoneOccupancy {
   percent: number | null;
   free_about: number | null;
   free_range: FreeRange | null;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 export interface ForecastPoint {
@@ -178,6 +178,11 @@ export interface Notice {
   related_canteen: { id: string; name: string } | null;
 }
 
+export interface ErrorResponse {
+  error: { code: string; message: string; details: Record<string, unknown> | null };
+  request_id: string;
+}
+
 export interface AlertFeed extends Timestamped {
   safety: SafetyStatus;
   notices: Notice[];
@@ -192,7 +197,7 @@ export interface ConsoleZone {
   level: CrowdLevel;
   occupied: number | null;
   occupied_range: FreeRange | null;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 export type StaffAlertType = "crowding" | "sensor_offline" | "data_stale";

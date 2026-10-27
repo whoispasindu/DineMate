@@ -4,13 +4,19 @@
     {
       "name": "student",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "C:/Users/Pasin/OneDrive/Desktop/Projects/DineMate", "--filter", "student", "dev"],
+      "runtimeArgs": ["--filter", "student", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "student-api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "student", "dev", "--mode", "api"],
       "port": 5173
     },
     {
       "name": "console",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "C:/Users/Pasin/OneDrive/Desktop/Projects/DineMate", "--filter", "console", "dev"],
+      "runtimeArgs": ["--filter", "console", "dev"],
       "port": 5174
     }
   ]

@@ -5,3 +5,5 @@ pnpm-lock.yaml
 services
 docs/DineMate_Development_Plan.md
 apps/student/public
+packages/api-client/openapi.json
+packages/api-client/src/generated

@@ -149,7 +149,7 @@ function summarize(seed: CanteenSeed, now: number): { summary: CanteenSummary; z
   const high = counted.reduce((sum, z) => sum + (z.free_range?.[1] ?? 0), 0);
   const percent = capacity > 0 ? Math.round(((capacity - free) / capacity) * 100) : null;
   const freshness: Freshness = live.length > 0 ? "live" : counted.length > 0 ? "stale" : "unavailable";
-  const latest = Math.max(...zones.map((z) => Date.parse(z.updated_at)));
+  const latest = Math.max(...zones.map((z) => (z.updated_at ? Date.parse(z.updated_at) : 0)));
   const shops = shopsFor(seed.id, now);
   return {
     zones,

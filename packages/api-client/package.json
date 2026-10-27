@@ -7,7 +7,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gen": "openapi-typescript openapi.json -o src/generated/schema.ts"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.90.0",
@@ -16,6 +17,7 @@
   "devDependencies": {
     "@tanstack/react-query": "^5.90.0",
     "@types/react": "^18.3.12",
+    "openapi-typescript": "7.13.0",
     "react": "^18.3.1",
     "typescript": "~5.9.3"
   }

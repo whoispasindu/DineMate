@@ -12,7 +12,7 @@ import { NOTICE_LOOK } from "../lib/present";
 type Summary = UseQueryResult<StudentSummary>;
 
 function latestUpdate(data: StudentSummary): string | null {
-  const live = data.canteens.filter((c) => c.freshness === "live").map((c) => Date.parse(c.updated_at));
+  const live = data.canteens.filter((c) => c.freshness === "live" && c.updated_at).map((c) => Date.parse(c.updated_at ?? ""));
   return live.length > 0 ? new Date(Math.max(...live)).toISOString() : null;
 }
 

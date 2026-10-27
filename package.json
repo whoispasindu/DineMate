@@ -13,7 +13,9 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "api:types": "uv run --directory services/api python -m app.openapi_export ../../packages/api-client/openapi.json && pnpm --filter @dinemate/api-client gen",
+    "dev:student:api": "pnpm --filter student dev --mode api"
   },
   "packageManager": "pnpm@12.15.0",
   "devDependencies": {

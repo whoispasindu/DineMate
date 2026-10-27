@@ -462,7 +462,8 @@ export function OverviewScreen() {
   const overview = useConsoleOverview();
   const now = useServerNow(1000);
   const data = overview.data;
-  const latest = data ? Math.max(...data.zones.filter((z) => z.freshness === "live").map((z) => Date.parse(z.updated_at))) : null;
+  const liveStamps = data?.zones.filter((z) => z.freshness === "live" && z.updated_at).map((z) => Date.parse(z.updated_at ?? "")) ?? [];
+  const latest = liveStamps.length > 0 ? Math.max(...liveStamps) : null;
   const k = data ? kpis(data) : null;
   return (
     <main id="main" className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-5 px-8 pb-10 pt-7">

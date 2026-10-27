@@ -3,7 +3,8 @@ import { CanteenArt, cx, formatAgo, formatClock, Icon, levelFor, Ring, StatusPil
 import { Link } from "react-router";
 import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText } from "../lib/present";
 
-export function freshnessText(freshness: Freshness, updatedAt: string, now: number): string {
+export function freshnessText(freshness: Freshness, updatedAt: string | null, now: number): string {
+  if (updatedAt === null) return "No live data yet";
   const ago = formatAgo(updatedAt, now);
   if (freshness === "live") return `Live · updated ${ago}`;
   if (freshness === "stale") return `Last updated ${ago} — may be out of date`;
@@ -279,7 +280,9 @@ export function ZoneCard({ zone, now }: { zone: ZoneOccupancy; now: number }) {
         <span className="text-[13px] text-muted">
           {numbers
             ? `${freeShort(zone)} ${rangeText(zone)} of ${zone.capacity} seats${zone.freshness === "stale" ? ` · ${formatAgo(zone.updated_at, now)}` : ""}`
-            : `${zone.capacity} seats · sensor offline since ${formatClock(zone.updated_at)}`}
+            : zone.updated_at
+              ? `${zone.capacity} seats · sensor offline since ${formatClock(zone.updated_at)}`
+              : `${zone.capacity} seats · not monitored yet`}
         </span>
       </div>
     </div>
