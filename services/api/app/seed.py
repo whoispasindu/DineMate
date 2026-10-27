@@ -348,6 +348,7 @@ def _seed_shops(session: Session, now: datetime) -> None:
                     dietary_tags=["vegetarian"] if item.vegetarian else [],
                     sort_order=item_order,
                     is_available=not item.sold_out,
+                    availability_updated_at=at_local(today, t("12:10")) if item.sold_out else now,
                     is_published=True,
                     periods=[models.MenuItemPeriod(period=p) for p in item.periods],
                 )
