@@ -20,3 +20,5 @@ data/frames/
 *.mkv
 *.pt
 services/vision/models/
+services/vision/validation/*.csv
+!services/vision/validation/counts.example.csv
