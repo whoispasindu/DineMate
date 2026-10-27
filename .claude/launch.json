@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "student",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "C:/Users/Pasin/OneDrive/Desktop/Projects/DineMate", "--filter", "student", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "console",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "C:/Users/Pasin/OneDrive/Desktop/Projects/DineMate", "--filter", "console", "dev"],
+      "port": 5174
+    }
+  ]
+}

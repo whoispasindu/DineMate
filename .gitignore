@@ -1,0 +1,15 @@
+node_modules/
+dist/
+dev-dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+
+data/videos/
+data/frames/
+*.mp4
+*.mov
+*.avi
+*.mkv

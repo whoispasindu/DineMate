@@ -1,0 +1,22 @@
+{
+  "name": "@dinemate/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.90.0",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.90.0",
+    "@types/react": "^18.3.12",
+    "react": "^18.3.1",
+    "typescript": "~5.9.3"
+  }
+}

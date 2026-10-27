@@ -1,0 +1,11 @@
+{
+  "name": "dinemate",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:student": "pnpm --filter student dev",
+    "dev:console": "pnpm --filter console dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
