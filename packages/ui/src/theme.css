@@ -63,27 +63,15 @@
 }
 
 @utility hazard-stripes {
-  background: repeating-linear-gradient(
-    135deg,
-    var(--color-hazard-yellow) 0 12px,
-    var(--color-hazard-black) 12px 24px
-  );
+  background: repeating-linear-gradient(135deg, var(--color-hazard-yellow) 0 12px, var(--color-hazard-black) 12px 24px);
 }
 
 @utility hazard-stripes-tight {
-  background: repeating-linear-gradient(
-    135deg,
-    var(--color-hazard-yellow) 0 10px,
-    var(--color-hazard-black) 10px 20px
-  );
+  background: repeating-linear-gradient(135deg, var(--color-hazard-yellow) 0 10px, var(--color-hazard-black) 10px 20px);
 }
 
 @utility forecast-stripes {
-  background: repeating-linear-gradient(
-    135deg,
-    var(--color-forecast) 0 3px,
-    var(--color-forecast-soft) 3px 6px
-  );
+  background: repeating-linear-gradient(135deg, var(--color-forecast) 0 3px, var(--color-forecast-soft) 3px 6px);
 }
 
 @utility tabular {

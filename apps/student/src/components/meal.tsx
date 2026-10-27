@@ -64,7 +64,10 @@ export function MealBadge({ text }: { text: string }) {
   );
 }
 
-export function mealBadgeText(current: { period: keyof typeof PERIOD_LABEL } | null, next: { period: keyof typeof PERIOD_LABEL } | null): string {
+export function mealBadgeText(
+  current: { period: keyof typeof PERIOD_LABEL } | null,
+  next: { period: keyof typeof PERIOD_LABEL } | null,
+): string {
   if (current) return `${PERIOD_LABEL[current.period].toUpperCase()} · NOW SERVING`;
   if (next) return `NEXT · ${PERIOD_LABEL[next.period].toUpperCase()}`;
   return "NO MEALS SCHEDULED";

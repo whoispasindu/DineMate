@@ -116,7 +116,12 @@ function BackButton({ className }: { className?: string }) {
     else navigate("/");
   };
   return (
-    <button type="button" aria-label="Back" onClick={goBack} className={cx("flex items-center justify-center border-0 bg-card text-ink", className)}>
+    <button
+      type="button"
+      aria-label="Back"
+      onClick={goBack}
+      className={cx("flex items-center justify-center border-0 bg-card text-ink", className)}
+    >
       <Icon name="arrowLeft" size={20} strokeWidth={2.2} />
     </button>
   );
@@ -151,7 +156,9 @@ function SeatHeadline({ canteen, large }: { canteen: CanteenSummary; large?: boo
   }
   return (
     <div className={cx("flex flex-col gap-1", !large && "items-center text-center", canteen.freshness === "stale" && "opacity-70")}>
-      <span className={cx("font-extrabold", large ? "text-[26px] tracking-[-0.02em]" : "mt-1.5 text-lg")}>~{canteen.free_about} seats free</span>
+      <span className={cx("font-extrabold", large ? "text-[26px] tracking-[-0.02em]" : "mt-1.5 text-lg")}>
+        ~{canteen.free_about} seats free
+      </span>
       <span className={cx("text-muted", large ? "text-sm" : "text-[13px]")}>
         Estimated {canteen.free_range[0]}–{canteen.free_range[1]} of {canteen.monitored_capacity} monitored seats
       </span>
@@ -192,7 +199,10 @@ function CanteenMobile({ data, now, online }: ViewProps) {
           <StatusPill level={canteen.level} freshness={canteen.freshness} />
         </div>
         {online ? (
-          <section aria-label="Seat estimate" className="flex flex-col items-center gap-1.5 rounded-[22px] border border-line bg-card px-4 pb-4 pt-[18px]">
+          <section
+            aria-label="Seat estimate"
+            className="flex flex-col items-center gap-1.5 rounded-[22px] border border-line bg-card px-4 pb-4 pt-[18px]"
+          >
             <HalfGauge percent={canteen.percent} level={canteen.level} freshness={canteen.freshness} caption="seats in use (est.)" />
             <SeatHeadline canteen={canteen} />
           </section>
@@ -214,9 +224,19 @@ function CanteenMobile({ data, now, online }: ViewProps) {
             className="border border-line bg-card"
           />
           {canteen.walk ? (
-            <Tile icon="walk" title={`${canteen.walk.minutes} min`} sub={`from ${canteen.walk.from_name}`} className="border border-line bg-card" />
+            <Tile
+              icon="walk"
+              title={`${canteen.walk.minutes} min`}
+              sub={`from ${canteen.walk.from_name}`}
+              className="border border-line bg-card"
+            />
           ) : (
-            <Tile icon="camera" title={`${canteen.zones_live} of ${canteen.zones_total} zones`} sub="with live data" className="border border-line bg-card" />
+            <Tile
+              icon="camera"
+              title={`${canteen.zones_live} of ${canteen.zones_total} zones`}
+              sub="with live data"
+              className="border border-line bg-card"
+            />
           )}
         </div>
         <h2 className="m-0 mt-1 text-[17px] font-extrabold">Seats by zone</h2>
@@ -236,7 +256,10 @@ function CanteenMobile({ data, now, online }: ViewProps) {
 function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: ForecastPoint[] }) {
   const nowMark = levelFor(canteen.level, canteen.freshness).bar;
   return (
-    <section aria-labelledby="fc-title" className="flex min-w-0 flex-[1.2_1_420px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5">
+    <section
+      aria-labelledby="fc-title"
+      className="flex min-w-0 flex-[1.2_1_420px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="fc-title" className="m-0 text-[17px] font-extrabold">
           Next hour
@@ -247,7 +270,11 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
         {canteen.percent !== null ? (
           <li className="flex flex-1 flex-col items-center gap-1.5">
             <span className="text-xs font-extrabold">{canteen.percent}%</span>
-            <div aria-hidden="true" className={cx("w-full max-w-16 rounded-t-[10px] rounded-b", nowMark)} style={{ height: Math.round(canteen.percent * 1.2) }} />
+            <div
+              aria-hidden="true"
+              className={cx("w-full max-w-16 rounded-t-[10px] rounded-b", nowMark)}
+              style={{ height: Math.round(canteen.percent * 1.2) }}
+            />
             <span className="text-xs font-extrabold">Now</span>
           </li>
         ) : null}
@@ -274,7 +301,10 @@ function CanteenWeb({ data, now, online }: ViewProps) {
   const { canteen, zones, forecast, hours_today, shops } = data;
   return (
     <main id="main" className="mx-auto flex max-w-[1200px] flex-col gap-[22px] px-6 pb-10 pt-[22px]">
-      <Link to="/" className="inline-flex min-h-9 items-center gap-1.5 self-start text-sm font-bold text-brand no-underline hover:text-brand-dark">
+      <Link
+        to="/"
+        className="inline-flex min-h-9 items-center gap-1.5 self-start text-sm font-bold text-brand no-underline hover:text-brand-dark"
+      >
         <Icon name="arrowLeft" size={16} strokeWidth={2.4} />
         All canteens
       </Link>
@@ -303,7 +333,12 @@ function CanteenWeb({ data, now, online }: ViewProps) {
             <OfflineCard />
           )}
           <div className="grid grid-cols-3 gap-2.5">
-            <Tile icon="clock" title={isOpenNow(hours_today, now) ? "Open now" : "Closed now"} sub={hoursText(hours_today)} className="bg-page" />
+            <Tile
+              icon="clock"
+              title={isOpenNow(hours_today, now) ? "Open now" : "Closed now"}
+              sub={hoursText(hours_today)}
+              className="bg-page"
+            />
             <Tile
               icon="store"
               title={`${canteen.shops_total} shops`}
@@ -327,7 +362,10 @@ function CanteenWeb({ data, now, online }: ViewProps) {
       )}
       <div className="flex flex-wrap gap-5">
         {online && forecast.length > 0 && canteen.freshness === "live" ? <NextHour canteen={canteen} forecast={forecast} /> : null}
-        <section aria-labelledby="shops-title" className="flex min-w-0 flex-[1_1_360px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5">
+        <section
+          aria-labelledby="shops-title"
+          className="flex min-w-0 flex-[1_1_360px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
+        >
           <div className="mb-1.5 flex items-center justify-between">
             <h2 id="shops-title" className="m-0 text-[17px] font-extrabold">
               Shops in {canteen.name}

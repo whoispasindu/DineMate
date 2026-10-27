@@ -57,7 +57,9 @@ function HomeMobile({ summary, now, online }: HomeProps) {
           <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em]">{greeting(now)}</h1>
           <span className="text-sm text-muted">Where will you sit today?</span>
         </div>
-        {data?.safety.events.map((event) => <SafetyBanner key={event.id} event={event} layout="mobile" />)}
+        {data?.safety.events.map((event) => (
+          <SafetyBanner key={event.id} event={event} layout="mobile" />
+        ))}
         <MealPill />
         {!online ? (
           <OfflineCard />
@@ -73,11 +75,7 @@ function HomeMobile({ summary, now, online }: HomeProps) {
           )
         ) : (
           <>
-            {best ? (
-              <BestSpotMobile canteen={best} />
-            ) : (
-              <NoBestSpot anyLive={data.canteens.some((c) => c.freshness === "live")} />
-            )}
+            {best ? <BestSpotMobile canteen={best} /> : <NoBestSpot anyLive={data.canteens.some((c) => c.freshness === "live")} />}
             <div className="flex items-center justify-between">
               <h2 className="m-0 text-[17px] font-extrabold">Canteens now</h2>
               {data.canteens.some((c) => c.is_sample) ? <SampleBadge /> : null}
@@ -113,7 +111,9 @@ function HomeWeb({ summary, now, online }: HomeProps) {
           {data?.canteens.some((c) => c.is_sample) ? <SampleBadge /> : null}
         </div>
       </div>
-      {data?.safety.events.map((event) => <SafetyBanner key={event.id} event={event} layout="web" />)}
+      {data?.safety.events.map((event) => (
+        <SafetyBanner key={event.id} event={event} layout="web" />
+      ))}
       {!online ? <OfflineCard /> : null}
       <div className="flex flex-wrap gap-5">
         {!online ? null : !data ? (
@@ -169,7 +169,10 @@ function HomeWeb({ summary, now, online }: HomeProps) {
 
 function ShopsNow({ shops }: { shops: StudentSummary["shops_now"] }) {
   return (
-    <section aria-labelledby="shops-now-title" className="flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5">
+    <section
+      aria-labelledby="shops-now-title"
+      className="flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
+    >
       <div className="mb-1.5 flex items-center justify-between">
         <h2 id="shops-now-title" className="m-0 text-[17px] font-extrabold">
           Shops
@@ -202,7 +205,10 @@ function LatestAlerts() {
   const feed = useAlertFeed();
   const notices = feed.data?.notices.slice(0, 3) ?? [];
   return (
-    <section aria-labelledby="latest-title" className="flex min-w-0 flex-[1_1_300px] flex-col gap-2.5 rounded-[22px] border border-line bg-card p-5">
+    <section
+      aria-labelledby="latest-title"
+      className="flex min-w-0 flex-[1_1_300px] flex-col gap-2.5 rounded-[22px] border border-line bg-card p-5"
+    >
       <div className="flex items-center justify-between">
         <h2 id="latest-title" className="m-0 text-[17px] font-extrabold">
           Latest alerts

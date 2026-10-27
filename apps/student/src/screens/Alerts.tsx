@@ -81,7 +81,9 @@ function NoticeRow({ notice, layout, last }: { notice: Notice; layout: "mobile" 
   const web = layout === "web";
   return (
     <li className={cx("flex", web ? "gap-3.5 py-4" : "gap-3 py-3", !last && "border-b border-line-soft")}>
-      <span className={cx("flex shrink-0 items-center justify-center", web ? "h-11 w-11 rounded-[14px]" : "h-10 w-10 rounded-xl", look.tile)}>
+      <span
+        className={cx("flex shrink-0 items-center justify-center", web ? "h-11 w-11 rounded-[14px]" : "h-10 w-10 rounded-xl", look.tile)}
+      >
         <Icon name={look.icon} size={web ? 20 : 19} strokeWidth={2.2} />
       </span>
       <div className={cx("flex flex-1 flex-col", web ? "gap-1" : "gap-0.5")}>
@@ -143,7 +145,14 @@ export function AlertsScreen() {
             >
               Mark all read
             </button>
-            <Segmented label="Filter alerts" options={WEB_FILTERS} value={filter} onChange={setFilter} panelId={panelId} className="bg-chip" />
+            <Segmented
+              label="Filter alerts"
+              options={WEB_FILTERS}
+              value={filter}
+              onChange={setFilter}
+              panelId={panelId}
+              className="bg-chip"
+            />
           </div>
         </div>
         <div className="flex flex-wrap items-start gap-5">
@@ -168,7 +177,10 @@ export function AlertsScreen() {
               </section>
             ) : null}
           </div>
-          <aside aria-labelledby="prefs-title" className="flex min-w-0 flex-[1_1_300px] flex-col gap-1.5 rounded-[22px] border border-line bg-card p-5">
+          <aside
+            aria-labelledby="prefs-title"
+            className="flex min-w-0 flex-[1_1_300px] flex-col gap-1.5 rounded-[22px] border border-line bg-card p-5"
+          >
             <h2 id="prefs-title" className="m-0 mb-2 text-[17px] font-extrabold">
               Notify me about
             </h2>
@@ -187,7 +199,11 @@ export function AlertsScreen() {
       <header className="flex flex-col gap-3 px-4 pb-2.5 pt-[18px]">
         <div className="flex items-center justify-between">
           <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em]">Alerts</h1>
-          <button type="button" onClick={markAllRead} className="min-h-10 rounded-xl border-0 bg-transparent px-3 text-sm font-bold text-brand">
+          <button
+            type="button"
+            onClick={markAllRead}
+            className="min-h-10 rounded-xl border-0 bg-transparent px-3 text-sm font-bold text-brand"
+          >
             Mark all read
           </button>
         </div>

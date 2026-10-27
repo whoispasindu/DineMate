@@ -52,7 +52,10 @@ export function WelcomeScreen() {
           </div>
           <ul className="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
             {FEATURES.map((f) => (
-              <li key={f.label} className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-[7px] text-[13px] font-bold text-ink-2">
+              <li
+                key={f.label}
+                className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-[7px] text-[13px] font-bold text-ink-2"
+              >
                 <Icon name={f.icon} size={15} className="text-brand" />
                 {f.label}
               </li>

@@ -213,9 +213,7 @@ export function SimulationLabel({ children = "SIMULATION — NOT A REAL EMERGENC
 
 export function SampleBadge({ children = "SAMPLE DATA", className }: { children?: ReactNode; className?: string }) {
   return (
-    <span className={cx("shrink-0 rounded-md bg-chip px-2 py-1 text-[11px] font-extrabold text-neutral-ink", className)}>
-      {children}
-    </span>
+    <span className={cx("shrink-0 rounded-md bg-chip px-2 py-1 text-[11px] font-extrabold text-neutral-ink", className)}>{children}</span>
   );
 }
 

@@ -47,7 +47,10 @@ function zoneChip(zone: ConsoleZone): { label: string; className: string; icon: 
 
 function Card({ children, className, labelledBy }: { children: ReactNode; className?: string; labelledBy?: string }) {
   return (
-    <section aria-labelledby={labelledBy} className={cx("flex min-w-0 flex-col rounded-2xl border border-line bg-card px-5 py-[18px]", className)}>
+    <section
+      aria-labelledby={labelledBy}
+      className={cx("flex min-w-0 flex-col rounded-2xl border border-line bg-card px-5 py-[18px]", className)}
+    >
       {children}
     </section>
   );
@@ -128,7 +131,11 @@ function ZoneTable({ zones, now }: { zones: ConsoleZone[]; now: number }) {
                 <th
                   key={h}
                   scope="col"
-                  className={cx("border-b border-chip pb-2.5 pt-2 font-semibold", i === 0 ? "pr-2" : i === 5 ? "pl-2" : "px-2", h === "Load" && "w-[150px]")}
+                  className={cx(
+                    "border-b border-chip pb-2.5 pt-2 font-semibold",
+                    i === 0 ? "pr-2" : i === 5 ? "pl-2" : "px-2",
+                    h === "Load" && "w-[150px]",
+                  )}
                 >
                   {h}
                 </th>
@@ -152,7 +159,9 @@ function ZoneTable({ zones, now }: { zones: ConsoleZone[]; now: number }) {
                   <td className={cx(cell, "px-2 font-mono")}>{z.capacity}</td>
                   <td className={cx(cell, "px-2")}>
                     <span className="font-mono font-semibold">{live ? z.occupied : "—"}</span>{" "}
-                    <span className="text-xs text-muted">{live && z.occupied_range ? `(${z.occupied_range[0]}–${z.occupied_range[1]})` : "hidden"}</span>
+                    <span className="text-xs text-muted">
+                      {live && z.occupied_range ? `(${z.occupied_range[0]}–${z.occupied_range[1]})` : "hidden"}
+                    </span>
                   </td>
                   <td className={cx(cell, "px-2")}>
                     <div className="flex items-center gap-2">
@@ -323,7 +332,8 @@ function OccupancyChart({ title, points, now }: { title: string; points: Occupan
         ))}
       </div>
       <p className="m-0 text-xs text-muted">
-        Forecast = blend of current reading and historical average for this weekday. Shown as experimental until evaluated against manual counts.
+        Forecast = blend of current reading and historical average for this weekday. Shown as experimental until evaluated against manual
+        counts.
       </p>
     </Card>
   );
@@ -353,7 +363,8 @@ function SafetyCard({ safety, now }: { safety: ConsoleOverview["safety"]; now: n
         </span>
       )}
       <span className="text-xs text-muted">
-        Source: {safety.source.name} · {safety.source.online ? "online" : "offline"} · last heartbeat {formatAgo(safety.source.last_heartbeat_at, now)}
+        Source: {safety.source.name} · {safety.source.online ? "online" : "offline"} · last heartbeat{" "}
+        {formatAgo(safety.source.last_heartbeat_at, now)}
       </span>
       <span className="text-xs text-muted">
         Real alarm integration: {safety.real_integration_connected ? "connected" : "not connected (requires university approval)"}
@@ -390,7 +401,10 @@ function DeviceList({ devices, now }: { devices: DeviceHealth[]; now: number }) 
         {devices.map((d, i) => {
           const tone = DEVICE_TONE[d.status];
           return (
-            <li key={d.id} className={cx("flex items-center justify-between gap-2.5 py-[9px]", i < devices.length - 1 && "border-b border-line-soft")}>
+            <li
+              key={d.id}
+              className={cx("flex items-center justify-between gap-2.5 py-[9px]", i < devices.length - 1 && "border-b border-line-soft")}
+            >
               <div className="flex min-w-0 flex-col">
                 <span className="font-mono text-[13px] font-semibold">{d.id}</span>
                 <span className="text-xs text-muted">{d.where}</span>
@@ -416,7 +430,11 @@ function SafetyEventBanner({ safety }: { safety: ConsoleOverview["safety"] }) {
       {safety.events
         .filter((e) => e.status !== "resolved")
         .map((e) => (
-          <HazardFrame key={e.id} className="rounded-2xl p-1" innerClassName="flex flex-wrap items-center justify-between gap-3 rounded-[13px] px-[18px] py-3.5">
+          <HazardFrame
+            key={e.id}
+            className="rounded-2xl p-1"
+            innerClassName="flex flex-wrap items-center justify-between gap-3 rounded-[13px] px-[18px] py-3.5"
+          >
             <div className="flex flex-col gap-1.5">
               {e.is_simulation ? <SimulationLabel /> : null}
               <span className="inline-flex items-center gap-2 text-[17px] font-extrabold text-danger-ink">
@@ -479,9 +497,24 @@ export function OverviewScreen() {
 
       {k ? (
         <section aria-label="Key figures" className="flex flex-wrap gap-4">
-          <Kpi title="Zones with live data" value={String(k.live)} suffix={`of ${data?.zones.length ?? 0}`} sub={`${k.stale} stale · ${k.unavailable} unavailable`} />
-          <Kpi title="Free seats (live zones, est.)" value={`~${k.free}`} suffix={`${k.low}–${k.high}`} sub={`of ${k.capacity} monitored seats`} />
-          <Kpi title="Open crowding alerts" value={String(k.crowding)} sub={`${k.awaiting} awaiting acknowledgement`} tone={k.crowding > 0 ? "alert" : undefined} />
+          <Kpi
+            title="Zones with live data"
+            value={String(k.live)}
+            suffix={`of ${data?.zones.length ?? 0}`}
+            sub={`${k.stale} stale · ${k.unavailable} unavailable`}
+          />
+          <Kpi
+            title="Free seats (live zones, est.)"
+            value={`~${k.free}`}
+            suffix={`${k.low}–${k.high}`}
+            sub={`of ${k.capacity} monitored seats`}
+          />
+          <Kpi
+            title="Open crowding alerts"
+            value={String(k.crowding)}
+            sub={`${k.awaiting} awaiting acknowledgement`}
+            tone={k.crowding > 0 ? "alert" : undefined}
+          />
           <Kpi
             title="Devices needing attention"
             value={String(k.attention)}
@@ -505,7 +538,11 @@ export function OverviewScreen() {
             <AlertQueue alerts={data.alerts} now={now} />
           </div>
           <div className="flex flex-wrap items-start gap-5">
-            <OccupancyChart title={`${data.occupancy_today.canteen_name} — occupancy today`} points={data.occupancy_today.points} now={now} />
+            <OccupancyChart
+              title={`${data.occupancy_today.canteen_name} — occupancy today`}
+              points={data.occupancy_today.points}
+              now={now}
+            />
             <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-5">
               <SafetyCard safety={data.safety} now={now} />
               <DeviceList devices={data.devices} now={now} />

@@ -43,7 +43,14 @@ export function MessageCard({ icon, title, body, dashed, className }: MessageCar
 }
 
 export function OfflineCard() {
-  return <MessageCard icon="wifiOff" dashed title="You're offline" body="Showing nothing until we reconnect — seat numbers are never shown from memory." />;
+  return (
+    <MessageCard
+      icon="wifiOff"
+      dashed
+      title="You're offline"
+      body="Showing nothing until we reconnect — seat numbers are never shown from memory."
+    />
+  );
 }
 
 export function Footnote({ children, className }: { children: ReactNode; className?: string }) {

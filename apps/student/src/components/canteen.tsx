@@ -30,7 +30,14 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
         <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" className="self-start" />
         <span className={cx("text-xs text-muted", canteen.freshness === "stale" && "opacity-70")}>{metaLine(canteen, now)}</span>
       </div>
-      <Ring percent={canteen.percent} level={canteen.level} freshness={canteen.freshness} size={54} thickness={6} textClassName="text-[13px]" />
+      <Ring
+        percent={canteen.percent}
+        level={canteen.level}
+        freshness={canteen.freshness}
+        size={54}
+        thickness={6}
+        textClassName="text-[13px]"
+      />
     </Link>
   );
 }
@@ -45,7 +52,14 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
         <CanteenArt wall={canteenWall(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-2xl" />
       </div>
       <div className="flex items-center gap-3.5 px-1.5 pb-1.5">
-        <Ring percent={canteen.percent} level={canteen.level} freshness={canteen.freshness} size={72} thickness={8} textClassName="text-base" />
+        <Ring
+          percent={canteen.percent}
+          level={canteen.level}
+          freshness={canteen.freshness}
+          size={72}
+          thickness={8}
+          textClassName="text-base"
+        />
         <div className="flex flex-1 flex-col gap-[5px]">
           <div className="flex items-center justify-between gap-2">
             <span className="text-lg font-extrabold">{canteen.name}</span>
@@ -161,7 +175,10 @@ function BestBadge({ className, large }: { className?: string; large?: boolean }
 
 export function NoBestSpot({ anyLive }: { anyLive: boolean }) {
   return (
-    <section aria-label="Best spot now" className="flex items-start gap-3 rounded-[22px] border-[1.5px] border-dashed border-dash bg-surface-soft p-4">
+    <section
+      aria-label="Best spot now"
+      className="flex items-start gap-3 rounded-[22px] border-[1.5px] border-dashed border-dash bg-surface-soft p-4"
+    >
       <Icon name="question" size={22} className="mt-0.5 shrink-0 text-neutral-ink" />
       <span className="flex flex-col gap-0.5">
         <span className="text-[15px] font-extrabold">{anyLive ? "No reliable alternative right now" : "No seat info right now"}</span>
@@ -198,7 +215,10 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
             <div
               aria-hidden="true"
               title={`${p.is_forecast ? "Forecast" : "Measured"} ${p.percent}%`}
-              className={cx("w-full max-w-[46px] rounded-t-lg rounded-b", p.is_forecast ? "forecast-stripes" : p.is_now ? "bg-busy-mark" : "bg-brand")}
+              className={cx(
+                "w-full max-w-[46px] rounded-t-lg rounded-b",
+                p.is_forecast ? "forecast-stripes" : p.is_now ? "bg-busy-mark" : "bg-brand",
+              )}
               style={{ height: Math.round(p.percent * 1.2) }}
             />
             <span aria-hidden="true" className={cx("text-[11px]", p.is_now ? "font-extrabold text-ink" : "text-muted")}>
@@ -225,9 +245,17 @@ export function ZoneBarRow({ zone, last }: { zone: ZoneOccupancy; last: boolean 
         </div>
         <div
           aria-hidden="true"
-          className={cx("h-[7px] overflow-hidden rounded bg-track", !numbers && "outline outline-1 -outline-offset-1 outline-dashed outline-dash")}
+          className={cx(
+            "h-[7px] overflow-hidden rounded bg-track",
+            !numbers && "outline outline-1 -outline-offset-1 outline-dashed outline-dash",
+          )}
         >
-          {numbers ? <div className={cx("h-full rounded", style.bar, zone.freshness === "stale" && "opacity-50")} style={{ width: `${zone.percent}%` }} /> : null}
+          {numbers ? (
+            <div
+              className={cx("h-full rounded", style.bar, zone.freshness === "stale" && "opacity-50")}
+              style={{ width: `${zone.percent}%` }}
+            />
+          ) : null}
         </div>
       </div>
       <span className="w-10 text-right text-sm font-extrabold">{numbers ? `${zone.percent}%` : "—"}</span>

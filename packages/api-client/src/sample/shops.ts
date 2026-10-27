@@ -227,9 +227,7 @@ export function shopById(id: string, now: number): Shop | undefined {
 }
 
 export function featuredShops(now: number): Shop[] {
-  return ["s-rice", "s-kottu", "s-noodle", "s-juice"]
-    .map((id) => shopById(id, now))
-    .filter((s): s is Shop => s !== undefined);
+  return ["s-rice", "s-kottu", "s-noodle", "s-juice"].map((id) => shopById(id, now)).filter((s): s is Shop => s !== undefined);
 }
 
 export function menuItems(shopId: string): MenuItem[] {

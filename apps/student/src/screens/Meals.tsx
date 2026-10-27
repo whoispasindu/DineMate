@@ -12,7 +12,10 @@ function Countdown({ data, now, remaining }: { data: MealStatus; now: number; re
   const progress = current ? windowProgress(current, now) : 0;
   const far = !current && remaining !== null && remaining > FAR_AWAY_MS;
   return (
-    <section aria-label="Meal countdown" className="flex flex-col items-center gap-3.5 rounded-3xl bg-brand-dark px-[18px] py-[22px] text-white">
+    <section
+      aria-label="Meal countdown"
+      className="flex flex-col items-center gap-3.5 rounded-3xl bg-brand-dark px-[18px] py-[22px] text-white"
+    >
       <MealBadge text={mealBadgeText(current, next)} />
       {focus && remaining !== null ? (
         <>
@@ -60,7 +63,9 @@ function TodayRow({ window, now }: { window: MealWindow; now: number }) {
         <Icon name={PERIOD_ICON[window.period]} size={20} />
       </span>
       <span className="flex flex-1 flex-col">
-        <span className={cx("text-[15px] font-extrabold", state.kind === "ended" && "text-neutral-ink")}>{PERIOD_LABEL[window.period]}</span>
+        <span className={cx("text-[15px] font-extrabold", state.kind === "ended" && "text-neutral-ink")}>
+          {PERIOD_LABEL[window.period]}
+        </span>
         <span className={cx("text-xs", state.kind === "now" ? "text-ink-2" : "text-muted")}>{formatRange(window.starts, window.ends)}</span>
       </span>
       <span
@@ -89,7 +94,9 @@ function DayCell({ day }: { day: WeekDay }) {
         !day.is_today && day.kind === "closed" && "border border-dashed border-dash bg-page",
       )}
     >
-      <span className={cx("text-[11px]", day.is_today ? "text-on-dark-strong" : day.kind === "special" ? "text-busy" : "text-muted")}>{day.weekday}</span>
+      <span className={cx("text-[11px]", day.is_today ? "text-on-dark-strong" : day.kind === "special" ? "text-busy" : "text-muted")}>
+        {day.weekday}
+      </span>
       <span
         className={cx(
           "text-[15px] font-extrabold",

@@ -11,7 +11,17 @@ import {
 import { cx, formatClock, formatPrice, Icon, SampleBadge, type IconName } from "@dinemate/ui";
 import { useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { CanteenSelect, FilterChips, Footnote, Loading, MessageCard, SearchField, Segmented, ShopStatusDot, Skeleton } from "../components/common";
+import {
+  CanteenSelect,
+  FilterChips,
+  Footnote,
+  Loading,
+  MessageCard,
+  SearchField,
+  Segmented,
+  ShopStatusDot,
+  Skeleton,
+} from "../components/common";
 import { useIsDesktop } from "../lib/device";
 import { ITEM_TINTS, PERIOD_LABEL, PERIODS, SHOP_LOOK } from "../lib/present";
 
@@ -120,7 +130,14 @@ interface FoodViewProps {
 function MenuEmpty({ menuEmpty, filtering, period }: Pick<FoodViewProps, "menuEmpty" | "filtering" | "period">) {
   if (menuEmpty) return <MessageCard icon="utensils" dashed title="Menu not added yet" body="This shop hasn't published a menu." />;
   if (filtering) return <MessageCard icon="search" title="Nothing matches" body="Try another search or category." />;
-  return <MessageCard icon="utensils" dashed title={`No ${PERIOD_LABEL[period].toLowerCase()} menu`} body="This shop doesn't list items for this meal." />;
+  return (
+    <MessageCard
+      icon="utensils"
+      dashed
+      title={`No ${PERIOD_LABEL[period].toLowerCase()} menu`}
+      body="This shop doesn't list items for this meal."
+    />
+  );
 }
 
 function AvailabilityChip({ available }: { available: boolean }) {
@@ -161,7 +178,8 @@ function ShopCard({ shop, href, selected }: { shop: Shop; href: string; selected
 }
 
 function FoodMobile(props: FoodViewProps) {
-  const { canteenId, canteens, selectCanteen, shops, shop, shopHref, q, setQ, category, setCategory, period, setPeriod, panelId, items } = props;
+  const { canteenId, canteens, selectCanteen, shops, shop, shopHref, q, setQ, category, setCategory, period, setPeriod, panelId, items } =
+    props;
   return (
     <>
       <header className="flex flex-col gap-3 px-4 pb-2.5 pt-[18px]">
@@ -186,7 +204,15 @@ function FoodMobile(props: FoodViewProps) {
             ))}
           </div>
         )}
-        <Segmented label="Meal period" options={PERIOD_OPTIONS} value={period} onChange={setPeriod} panelId={panelId} stretch className="bg-chip" />
+        <Segmented
+          label="Meal period"
+          options={PERIOD_OPTIONS}
+          value={period}
+          onChange={setPeriod}
+          panelId={panelId}
+          stretch
+          className="bg-chip"
+        />
         <div id={panelId} role="tabpanel" aria-label={`${PERIOD_LABEL[period]} menu`}>
           {props.menuLoading ? (
             <Loading label="Loading menu">
@@ -208,7 +234,9 @@ function FoodMobile(props: FoodViewProps) {
                     <Icon name={itemIcon(item)} size={24} />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-                    <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>{item.name}</span>
+                    <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>
+                      {item.name}
+                    </span>
                     <span className="text-[13px] text-muted">
                       {formatPrice(item.price_lkr)}
                       {item.tags.includes("vegetarian") ? " · Vegetarian" : ""}
@@ -230,7 +258,8 @@ function FoodMobile(props: FoodViewProps) {
 }
 
 function FoodWeb(props: FoodViewProps) {
-  const { canteenId, canteens, selectCanteen, shops, shop, shopHref, q, setQ, category, setCategory, period, setPeriod, panelId, items } = props;
+  const { canteenId, canteens, selectCanteen, shops, shop, shopHref, q, setQ, category, setCategory, period, setPeriod, panelId, items } =
+    props;
   const canteenName = canteens.find((c) => c.id === canteenId)?.name ?? "this canteen";
   return (
     <main id="main" className="mx-auto flex max-w-[1200px] flex-col gap-5 px-6 pb-10 pt-7">
@@ -254,7 +283,10 @@ function FoodWeb(props: FoodViewProps) {
       </div>
       <FilterChips label="Food type" options={CATEGORIES} value={category} onChange={setCategory} wrap />
       <div className="flex flex-wrap items-start gap-5">
-        <aside aria-label={`Shops in ${canteenName}`} className="flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-2.5">
+        <aside
+          aria-label={`Shops in ${canteenName}`}
+          className="flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-2.5"
+        >
           {props.shopsLoading ? (
             <Loading label="Loading shops">
               <Skeleton className="h-[68px]" />
@@ -284,7 +316,10 @@ function FoodWeb(props: FoodViewProps) {
             );
           })}
         </aside>
-        <section aria-labelledby="menu-title" className="flex min-w-0 flex-[2.4_1_560px] flex-col gap-4 rounded-[22px] border border-line bg-card p-5">
+        <section
+          aria-labelledby="menu-title"
+          className="flex min-w-0 flex-[2.4_1_560px] flex-col gap-4 rounded-[22px] border border-line bg-card p-5"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
               <h2 id="menu-title" className="m-0 text-xl font-extrabold">
@@ -292,13 +327,22 @@ function FoodWeb(props: FoodViewProps) {
               </h2>
               {shop ? (
                 <span className="text-[13px] text-muted">
-                  {shop.status.state === "temporarily_closed" ? `Temporarily closed${shop.status.reason ? ` — ${shop.status.reason}` : ""} · ` : ""}
+                  {shop.status.state === "temporarily_closed"
+                    ? `Temporarily closed${shop.status.reason ? ` — ${shop.status.reason}` : ""} · `
+                    : ""}
                   {shop.hours_label}
                   {props.menuUpdatedAt ? ` · menu updated ${formatClock(props.menuUpdatedAt)}` : ""}
                 </span>
               ) : null}
             </div>
-            <Segmented label="Meal period" options={PERIOD_OPTIONS} value={period} onChange={setPeriod} panelId={panelId} className="bg-line-soft" />
+            <Segmented
+              label="Meal period"
+              options={PERIOD_OPTIONS}
+              value={period}
+              onChange={setPeriod}
+              panelId={panelId}
+              className="bg-line-soft"
+            />
           </div>
           <div id={panelId} role="tabpanel" aria-label={`${PERIOD_LABEL[period]} menu`}>
             {props.menuLoading ? (
@@ -321,7 +365,9 @@ function FoodWeb(props: FoodViewProps) {
                       <Icon name={itemIcon(item)} size={40} strokeWidth={1.8} />
                     </span>
                     <span className="flex flex-col gap-1.5 px-3.5 pb-3.5 pt-3">
-                      <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>{item.name}</span>
+                      <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>
+                        {item.name}
+                      </span>
                       <span className="flex items-center justify-between gap-2">
                         <span className="text-[15px] font-extrabold">{formatPrice(item.price_lkr)}</span>
                         <AvailabilityChip available={item.is_available} />
@@ -333,7 +379,9 @@ function FoodWeb(props: FoodViewProps) {
               </ul>
             )}
           </div>
-          {props.isSample ? <Footnote>Sample data — shop names, items and prices are placeholders until real shops provide them.</Footnote> : null}
+          {props.isSample ? (
+            <Footnote>Sample data — shop names, items and prices are placeholders until real shops provide them.</Footnote>
+          ) : null}
         </section>
       </div>
     </main>

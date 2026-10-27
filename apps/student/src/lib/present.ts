@@ -82,9 +82,4 @@ export const SHOP_LOOK: Record<ShopKind, { icon: IconName; tile: string }> = {
   drinks: { icon: "cup", tile: "bg-indigo-bg text-indigo" },
 };
 
-export const ITEM_TINTS = [
-  "bg-busy-bg text-busy",
-  "bg-ok-bg text-ok",
-  "bg-crowd-bg text-crowd",
-  "bg-indigo-bg text-indigo",
-];
+export const ITEM_TINTS = ["bg-busy-bg text-busy", "bg-ok-bg text-ok", "bg-crowd-bg text-crowd", "bg-indigo-bg text-indigo"];
