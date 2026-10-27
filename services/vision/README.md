@@ -14,7 +14,7 @@ Run everything from `services/vision` unless noted. The API must be running (`pn
    uv sync
    ```
 
-2. **Draw your zones** on one webcam frame. Click the corners of a seating area, press Enter, answer the prompts (type, name, seats). Mark walkways too. Press S to save.
+2. **Draw your zones** on one webcam frame. Everything happens in the window; prompts appear on the dark bar at the top. Click the corners of a seating area and press Enter, then press S (seating), type a name and press Enter, then type the number of seats and press Enter. Mark queues (Q) and walkways (W) the same way. U undoes a point, Esc clears the shape in progress, S saves, Q quits. Large frames (Full HD, 4K) are scaled to fit the screen.
 
    ```bash
    uv run python -m vision.zone_tool --source 0 --out layouts/webcam.json
