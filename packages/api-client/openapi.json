@@ -355,6 +355,279 @@
           }
         }
       }
+    },
+    "/api/v1/devices/{device_id}/config": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Get Device Config",
+        "operationId": "get_device_config_api_v1_devices__device_id__config_get",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "if-none-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-None-Match"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceConfig"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not modified"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{device_id}/occupancy": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Post Occupancy",
+        "operationId": "post_occupancy_api_v1_devices__device_id__occupancy_post",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OccupancyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OccupancyAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{device_id}/heartbeat": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Post Heartbeat",
+        "operationId": "post_heartbeat_api_v1_devices__device_id__heartbeat_post",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeartbeatAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -643,6 +916,127 @@
         ],
         "title": "CanteenSummary"
       },
+      "ConfigZone": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "points": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "name",
+          "capacity",
+          "points"
+        ],
+        "title": "ConfigZone"
+      },
+      "DeviceConfig": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "camera",
+              "simulator"
+            ],
+            "title": "Kind"
+          },
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "layout_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layout Version"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigZone"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "ignore": {
+            "items": {
+              "$ref": "#/components/schemas/IgnoreArea"
+            },
+            "type": "array",
+            "title": "Ignore"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/WorkerSettings"
+          },
+          "simulation": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/SimulationProfile"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Simulation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "kind",
+          "canteen_id",
+          "layout_version",
+          "zones",
+          "ignore",
+          "settings",
+          "simulation"
+        ],
+        "title": "DeviceConfig"
+      },
       "ErrorDetail": {
         "properties": {
           "code": {
@@ -769,6 +1163,120 @@
           "server_time"
         ],
         "title": "HealthResponse"
+      },
+      "HeartbeatAccepted": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id"
+        ],
+        "title": "HeartbeatAccepted"
+      },
+      "HeartbeatIn": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "fps": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fps"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "stream_ok": {
+            "type": "boolean",
+            "title": "Stream Ok",
+            "default": true
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "HeartbeatIn"
+      },
+      "IgnoreArea": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "queue",
+              "walkway",
+              "ignore"
+            ],
+            "title": "Type"
+          },
+          "points": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "points"
+        ],
+        "title": "IgnoreArea"
       },
       "MealStatus": {
         "properties": {
@@ -973,6 +1481,54 @@
           "is_available"
         ],
         "title": "MenuItem"
+      },
+      "OccupancyAccepted": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "accepted": {
+            "type": "integer",
+            "title": "Accepted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "accepted"
+        ],
+        "title": "OccupancyAccepted"
+      },
+      "OccupancyIn": {
+        "properties": {
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "readings": {
+            "items": {
+              "$ref": "#/components/schemas/ZoneReadingIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Readings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "captured_at",
+          "readings"
+        ],
+        "title": "OccupancyIn"
       },
       "OpeningHours": {
         "properties": {
@@ -1231,6 +1787,29 @@
         ],
         "title": "ShopStatus"
       },
+      "SimulationProfile": {
+        "properties": {
+          "base": {
+            "type": "integer",
+            "title": "Base"
+          },
+          "below": {
+            "type": "integer",
+            "title": "Below"
+          },
+          "above": {
+            "type": "integer",
+            "title": "Above"
+          }
+        },
+        "type": "object",
+        "required": [
+          "base",
+          "below",
+          "above"
+        ],
+        "title": "SimulationProfile"
+      },
       "StudentSummary": {
         "properties": {
           "server_time": {
@@ -1395,6 +1974,68 @@
         ],
         "title": "WeekDay"
       },
+      "WorkerSettings": {
+        "properties": {
+          "post_every_s": {
+            "type": "number",
+            "title": "Post Every S"
+          },
+          "smoothing_s": {
+            "type": "number",
+            "title": "Smoothing S"
+          },
+          "dwell_s": {
+            "type": "number",
+            "title": "Dwell S"
+          },
+          "fps": {
+            "type": "number",
+            "title": "Fps"
+          },
+          "min_confidence": {
+            "type": "number",
+            "title": "Min Confidence"
+          },
+          "seated_ratio": {
+            "type": "number",
+            "title": "Seated Ratio"
+          },
+          "h_stand_a": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "H Stand A"
+          },
+          "h_stand_b": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "H Stand B"
+          }
+        },
+        "type": "object",
+        "required": [
+          "post_every_s",
+          "smoothing_s",
+          "dwell_s",
+          "fps",
+          "min_confidence",
+          "seated_ratio",
+          "h_stand_a",
+          "h_stand_b"
+        ],
+        "title": "WorkerSettings"
+      },
       "ZoneOccupancy": {
         "properties": {
           "zone_id": {
@@ -1525,6 +2166,71 @@
           "zones"
         ],
         "title": "ZoneOccupancyList"
+      },
+      "ZoneReadingIn": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "estimated_occupied": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Estimated Occupied"
+          },
+          "occupied_low": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupied Low"
+          },
+          "occupied_high": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupied High"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Confidence",
+            "default": "medium"
+          },
+          "samples": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Samples"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "estimated_occupied"
+        ],
+        "title": "ZoneReadingIn"
       }
     }
   }
