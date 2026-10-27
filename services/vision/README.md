@@ -14,7 +14,7 @@ Run everything from `services/vision` unless noted. The API must be running (`pn
    uv sync
    ```
 
-2. **Draw your zones** on one webcam frame. Click the corners of a seating area, press Enter, answer the prompts (type, name, seats). Mark walkways too. Press S to save.
+2. **Draw your zones** on one webcam frame. Everything happens in the window; prompts appear on the dark bar at the top. Click the corners of a seating area and press Enter, then press S (seating), type a name and press Enter, then type the number of seats and press Enter. Mark queues (Q) and walkways (W) the same way. U undoes a point, Esc clears the shape in progress, S saves, Q quits. Large frames (Full HD, 4K) are scaled to fit the screen.
 
    ```bash
    uv run python -m vision.zone_tool --source 0 --out layouts/webcam.json
@@ -42,15 +42,33 @@ A ready-made zone covering most of the frame is in `layouts/webcam-desk.json` if
 
 ## Canteen videos
 
-Keep videos in `data/videos/` at the repo root (git-ignored). Use the same steps with `--source path/to/video.mp4`; add `--loop` to keep a short clip running, or `--fast` to process it as fast as the CPU allows. Draw zones from a frame of the same video (`--at 12` picks the frame 12 s in).
+Keep videos in `data/videos/` at the repo root (git-ignored), or anywhere on disk.
 
-Offline check without the API (prints readings instead of posting):
+**Easiest: the studio.** One window: draw zones on the first frame, press S, and the video starts playing with tracking boxes and live counts. Everything is scaled to fit the screen, and nothing is saved except the zones.
 
 ```bash
-uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout layouts/lunch.json --dry-run --fast
+uv run python -m vision.studio "C:\path\to\lunch.mp4"
 ```
 
+- Zones are saved to `layouts/<video name>.json` and reused next time; press **Z** while playing to edit them (or start with `--redraw`).
+- **Space** pauses, **Q** quits. The video loops.
+- Clips shorter than 90 s automatically count people after 3 s and post every 3 s; override with `--dwell-s`, `--smoothing-s`, `--post-every-s`.
+- Counts are also printed in the terminal. Use `--at 12` to draw on the frame 12 s in, `--fast` to skip real-time playback.
+- `uv run python -m vision.studio` with no path uses the webcam.
+
+**Same thing through the API** (counts appear in the student app): register the video as a device with the zones file (step 3 above), then run the worker with `--source path/to/video.mp4 --loop --preview`.
+
+Offline check from the terminal only (prints readings, no window unless `--preview`):
+
+```bash
+uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout layouts/lunch.json --dry-run --preview --loop --dwell-s 3 --smoothing-s 6 --post-every-s 3
+```
+
+Boxes in the studio and in `--preview`: green = counted, yellow = waiting for the dwell, grey = outside zones or in a walkway. Both windows scale to fit the screen.
+
 ## Settings
+
+Detection size: the worker uses YOLO at 1280 px for sources 1920 px wide or more (Full HD, 4K) and 640 px otherwise; people in high-resolution canteen footage are too small at 640. Override with `--imgsz`. The chosen size is logged at start.
 
 Per-device settings live in the device config served by the API (`dwell_s`, `post_every_s`, `smoothing_s`, `fps`, `min_confidence`, `seated_ratio`, `h_stand_a`, `h_stand_b`). Set the first four with `devices_cli register`. The seated filter stays off until `h_stand_a`/`h_stand_b` are calibrated (Phase 3).
 

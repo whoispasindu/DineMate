@@ -5,7 +5,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any
 
 import httpx
 
@@ -45,6 +45,20 @@ def layout_config(path: str) -> dict[str, Any]:
     }
 
 
+def apply_overrides(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    overrides = {
+        key: value
+        for key, value in (
+            ("dwell_s", args.dwell_s),
+            ("smoothing_s", args.smoothing_s),
+            ("post_every_s", args.post_every_s),
+        )
+        if value is not None
+    }
+    settings = {**DEFAULT_SETTINGS, **config.get("settings", {}), **overrides}
+    return {**config, "settings": settings}
+
+
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Count seated people per zone and post counts to DineMate. Frames never leave memory."
@@ -57,7 +71,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--token", default=os.environ.get("DINEMATE_DEVICE_TOKEN"))
     parser.add_argument("--layout", help="layout JSON for --dry-run instead of fetching config from the API")
     parser.add_argument("--model", default=os.environ.get("DINEMATE_MODEL", str(DEFAULT_MODEL)))
-    parser.add_argument("--imgsz", type=int, default=640)
+    parser.add_argument(
+        "--imgsz",
+        type=int,
+        help="YOLO input size; default picks 1280 for sources 1920 px wide or more, else 640",
+    )
     parser.add_argument("--loop", action="store_true", help="restart a video file when it ends")
     parser.add_argument(
         "--fast", action="store_true", help="process a video file as fast as possible instead of in real time"
@@ -66,6 +84,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
         "--preview", action="store_true", help="show a local window with zones and detections (nothing is saved)"
     )
     parser.add_argument("--dry-run", action="store_true", help="print readings instead of posting them")
+    parser.add_argument("--dwell-s", type=float, help="seconds someone must stay in a zone before counting")
+    parser.add_argument("--smoothing-s", type=float, help="length of the median window in seconds")
+    parser.add_argument("--post-every-s", type=float, help="seconds between readings")
     args = parser.parse_args(argv)
     if args.dry_run and not args.layout and not (args.device and args.token):
         parser.error("--dry-run needs --layout, or --device and --token to read the layout from the API")
@@ -75,46 +96,30 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 
 class Preview:
-    COLORS: ClassVar[dict[str, tuple[int, int, int]]] = {
-        "counted": (60, 170, 80),
-        "waiting for dwell": (30, 190, 230),
-        "standing": (60, 120, 230),
-    }
+    WINDOW = "DineMate vision (local preview, nothing is saved)"
 
     def __init__(self) -> None:
         import cv2
 
+        from vision.overlay import screen_limits
+
         self.cv2 = cv2
+        self.limits = screen_limits()
+        cv2.namedWindow(self.WINDOW, cv2.WINDOW_AUTOSIZE)
 
-    def show(self, image: Any, counter: ZoneCounter, assignments: list[Assignment], readings: dict[str, int]) -> bool:
-        cv2 = self.cv2
-        import numpy as np
+    def show(
+        self,
+        image: Any,
+        counter: ZoneCounter,
+        assignments: list[Assignment],
+        readings: dict[str, dict[str, Any]],
+        status: str,
+    ) -> bool:
+        from vision.overlay import draw
 
-        h, w = image.shape[:2]
-        canvas = image.copy()
-        for area in counter.ignore:
-            pts = np.array([[round(x * w), round(y * h)] for x, y in area], dtype=np.int32)
-            cv2.polylines(canvas, [pts], True, (120, 120, 120), 1)
-        for zone in counter.zones:
-            pts = np.array([[round(x * w), round(y * h)] for x, y in zone.points], dtype=np.int32)
-            cv2.polylines(canvas, [pts], True, (69, 122, 31), 2)
-            label = f"{zone.name}: {readings.get(zone.zone_id, 0)}/{zone.capacity}"
-            cv2.putText(
-                canvas,
-                label,
-                (int(pts[0][0]) + 6, int(pts[0][1]) + 22),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.6,
-                (69, 122, 31),
-                2,
-            )
-        for a in assignments:
-            d = a.detection
-            color = self.COLORS.get(a.reason, (150, 150, 150))
-            cv2.rectangle(canvas, (int(d.x1), int(d.y1)), (int(d.x2), int(d.y2)), color, 2)
-            cv2.putText(canvas, a.reason, (int(d.x1), int(d.y1) - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 1)
-        cv2.imshow("DineMate vision (local preview, nothing is saved)", canvas)
-        return cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
+        canvas = draw(image, counter.zones, counter.ignore, assignments, readings, status, self.limits)
+        self.cv2.imshow(self.WINDOW, canvas)
+        return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
 
     def close(self) -> None:
         self.cv2.destroyAllWindows()
@@ -128,9 +133,16 @@ def run(args: argparse.Namespace) -> int:
     if not config or not config.get("zones"):
         log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
         return 1
+    config = apply_overrides(config, args)
     counter = ZoneCounter(*zones_from_config(config))
-    settings = {**DEFAULT_SETTINGS, **config.get("settings", {})}
+    settings = config["settings"]
     log.info("Counting %d zone(s): %s", len(counter.zones), ", ".join(z.name for z in counter.zones))
+    log.info(
+        "Dwell %ss, smoothing %ss, a reading every %ss",
+        settings["dwell_s"],
+        settings["smoothing_s"],
+        settings["post_every_s"],
+    )
     detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(settings["min_confidence"]))
     source = FrameSource(args.source, fps=float(settings["fps"]), loop=args.loop, realtime=not args.fast)
     preview = Preview() if args.preview else None
@@ -139,7 +151,7 @@ def run(args: argparse.Namespace) -> int:
     last_post: float | None = None
     fps = 0.0
     latency_ms = 0
-    shown: dict[str, int] = {}
+    shown: dict[str, dict[str, Any]] = {}
     try:
         for frame in source.frames():
             started = time.perf_counter()
@@ -148,12 +160,18 @@ def run(args: argparse.Namespace) -> int:
             fps = 0.9 * fps + 0.1 * (1000 / max(latency_ms, 1)) if fps else 1000 / max(latency_ms, 1)
             height, width = frame.image.shape[:2]
             assignments = counter.update(detections, width, height, frame.at)
-            last_post = last_post if last_post is not None else frame.at
+            if last_post is None:
+                last_post = frame.at
+                chosen = "set by --imgsz" if args.imgsz else f"auto for a {width}px-wide source"
+                log.info("Source is %dx%d; detecting at %d px (%s)", width, height, detector.imgsz, chosen)
             if frame.at - last_post >= float(settings["post_every_s"]):
                 readings = counter.readings()
-                shown = {r["zone_id"]: r["estimated_occupied"] for r in readings}
+                shown = {r["zone_id"]: r for r in readings}
                 last_post = frame.at
-                summary = ", ".join(f"{z.name} ~{shown.get(z.zone_id, 0)}" for z in counter.zones)
+                summary = ", ".join(
+                    f"{z.name} ~{shown[z.zone_id]['estimated_occupied'] if z.zone_id in shown else 0}"
+                    for z in counter.zones
+                )
                 if posting and client:
                     try:
                         client.post_occupancy(readings)
@@ -168,8 +186,9 @@ def run(args: argparse.Namespace) -> int:
                 try:
                     fresh = client.config()
                     if fresh is not None:
+                        fresh = apply_overrides(fresh, args)
                         counter.reconfigure(*zones_from_config(fresh))
-                        settings = {**DEFAULT_SETTINGS, **fresh.get("settings", {})}
+                        settings = fresh["settings"]
                         log.info("layout updated to version %s", fresh.get("layout_version"))
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("config refresh failed: %s", exc)
@@ -181,7 +200,9 @@ def run(args: argparse.Namespace) -> int:
                     )
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("heartbeat failed: %s", exc)
-            if preview and not preview.show(frame.image, counter, assignments, shown):
+            if preview and not preview.show(
+                frame.image, counter, assignments, shown, "Live preview - Q to quit (nothing is saved)"
+            ):
                 break
     except KeyboardInterrupt:
         log.info("stopping")
