@@ -57,7 +57,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--token", default=os.environ.get("DINEMATE_DEVICE_TOKEN"))
     parser.add_argument("--layout", help="layout JSON for --dry-run instead of fetching config from the API")
     parser.add_argument("--model", default=os.environ.get("DINEMATE_MODEL", str(DEFAULT_MODEL)))
-    parser.add_argument("--imgsz", type=int, default=640)
+    parser.add_argument(
+        "--imgsz",
+        type=int,
+        help="YOLO input size; default picks 1280 for sources 1920 px wide or more, else 640",
+    )
     parser.add_argument("--loop", action="store_true", help="restart a video file when it ends")
     parser.add_argument(
         "--fast", action="store_true", help="process a video file as fast as possible instead of in real time"
@@ -148,7 +152,10 @@ def run(args: argparse.Namespace) -> int:
             fps = 0.9 * fps + 0.1 * (1000 / max(latency_ms, 1)) if fps else 1000 / max(latency_ms, 1)
             height, width = frame.image.shape[:2]
             assignments = counter.update(detections, width, height, frame.at)
-            last_post = last_post if last_post is not None else frame.at
+            if last_post is None:
+                last_post = frame.at
+                chosen = "set by --imgsz" if args.imgsz else f"auto for a {width}px-wide source"
+                log.info("Source is %dx%d; detecting at %d px (%s)", width, height, detector.imgsz, chosen)
             if frame.at - last_post >= float(settings["post_every_s"]):
                 readings = counter.readings()
                 shown = {r["zone_id"]: r["estimated_occupied"] for r in readings}
