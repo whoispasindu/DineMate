@@ -3,20 +3,21 @@
 One developer, seven phases, Week 0 → 10 Jan 2027. This replaces the four-person allocation in Section 21 of the [development plan](DineMate_Development_Plan.md); everything else in the plan still applies.
 
 **How to work through it**
+
 - Finish one phase before starting the next. Each phase ends with a demo you can run, not just code.
 - Tick boxes here as work lands (one commit per item where possible).
 - Vision input for now: the laptop webcam plus recorded canteen videos in `data/videos/` (git-ignored, never committed).
 - If the competition deadline turns out earlier, use the **Cut first** list at the bottom.
 
-| Phase | Weeks | Dates | Goal |
-|---|---|---|---|
-| 0. Foundations | 0 | 27 Oct – 1 Nov | Repo, tooling, empty API and database running |
-| 1. Real data API | 1–2 | 2 – 15 Nov | Student app runs on the real API instead of sample data |
-| 2. Live occupancy loop | 3–4 | 16 – 29 Nov | Webcam or video → worker → API → Home screen |
-| 3. Crowding & accuracy | 5 | 30 Nov – 6 Dec | Crowding alerts work; accuracy measured on videos |
-| 4. Staff tools | 6–7 | 7 – 20 Dec | Login, shop manager, schedules, zone editor |
-| 5. Safety module | 8 | 21 – 27 Dec | Labelled safety simulation end to end |
-| 6. Forecast, polish & demo | 9–10 | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed |
+| Phase                      | Weeks | Dates           | Goal                                                    |
+| -------------------------- | ----- | --------------- | ------------------------------------------------------- |
+| 0. Foundations             | 0     | 27 Oct – 1 Nov  | Repo, tooling, empty API and database running           |
+| 1. Real data API           | 1–2   | 2 – 15 Nov      | Student app runs on the real API instead of sample data |
+| 2. Live occupancy loop     | 3–4   | 16 – 29 Nov     | Webcam or video → worker → API → Home screen            |
+| 3. Crowding & accuracy     | 5     | 30 Nov – 6 Dec  | Crowding alerts work; accuracy measured on videos       |
+| 4. Staff tools             | 6–7   | 7 – 20 Dec      | Login, shop manager, schedules, zone editor             |
+| 5. Safety module           | 8     | 21 – 27 Dec     | Labelled safety simulation end to end                   |
+| 6. Forecast, polish & demo | 9–10  | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed            |
 
 ---
 
@@ -31,10 +32,10 @@ One developer, seven phases, Week 0 → 10 Jan 2027. This replaces the four-pers
 ## Phase 0 — Foundations (Week 0)
 
 - [x] Git repo and first commit
-- [ ] ESLint + Prettier for the TypeScript packages; ruff + black for Python
-- [ ] `services/api`: FastAPI app with `/api/v1/health`, settings from `.env`, `infra/.env.example`
-- [ ] `infra/docker-compose.yml`: Postgres 16 + API (front ends keep running with `pnpm dev`)
-- [ ] GitHub Actions CI: typecheck, build, lint, `pytest`
+- [x] ESLint + Prettier for the TypeScript packages; ruff (lint + black-compatible format) for Python
+- [x] `services/api`: FastAPI app with `/api/v1/health`, settings from `.env`, `infra/.env.example`
+- [x] `infra/docker-compose.yml`: Postgres 16 + API (front ends keep running with `pnpm dev`)
+- [x] GitHub Actions CI: lint, format, typecheck, build, ruff, `pytest`, Compose smoke test (green once pushed)
 - [ ] Non-code: permission request, GreenExE registration, organiser questions (plan 18.4)
 
 **Done when:** `docker compose up` serves `/api/v1/health`, and CI is green on `main`.
