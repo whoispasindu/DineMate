@@ -12,7 +12,8 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
 - infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.
 - Still on sample data: student Alerts tab and the console (until Phases 3 and 5).
-- services/vision — YOLO worker; posts zone counts only, never stores video (not started).
+- services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts. See services/vision/README.md. Videos live in git-ignored `data/videos/`.
+- Devices authenticate with `Authorization: Device <token>`; register cameras with `uv run python -m app.devices_cli register` (services/api).
 
 ## Rules
 
@@ -27,6 +28,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - TypeScript strict; Python 3.12 with type hints; ruff (lint + black-compatible format); eslint + prettier.
 - Clean code without inline comments.
 - Conventional commits. Never add a "Co-Authored-By" line to commit messages.
+- One branch per roadmap phase (`phase-<n>-<slug>`, from up-to-date main). Merge to main only when the owner says so.
 - Every PR: tests pass, lint clean, no secrets committed.
 
 ## Commands

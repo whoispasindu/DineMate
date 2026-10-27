@@ -11,6 +11,7 @@ from app import models
 from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
+from app.core.device_auth import hash_token
 from app.services.timeutil import at_local, local_date
 
 ALL_DAY = ("breakfast", "lunch", "dinner")
@@ -269,7 +270,12 @@ def _seed_canteens(session: Session, now: datetime) -> None:
             if z.device not in devices:
                 kind = "simulator" if z.device.startswith("sim-") else "camera"
                 devices[z.device] = models.Device(
-                    id=z.device, canteen_id=c.id, kind=kind, config={"profiles": {}}, is_enabled=z.offline_for_s is None
+                    id=z.device,
+                    canteen_id=c.id,
+                    kind=kind,
+                    config={"profiles": {}},
+                    is_enabled=z.offline_for_s is None,
+                    token_hash=hash_token(get_settings().simulator_token) if kind == "simulator" else None,
                 )
                 session.add(devices[z.device])
             profiles = dict(devices[z.device].config["profiles"])

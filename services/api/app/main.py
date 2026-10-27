@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.core.config import get_settings
 from app.core.errors import install_error_handling
-from app.routers import canteens, health, schedules, shops, student
+from app.routers import canteens, devices, health, schedules, shops, student
 
 API_PREFIX = "/api/v1"
 
@@ -27,7 +27,7 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type", "If-Match"],
         expose_headers=["X-Request-ID"],
     )
-    for router in (health.router, student.router, canteens.router, shops.router, schedules.router):
+    for router in (health.router, student.router, canteens.router, shops.router, schedules.router, devices.router):
         app.include_router(router, prefix=API_PREFIX)
     return app
 

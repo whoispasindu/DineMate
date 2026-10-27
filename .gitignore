@@ -18,3 +18,5 @@ data/frames/
 *.mov
 *.avi
 *.mkv
+*.pt
+services/vision/models/

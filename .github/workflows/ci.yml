@@ -72,6 +72,21 @@ jobs:
           uv run python -m app.openapi_export ../../packages/api-client/openapi.json
           git diff --exit-code ../../packages/api-client/openapi.json
 
+  vision:
+    name: Vision (ruff, counting tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/vision
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.5"
+      - run: uvx ruff@0.17.0 check .
+      - run: uvx ruff@0.17.0 format --check .
+      - run: uv run --no-project --python 3.12 --with pytest --with numpy pytest -q
+
   compose:
     name: Docker Compose smoke test
     runs-on: ubuntu-latest

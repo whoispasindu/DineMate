@@ -59,14 +59,15 @@ Notes from Phase 1:
 
 ## Phase 2 — Live occupancy loop (Weeks 3–4)
 
-- [ ] Device tokens; `POST /devices/{id}/occupancy`, `POST /devices/{id}/heartbeat`, `GET /devices/{id}/config` (with ETag)
-- [ ] Freshness job: live → stale at 2 min → unavailable at 10 min
-- [ ] Occupancy simulator for the canteens with no camera (clearly `is_simulated`)
-- [ ] `services/vision` worker: `--source 0` (webcam) or `--source path/to/video.mp4`; YOLO person detection, tracking, zone assignment, seated filter, 60 s median, posts counts only, frames never stored
-- [ ] Zone tool: grab one frame per source, click out seating outlines, save as layout version 1
-- [ ] Student app polls every 15 s (WebSocket `/ws/live` is optional; see Cut first)
+- [x] Device tokens (hashed); `POST /devices/{id}/occupancy`, `POST /devices/{id}/heartbeat`, `GET /devices/{id}/config` (with ETag); `app.devices_cli` registers a camera from a layout file
+- [x] Freshness: live → stale at 2 min → unavailable at 10 min, computed on every read from the latest reading (no background job needed until Phase 3 alerts)
+- [x] Occupancy simulator for the canteens with no camera posts through the same authenticated ingest (stored as `is_simulated`)
+- [x] `services/vision` worker: `--source 0` (webcam) or a video file; YOLO11n + ByteTrack, zone assignment, walkway masking, seated filter (off until calibrated), dwell, 60 s median, uncertainty band; posts counts only, frames never stored
+- [x] Zone tool: grab one frame per source, click out seating outlines, save a layout JSON
+- [x] Student app polls every 15 s (WebSocket `/ws/live` deferred; see Cut first)
 
 **Done when:** you sit in a marked zone in front of the webcam and the Home screen's free seats change within about 60 s. Stopping the worker shows "No info right now" after 10 min.
+✅ 28 Oct: checked on a looping test clip, then with the laptop webcam: sitting in the desk zone took "Pilot (webcam)" on Home from 2 free to ~1 free (0–2) within one post after the 10 s dwell. Windows needs both camera privacy switches on for desktop apps.
 
 ## Phase 3 — Crowding & accuracy (Week 5)
 

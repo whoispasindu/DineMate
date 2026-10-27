@@ -140,6 +140,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/devices/{device_id}/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Device Config */
+        get: operations["get_device_config_api_v1_devices__device_id__config_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/occupancy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Occupancy */
+        post: operations["post_occupancy_api_v1_devices__device_id__occupancy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Heartbeat */
+        post: operations["post_heartbeat_api_v1_devices__device_id__heartbeat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -239,6 +290,48 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
         };
+        /** ConfigZone */
+        ConfigZone: {
+            /** Zone Id */
+            zone_id: string;
+            /** Name */
+            name: string;
+            /** Capacity */
+            capacity: number;
+            /** Points */
+            points: [
+                number,
+                number
+            ][];
+        };
+        /** DeviceConfig */
+        DeviceConfig: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "camera" | "simulator";
+            /** Canteen Id */
+            canteen_id: string;
+            /** Layout Version */
+            layout_version: number | null;
+            /** Zones */
+            zones: components["schemas"]["ConfigZone"][];
+            /** Ignore */
+            ignore: components["schemas"]["IgnoreArea"][];
+            settings: components["schemas"]["WorkerSettings"];
+            /** Simulation */
+            simulation: {
+                [key: string]: components["schemas"]["SimulationProfile"];
+            } | null;
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -294,6 +387,48 @@ export interface components {
              * Format: date-time
              */
             server_time: string;
+        };
+        /** HeartbeatAccepted */
+        HeartbeatAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+        };
+        /** HeartbeatIn */
+        HeartbeatIn: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "degraded" | "error";
+            /** Fps */
+            fps?: number | null;
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /**
+             * Stream Ok
+             * @default true
+             */
+            stream_ok: boolean;
+            /** Message */
+            message?: string | null;
+        };
+        /** IgnoreArea */
+        IgnoreArea: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "queue" | "walkway" | "ignore";
+            /** Points */
+            points: [
+                number,
+                number
+            ][];
         };
         /** MealStatus */
         MealStatus: {
@@ -369,6 +504,28 @@ export interface components {
             periods: ("breakfast" | "lunch" | "dinner")[];
             /** Is Available */
             is_available: boolean;
+        };
+        /** OccupancyAccepted */
+        OccupancyAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Accepted */
+            accepted: number;
+        };
+        /** OccupancyIn */
+        OccupancyIn: {
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Readings */
+            readings: components["schemas"]["ZoneReadingIn"][];
         };
         /** OpeningHours */
         OpeningHours: {
@@ -460,6 +617,15 @@ export interface components {
             /** Reason */
             reason: string | null;
         };
+        /** SimulationProfile */
+        SimulationProfile: {
+            /** Base */
+            base: number;
+            /** Below */
+            below: number;
+            /** Above */
+            above: number;
+        };
         /** StudentSummary */
         StudentSummary: {
             /**
@@ -513,6 +679,25 @@ export interface components {
             /** Is Today */
             is_today: boolean;
         };
+        /** WorkerSettings */
+        WorkerSettings: {
+            /** Post Every S */
+            post_every_s: number;
+            /** Smoothing S */
+            smoothing_s: number;
+            /** Dwell S */
+            dwell_s: number;
+            /** Fps */
+            fps: number;
+            /** Min Confidence */
+            min_confidence: number;
+            /** Seated Ratio */
+            seated_ratio: number;
+            /** H Stand A */
+            h_stand_a: number | null;
+            /** H Stand B */
+            h_stand_b: number | null;
+        };
         /** ZoneOccupancy */
         ZoneOccupancy: {
             /** Zone Id */
@@ -554,6 +739,25 @@ export interface components {
             canteen_id: string;
             /** Zones */
             zones: components["schemas"]["ZoneOccupancy"][];
+        };
+        /** ZoneReadingIn */
+        ZoneReadingIn: {
+            /** Zone Id */
+            zone_id: string;
+            /** Estimated Occupied */
+            estimated_occupied: number;
+            /** Occupied Low */
+            occupied_low?: number | null;
+            /** Occupied High */
+            occupied_high?: number | null;
+            /**
+             * Confidence
+             * @default medium
+             * @enum {string}
+             */
+            confidence: "high" | "medium" | "low";
+            /** Samples */
+            samples?: number | null;
         };
     };
     responses: never;
@@ -808,6 +1012,175 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_device_config_api_v1_devices__device_id__config_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-none-match"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceConfig"];
+                };
+            };
+            /** @description Not modified */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_occupancy_api_v1_devices__device_id__occupancy_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OccupancyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OccupancyAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_heartbeat_api_v1_devices__device_id__heartbeat_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeartbeatIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeartbeatAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
