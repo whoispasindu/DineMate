@@ -21,14 +21,35 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generated API types are up to date
+        run: |
+          pnpm --filter @dinemate/api-client gen
+          git diff --exit-code packages/api-client/src/generated
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm build
 
   api:
-    name: API (ruff, pytest)
+    name: API (ruff, pytest with Postgres)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dinemate
+          POSTGRES_PASSWORD: dinemate
+          POSTGRES_DB: dinemate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dinemate"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DINEMATE_TEST_DATABASE_URL: postgresql+psycopg://dinemate:dinemate@localhost:5432/dinemate_test
+      DINEMATE_REQUIRE_DB_TESTS: "1"
     defaults:
       run:
         working-directory: services/api
@@ -42,6 +63,14 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest -q
+      - name: Models and migrations agree
+        run: uv run alembic check
+        env:
+          DINEMATE_DATABASE_URL: postgresql+psycopg://dinemate:dinemate@localhost:5432/dinemate_test
+      - name: OpenAPI spec is up to date
+        run: |
+          uv run python -m app.openapi_export ../../packages/api-client/openapi.json
+          git diff --exit-code ../../packages/api-client/openapi.json
 
   compose:
     name: Docker Compose smoke test
@@ -50,5 +79,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker compose -f infra/docker-compose.yml up -d --build --wait
       - run: curl --fail --silent --show-error http://localhost:8000/api/v1/health
+      - run: curl --fail --silent --show-error http://localhost:8000/api/v1/student/summary | grep -q '"canteens"'
+      - if: always()
+        run: docker compose -f infra/docker-compose.yml logs api simulator
       - if: always()
         run: docker compose -f infra/docker-compose.yml down -v

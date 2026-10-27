@@ -8,9 +8,10 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - apps/student — installable PWA for students. Keep it simple.
 - apps/console — staff console (admin, canteen manager, shop manager, safety officer).
 - packages/ui — shared tokens and components (StatusPill, Ring, CanteenArt, HazardFrame, icons).
-- packages/api-client — API types, a sample "server" (labelled sample data) and TanStack Query hooks. Swap the sample functions for real fetches when services/api exists.
-- services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Only `/api/v1/health` so far.
-- infra/docker-compose.yml — Postgres 16 + API. Copy infra/.env.example to infra/.env to override defaults.
+- packages/api-client — hand-written API types, TanStack Query hooks, and a client that calls the real API when `configureApi({ baseUrl })` is set, else a labelled sample "server". `src/contract.ts` makes typecheck fail if the types drift from the generated OpenAPI types in `src/generated/`.
+- services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
+- infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.
+- Still on sample data: student Alerts tab and the console (until Phases 3 and 5).
 - services/vision — YOLO worker; posts zone counts only, never stores video (not started).
 
 ## Rules
@@ -31,8 +32,10 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 ## Commands
 
 - pnpm install
-- pnpm dev:student / pnpm dev:console
+- pnpm dev:student (sample data) / pnpm dev:student:api (real API on :8000) / pnpm dev:console
 - pnpm typecheck / pnpm build / pnpm lint / pnpm format
-- pnpm stack:up / pnpm stack:down — Postgres + API in Docker (API on :8000)
+- pnpm stack:up / pnpm stack:down — Postgres + API + simulator in Docker (API on :8000)
 - pnpm dev:api — API with reload against a local or Docker Postgres
-- pnpm test:api — pytest; `uv run ruff check .` and `uv run ruff format .` in services/api
+- pnpm test:api — pytest; integration tests use `dinemate_test` on localhost:5432 and skip if Postgres is down (set DINEMATE_REQUIRE_DB_TESTS=1 to fail instead)
+- pnpm api:types — after changing API schemas: re-export openapi.json and regenerate TS types (CI checks both)
+- In services/api: `uv run alembic revision --autogenerate -m "..."`, `uv run alembic upgrade head`, `uv run python -m app.seed --reset`

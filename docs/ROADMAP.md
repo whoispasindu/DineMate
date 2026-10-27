@@ -42,13 +42,20 @@ One developer, seven phases, Week 0 → 10 Jan 2027. This replaces the four-pers
 
 ## Phase 1 — Real data API (Weeks 1–2)
 
-- [ ] SQLAlchemy models + Alembic migrations for the core tables (plan Section 14): canteens, seating_zones, devices, zone_layouts, shops, shop_hours, exceptions, menus, meal_schedules, overrides
-- [ ] Seed script with the same sample canteens, zones, shops and menus the UI uses today, all flagged `is_sample`
-- [ ] Read endpoints: `/canteens`, `/canteens/{id}/occupancy`, `/canteens/{id}/shops`, `/shops/{id}/menu`, `/meal-status`, `/student/summary`
-- [ ] Shop status resolution (temporary closure → exception → weekly → unknown) and meal status in Asia/Colombo, with tests for midnight, weekends and holidays
-- [ ] Generate `packages/api-client` types from the OpenAPI spec; replace the sample functions with real fetches behind `VITE_API_URL` (keep the sample mode for offline demos)
+- [x] SQLAlchemy models + Alembic migrations for the core tables (plan Section 14): canteens, seating_zones, devices, zone_layouts, occupancy_readings, shops, shop_hours, exceptions, menus, meal_schedules, overrides (+ canteen_hours, walking_times, app_state)
+- [x] Seed script with the same sample canteens, zones, shops and menus the UI uses today, all flagged `is_sample` (`python -m app.seed`; Compose seeds an empty database on start)
+- [x] Read endpoints: `/canteens`, `/canteens/{id}`, `/canteens/{id}/occupancy`, `/canteens/{id}/shops`, `/shops/{id}/menu`, `/meal-status`, `/student/summary`, with the plan's error format
+- [x] Shop status resolution (temporary closure → exception → weekly → unknown) and meal status in Asia/Colombo, with tests for midnight, weekends and holidays
+- [x] Generate `packages/api-client` types from the OpenAPI spec (`pnpm api:types`, checked in CI); real fetches behind `VITE_API_URL` (`pnpm dev:student:api`), sample mode kept for offline demos
+- [x] Pulled forward from Phase 2: a database-direct occupancy simulator (`python -m app.sim`, runs in Compose) so the API has live numbers
 
-**Done when:** the student app shows identical screens with the sample module switched off, and the schedule tests pass.
+**Done when:** the student app shows identical screens with the sample module switched off, and the schedule tests pass. ✅ 27 Oct — Alerts tab and console still use sample data until Phases 3 and 5.
+
+Notes from Phase 1:
+
+- Canteen and shop IDs are short text slugs (`a`, `s-rice`) instead of UUIDs, so URLs stay readable. Zones, readings and menu items use UUIDs.
+- Crowding levels use the default thresholds (60/80/95). Per-zone thresholds and hysteresis arrive in Phase 3.
+- `DINEMATE_DEMO_CLOCK_START` freezes the demo at a chosen moment (time keeps running from it); its anchor is stored in `app_state` so the API and simulator agree.
 
 ## Phase 2 — Live occupancy loop (Weeks 3–4)
 
