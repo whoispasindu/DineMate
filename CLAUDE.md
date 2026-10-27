@@ -12,7 +12,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
 - infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.
 - Still on sample data: student Alerts tab and the console (until Phases 3 and 5).
-- services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts. See services/vision/README.md. Videos live in git-ignored `data/videos/`.
+- services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts; `studio.py` draws zones then plays a video with live counts (offline, scaled to the screen). See services/vision/README.md. Videos live in git-ignored `data/videos/`.
 - Devices authenticate with `Authorization: Device <token>`; register cameras with `uv run python -m app.devices_cli register` (services/api).
 
 ## Rules

@@ -42,15 +42,29 @@ A ready-made zone covering most of the frame is in `layouts/webcam-desk.json` if
 
 ## Canteen videos
 
-Keep videos in `data/videos/` at the repo root (git-ignored). Use the same steps with `--source path/to/video.mp4`; add `--loop` to keep a short clip running, or `--fast` to process it as fast as the CPU allows. Draw zones from a frame of the same video (`--at 12` picks the frame 12 s in).
+Keep videos in `data/videos/` at the repo root (git-ignored), or anywhere on disk.
 
-Offline check without the API (prints readings instead of posting). The zone tool only draws and saves; this is the step that tracks people. For clips shorter than about a minute, shorten the timings so people are counted before the clip ends:
+**Easiest: the studio.** One window: draw zones on the first frame, press S, and the video starts playing with tracking boxes and live counts. Everything is scaled to fit the screen, and nothing is saved except the zones.
+
+```bash
+uv run python -m vision.studio "C:\path\to\lunch.mp4"
+```
+
+- Zones are saved to `layouts/<video name>.json` and reused next time; press **Z** while playing to edit them (or start with `--redraw`).
+- **Space** pauses, **Q** quits. The video loops.
+- Clips shorter than 90 s automatically count people after 3 s and post every 3 s; override with `--dwell-s`, `--smoothing-s`, `--post-every-s`.
+- Counts are also printed in the terminal. Use `--at 12` to draw on the frame 12 s in, `--fast` to skip real-time playback.
+- `uv run python -m vision.studio` with no path uses the webcam.
+
+**Same thing through the API** (counts appear in the student app): register the video as a device with the zones file (step 3 above), then run the worker with `--source path/to/video.mp4 --loop --preview`.
+
+Offline check from the terminal only (prints readings, no window unless `--preview`):
 
 ```bash
 uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout layouts/lunch.json --dry-run --preview --loop --dwell-s 3 --smoothing-s 6 --post-every-s 3
 ```
 
-`--preview` plays the video with boxes: green = counted, yellow = waiting for the dwell, grey = outside zones. Add `--fast` to skip real-time playback.
+Boxes in the studio and in `--preview`: green = counted, yellow = waiting for the dwell, grey = outside zones or in a walkway. Both windows scale to fit the screen.
 
 ## Settings
 

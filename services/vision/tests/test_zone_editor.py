@@ -84,3 +84,28 @@ def test_blank_name_and_capacity_get_defaults_and_escape_cancels() -> None:
     press(editor, [ESC])
     assert editor.current == []
     assert press(editor, [NO_KEY, -1]) == [None, None]
+
+
+def test_saved_layout_loads_for_editing_and_d_deletes_last_area() -> None:
+    editor = ZoneEditor(800, 600)
+    editor.load(
+        {
+            "zones": [{"name": "Tables", "capacity": 20, "points": [[0.1, 0.5], [0.9, 0.5], [0.9, 0.9]]}],
+            "ignore": [{"type": "walkway", "points": [[0, 0], [1, 0], [1, 0.2]]}],
+        }
+    )
+    assert "Loaded 1 seating zone" in editor.prompt()
+    assert editor.layout()["zones"][0]["name"] == "Tables"
+    press(editor, "d")
+    assert editor.layout()["ignore"] == []
+    assert press(editor, "s") == ["save"]
+
+
+def test_d_does_nothing_while_drawing_a_shape() -> None:
+    editor = ZoneEditor(800, 600)
+    square(editor)
+    press(editor, [ENTER])
+    press(editor, "w")
+    editor.click(10, 10)
+    press(editor, "d")
+    assert len(editor.shapes) == 1 and len(editor.current) == 1

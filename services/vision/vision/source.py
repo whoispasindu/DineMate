@@ -54,9 +54,13 @@ class FrameSource:
         self.realtime = realtime
         self.capture = open_capture(spec)
         self.stream_ok = True
+        self._pace_start = time.monotonic()
 
     def close(self) -> None:
         self.capture.release()
+
+    def resume_after_pause(self, paused_s: float) -> None:
+        self._pace_start += paused_s
 
     def _camera_frames(self) -> Iterator[Frame]:
         interval = 1.0 / self.fps
@@ -81,7 +85,8 @@ class FrameSource:
     def _file_frames(self) -> Iterator[Frame]:
         video_fps = self.capture.get(cv2.CAP_PROP_FPS) or 25.0
         step = max(1, round(video_fps / self.fps))
-        started = time.monotonic()
+        origin = time.monotonic()
+        self._pace_start = origin
         index = 0
         played = 0.0
         while True:
@@ -98,12 +103,10 @@ class FrameSource:
                 continue
             video_time = played + index / video_fps
             if self.realtime:
-                delay = started + video_time - time.monotonic()
+                delay = self._pace_start + video_time - time.monotonic()
                 if delay > 0:
                     time.sleep(delay)
-                yield Frame(image, time.monotonic())
-            else:
-                yield Frame(image, started + video_time)
+            yield Frame(image, origin + video_time)
 
     def frames(self) -> Iterator[Frame]:
         return self._camera_frames() if is_camera(self.spec) else self._file_frames()

@@ -40,7 +40,7 @@ class ZoneEditor:
             return f"Seats in this zone: {self.text}_   (Enter, blank = {DEFAULT_CAPACITY})"
         if self.message:
             return self.message
-        return "Click corners of an area, Enter to close it, U undo, Esc clear, S save, Q quit"
+        return "Click corners, Enter closes an area | U undo point, D delete last area, Esc clear | S save, Q quit"
 
     def key(self, code: int) -> Action:
         if code < 0 or code == 255:
@@ -67,6 +67,9 @@ class ZoneEditor:
                 self.mode = "type"
         elif char == "u" and self.current:
             self.current.pop()
+        elif char == "d" and not self.current and self.shapes:
+            removed = self.shapes.pop()
+            self.message = f"Deleted {removed.get('name', removed['type'])}."
         elif char == "s":
             if not any(s["type"] == "seating" for s in self.shapes):
                 self.message = "Add at least one seating zone before saving."
@@ -121,6 +124,18 @@ class ZoneEditor:
 
     def _reset_pending(self, message: str) -> None:
         self.mode, self.text, self.pending, self.current, self.message = "points", "", {}, [], message
+
+    def load(self, layout: dict[str, Any]) -> None:
+        def points(raw: list[list[float]]) -> list[tuple[float, float]]:
+            return [(float(x), float(y)) for x, y in raw]
+
+        seating = [
+            {"type": "seating", "name": z["name"], "capacity": int(z["capacity"]), "points": points(z["points"])}
+            for z in layout.get("zones", [])
+        ]
+        others = [{"type": a["type"], "points": points(a["points"])} for a in layout.get("ignore", [])]
+        self.shapes = seating + others
+        self.message = f"Loaded {len(seating)} seating zone(s). Edit, or press S to keep them."
 
     def layout(self) -> dict[str, Any]:
         return {
