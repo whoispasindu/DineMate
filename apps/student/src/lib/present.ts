@@ -14,7 +14,10 @@ export function canteenWall(id: string): string {
 }
 
 export function canteenInitial(name: string): string {
-  return name.split(" ").at(-1)?.slice(0, 2) ?? name.slice(0, 1);
+  const words = name.split(/\s+/).filter(Boolean);
+  const last = words.at(-1) ?? "";
+  if (/^[\p{L}\p{N}]{1,2}$/u.test(last)) return last.toUpperCase();
+  return (words[0]?.match(/[\p{L}\p{N}]/u)?.[0] ?? "?").toUpperCase();
 }
 
 type Occupancy = Pick<CanteenSummary | ZoneOccupancy, "free_about" | "free_range" | "freshness">;
