@@ -13,4 +13,8 @@ export type ApiContract = [
   Expect<Assignable<Schemas["Menu"], T.Menu>>,
   Expect<Assignable<Schemas["MealStatus"], T.MealStatus>>,
   Expect<Assignable<Schemas["ErrorResponse"], T.ErrorResponse>>,
+  Expect<Assignable<Schemas["AlertFeed"], T.AlertFeed>>,
+  Expect<Assignable<Schemas["ConsoleOverview"], T.ConsoleOverview>>,
+  Expect<Assignable<Schemas["StaffAlertList"], { server_time: string; items: T.StaffAlert[] }>>,
+  Expect<Assignable<Schemas["StaffAlertResult"], T.StaffAlert & T.Timestamped>>,
 ];

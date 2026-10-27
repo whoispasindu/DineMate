@@ -5,6 +5,7 @@
   "scripts": {
     "dev:student": "pnpm --filter student dev",
     "dev:console": "pnpm --filter console dev",
+    "dev:console:api": "pnpm --filter console dev --mode api",
     "dev:api": "uv run --directory services/api uvicorn app.main:app --reload --port 8000",
     "test:api": "uv run --directory services/api pytest -q",
     "stack:up": "docker compose -f infra/docker-compose.yml up -d --build --wait",

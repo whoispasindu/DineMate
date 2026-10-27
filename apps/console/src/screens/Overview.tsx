@@ -386,8 +386,9 @@ const DEVICE_TONE: Record<DeviceHealth["status"], { text: string; dot: string; l
 };
 
 function deviceMeta(d: DeviceHealth, now: number): string {
-  if (d.status === "ok") return `${d.fps?.toFixed(1) ?? "—"} fps · ${d.latency_ms ?? "—"} ms`;
+  if (d.status === "ok") return d.fps === null ? "readings arriving" : `${d.fps.toFixed(1)} fps · ${d.latency_ms ?? "—"} ms`;
   if (d.status === "not_reporting") return `last reading ${formatAgo(d.last_seen_at, now)}`;
+  if (d.last_seen_at === null) return "never connected";
   return `no heartbeat ${formatMinutes(now - Date.parse(d.last_seen_at))}`;
 }
 

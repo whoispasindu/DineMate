@@ -32,20 +32,29 @@ export class ApiError extends Error {
 }
 
 let baseUrl: string | null = null;
+let staffToken: string | null = null;
 
-export function configureApi(options: { baseUrl?: string | null }): void {
+export function configureApi(options: { baseUrl?: string | null; staffToken?: string | null }): void {
   const url = options.baseUrl?.trim();
   baseUrl = url ? url.replace(/\/+$/, "") : null;
+  staffToken = options.staffToken?.trim() || null;
 }
 
 export function apiMode(): "api" | "sample" {
   return baseUrl === null ? "sample" : "api";
 }
 
-async function fromApi<T extends Timestamped>(path: string): Promise<T> {
+interface RequestOptions {
+  method?: "GET" | "POST";
+  staff?: boolean;
+}
+
+async function fromApi<T extends Timestamped>(path: string, options: RequestOptions = {}): Promise<T> {
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (options.staff && staffToken) headers.Authorization = `Bearer ${staffToken}`;
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}${path}`, { headers: { Accept: "application/json" } });
+    response = await fetch(`${baseUrl}${path}`, { method: options.method ?? "GET", headers });
   } catch {
     throw new ApiError(0, "network_error", "Can't reach the DineMate server.");
   }
@@ -101,11 +110,14 @@ export const api = {
       "Shop not found",
     ),
   mealStatus: (): Promise<MealStatus> => either("/meal-status", mealStatus, "Meal status unavailable"),
-  alerts: (): Promise<AlertFeed> => fromSample(alertFeed, "Alerts unavailable"),
-  consoleOverview: (): Promise<ConsoleOverview> => fromSample(consoleOverview, "Overview unavailable"),
+  alerts: (): Promise<AlertFeed> => either("/notices", alertFeed, "Alerts unavailable"),
+  consoleOverview: (): Promise<ConsoleOverview> =>
+    baseUrl === null ? fromSample(consoleOverview, "Overview unavailable") : fromApi<ConsoleOverview>("/console/overview", { staff: true }),
   acknowledgeAlert: (id: string): Promise<StaffAlert & Timestamped> =>
-    fromSample((now) => {
-      const alert = acknowledgeAlert(id, now);
-      return alert ? { ...alert, server_time: iso(now) } : undefined;
-    }, "Alert not found"),
+    baseUrl !== null
+      ? fromApi<StaffAlert & Timestamped>(`/alerts/${enc(id)}/acknowledge`, { method: "POST", staff: true })
+      : fromSample((now) => {
+          const alert = acknowledgeAlert(id, now);
+          return alert ? { ...alert, server_time: iso(now) } : undefined;
+        }, "Alert not found"),
 };
