@@ -45,6 +45,20 @@ def layout_config(path: str) -> dict[str, Any]:
     }
 
 
+def apply_overrides(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    overrides = {
+        key: value
+        for key, value in (
+            ("dwell_s", args.dwell_s),
+            ("smoothing_s", args.smoothing_s),
+            ("post_every_s", args.post_every_s),
+        )
+        if value is not None
+    }
+    settings = {**DEFAULT_SETTINGS, **config.get("settings", {}), **overrides}
+    return {**config, "settings": settings}
+
+
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Count seated people per zone and post counts to DineMate. Frames never leave memory."
@@ -70,6 +84,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
         "--preview", action="store_true", help="show a local window with zones and detections (nothing is saved)"
     )
     parser.add_argument("--dry-run", action="store_true", help="print readings instead of posting them")
+    parser.add_argument("--dwell-s", type=float, help="seconds someone must stay in a zone before counting")
+    parser.add_argument("--smoothing-s", type=float, help="length of the median window in seconds")
+    parser.add_argument("--post-every-s", type=float, help="seconds between readings")
     args = parser.parse_args(argv)
     if args.dry_run and not args.layout and not (args.device and args.token):
         parser.error("--dry-run needs --layout, or --device and --token to read the layout from the API")
@@ -132,9 +149,16 @@ def run(args: argparse.Namespace) -> int:
     if not config or not config.get("zones"):
         log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
         return 1
+    config = apply_overrides(config, args)
     counter = ZoneCounter(*zones_from_config(config))
-    settings = {**DEFAULT_SETTINGS, **config.get("settings", {})}
+    settings = config["settings"]
     log.info("Counting %d zone(s): %s", len(counter.zones), ", ".join(z.name for z in counter.zones))
+    log.info(
+        "Dwell %ss, smoothing %ss, a reading every %ss",
+        settings["dwell_s"],
+        settings["smoothing_s"],
+        settings["post_every_s"],
+    )
     detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(settings["min_confidence"]))
     source = FrameSource(args.source, fps=float(settings["fps"]), loop=args.loop, realtime=not args.fast)
     preview = Preview() if args.preview else None
@@ -175,8 +199,9 @@ def run(args: argparse.Namespace) -> int:
                 try:
                     fresh = client.config()
                     if fresh is not None:
+                        fresh = apply_overrides(fresh, args)
                         counter.reconfigure(*zones_from_config(fresh))
-                        settings = {**DEFAULT_SETTINGS, **fresh.get("settings", {})}
+                        settings = fresh["settings"]
                         log.info("layout updated to version %s", fresh.get("layout_version"))
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("config refresh failed: %s", exc)

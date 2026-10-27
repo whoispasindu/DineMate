@@ -44,11 +44,13 @@ A ready-made zone covering most of the frame is in `layouts/webcam-desk.json` if
 
 Keep videos in `data/videos/` at the repo root (git-ignored). Use the same steps with `--source path/to/video.mp4`; add `--loop` to keep a short clip running, or `--fast` to process it as fast as the CPU allows. Draw zones from a frame of the same video (`--at 12` picks the frame 12 s in).
 
-Offline check without the API (prints readings instead of posting):
+Offline check without the API (prints readings instead of posting). The zone tool only draws and saves; this is the step that tracks people. For clips shorter than about a minute, shorten the timings so people are counted before the clip ends:
 
 ```bash
-uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout layouts/lunch.json --dry-run --fast
+uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout layouts/lunch.json --dry-run --preview --loop --dwell-s 3 --smoothing-s 6 --post-every-s 3
 ```
+
+`--preview` plays the video with boxes: green = counted, yellow = waiting for the dwell, grey = outside zones. Add `--fast` to skip real-time playback.
 
 ## Settings
 
