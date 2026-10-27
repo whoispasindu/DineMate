@@ -1,0 +1,36 @@
+[project]
+name = "dinemate-vision"
+version = "0.1.0"
+description = "DineMate vision worker: counts seated people per zone and posts counts only; frames never leave memory"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "ultralytics==8.4.177",
+    "lap>=0.5.12",
+    "httpx>=0.28",
+    "numpy>=1.26",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+exclude-newer = "2026-10-14T00:00:00Z"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+allowed-confusables = ["–", "—"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["vision"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

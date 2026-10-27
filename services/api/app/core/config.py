@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     db_connect_timeout_s: int = 3
     demo_clock_start: datetime | None = None
     simulator_interval_s: float = 30.0
+    simulator_api_url: str = "http://localhost:8000/api/v1"
+    simulator_token: str = "dev-simulator-token"
+    simulator_devices: list[str] = ["sim-a", "sim-b", "sim-c"]
 
     @field_validator("demo_clock_start", mode="before")
     @classmethod

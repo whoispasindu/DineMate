@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -50,6 +51,23 @@ class ZoneLayout(Base):
     reference_image_url: Mapped[str | None] = mapped_column(Text)
     is_current: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DeviceHeartbeat(Base):
+    __tablename__ = "device_heartbeats"
+    __table_args__ = (
+        CheckConstraint("status IN ('ok', 'degraded', 'error')", name="status"),
+        Index("ix_device_heartbeats_device_received", "device_id", text("received_at DESC")),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    device_id: Mapped[str] = mapped_column(ForeignKey("devices.id", ondelete="CASCADE"))
+    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(Text)
+    fps: Mapped[float | None] = mapped_column(Float)
+    latency_ms: Mapped[int | None] = mapped_column(Integer)
+    stream_ok: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    message: Mapped[str | None] = mapped_column(Text)
 
 
 class OccupancyReading(Base):
