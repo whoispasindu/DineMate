@@ -13,10 +13,13 @@ WORKDIR /app
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev
 
+COPY alembic.ini docker-entrypoint.sh ./
+COPY alembic ./alembic
 COPY app ./app
 
-RUN useradd --system --no-create-home api
+RUN chmod +x docker-entrypoint.sh && useradd --system --no-create-home api
 USER api
 
 EXPOSE 8000
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

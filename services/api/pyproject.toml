@@ -9,6 +9,8 @@ dependencies = [
     "pydantic-settings>=2.6",
     "sqlalchemy>=2.0.36",
     "psycopg[binary]>=3.2",
+    "alembic>=1.14",
+    "tzdata>=2024.2",
 ]
 
 [dependency-groups]
@@ -27,6 +29,11 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+allowed-confusables = ["–", "—"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["alembic"]
+known-first-party = ["app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

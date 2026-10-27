@@ -1,5 +1,12 @@
 name: dinemate
 
+x-api-env: &api-env
+  DINEMATE_ENVIRONMENT: ${DINEMATE_ENVIRONMENT:-development}
+  DINEMATE_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dinemate}:${POSTGRES_PASSWORD:-dinemate}@db:5432/${POSTGRES_DB:-dinemate}
+  DINEMATE_CORS_ORIGINS: ${DINEMATE_CORS_ORIGINS:-["http://localhost:5173","http://localhost:5174"]}
+  DINEMATE_SIMULATION_MODE: ${DINEMATE_SIMULATION_MODE:-true}
+  DINEMATE_DEMO_CLOCK_START: ${DINEMATE_DEMO_CLOCK_START:-}
+
 services:
   db:
     image: postgres:16-alpine
@@ -20,10 +27,9 @@ services:
   api:
     build: ../services/api
     environment:
-      DINEMATE_ENVIRONMENT: ${DINEMATE_ENVIRONMENT:-development}
-      DINEMATE_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dinemate}:${POSTGRES_PASSWORD:-dinemate}@db:5432/${POSTGRES_DB:-dinemate}
-      DINEMATE_CORS_ORIGINS: ${DINEMATE_CORS_ORIGINS:-["http://localhost:5173","http://localhost:5174"]}
-      DINEMATE_SIMULATION_MODE: ${DINEMATE_SIMULATION_MODE:-true}
+      <<: *api-env
+      DINEMATE_MIGRATE_ON_START: "true"
+      DINEMATE_SEED_IF_EMPTY: ${DINEMATE_SEED_IF_EMPTY:-true}
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:
@@ -34,6 +40,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  simulator:
+    build: ../services/api
+    command: ["python", "-m", "app.sim"]
+    environment:
+      <<: *api-env
+      DINEMATE_SIMULATOR_INTERVAL_S: ${DINEMATE_SIMULATOR_INTERVAL_S:-30}
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   db-data:
