@@ -628,10 +628,297 @@
           }
         }
       }
+    },
+    "/api/v1/notices": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Get Notices",
+        "operationId": "get_notices_api_v1_notices_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertFeed"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "List Alerts",
+        "operationId": "list_alerts_api_v1_alerts_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "active",
+                "open",
+                "acknowledged",
+                "suspended",
+                "resolved",
+                "all"
+              ],
+              "type": "string",
+              "default": "active",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffAlertList"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}/acknowledge": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Acknowledge Alert",
+        "operationId": "acknowledge_alert_api_v1_alerts__alert_id__acknowledge_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffAlertResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/console/overview": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Get Console Overview",
+        "operationId": "get_console_overview_api_v1_console_overview_get",
+        "parameters": [
+          {
+            "name": "canteen_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Canteen Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsoleOverview"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AlertFeed": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "safety": {
+            "$ref": "#/components/schemas/SafetyStatus"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/Notice"
+            },
+            "type": "array",
+            "title": "Notices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "safety",
+          "notices"
+        ],
+        "title": "AlertFeed"
+      },
       "BestCanteen": {
         "properties": {
           "canteen_id": {
@@ -957,6 +1244,184 @@
         ],
         "title": "ConfigZone"
       },
+      "ConsoleOverview": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ConsoleZone"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/StaffAlert"
+            },
+            "type": "array",
+            "title": "Alerts"
+          },
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceHealth"
+            },
+            "type": "array",
+            "title": "Devices"
+          },
+          "occupancy_today": {
+            "$ref": "#/components/schemas/OccupancyToday"
+          },
+          "safety": {
+            "$ref": "#/components/schemas/ConsoleSafety"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "is_sample",
+          "zones",
+          "alerts",
+          "devices",
+          "occupancy_today",
+          "safety"
+        ],
+        "title": "ConsoleOverview"
+      },
+      "ConsoleSafety": {
+        "properties": {
+          "simulation_mode": {
+            "type": "boolean",
+            "title": "Simulation Mode"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SafetySource"
+          },
+          "real_integration_connected": {
+            "type": "boolean",
+            "title": "Real Integration Connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "simulation_mode",
+          "events",
+          "source",
+          "real_integration_connected"
+        ],
+        "title": "ConsoleSafety"
+      },
+      "ConsoleZone": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "canteen_name": {
+            "type": "string",
+            "title": "Canteen Name"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "freshness": {
+            "type": "string",
+            "enum": [
+              "live",
+              "stale",
+              "unavailable"
+            ],
+            "title": "Freshness"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "busy",
+              "crowded",
+              "near_capacity",
+              "unknown"
+            ],
+            "title": "Level"
+          },
+          "occupied": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupied"
+          },
+          "occupied_range": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupied Range"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "name",
+          "canteen_name",
+          "capacity",
+          "freshness",
+          "level",
+          "occupied",
+          "occupied_range",
+          "updated_at"
+        ],
+        "title": "ConsoleZone"
+      },
       "DeviceConfig": {
         "properties": {
           "server_time": {
@@ -1036,6 +1501,71 @@
           "simulation"
         ],
         "title": "DeviceConfig"
+      },
+      "DeviceHealth": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "where": {
+            "type": "string",
+            "title": "Where"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "not_reporting",
+              "offline"
+            ],
+            "title": "Status"
+          },
+          "fps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fps"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "where",
+          "status",
+          "fps",
+          "latency_ms",
+          "last_seen_at"
+        ],
+        "title": "DeviceHealth"
       },
       "ErrorDetail": {
         "properties": {
@@ -1482,6 +2012,63 @@
         ],
         "title": "MenuItem"
       },
+      "Notice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "crowding",
+              "data_unavailable",
+              "sold_out",
+              "shop_closing",
+              "meal_starting"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "related_canteen": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelatedCanteen"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "body",
+          "context",
+          "at",
+          "related_canteen"
+        ],
+        "title": "Notice"
+      },
       "OccupancyAccepted": {
         "properties": {
           "server_time": {
@@ -1530,6 +2117,51 @@
         ],
         "title": "OccupancyIn"
       },
+      "OccupancyPoint": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "percent": {
+            "type": "integer",
+            "title": "Percent"
+          },
+          "is_forecast": {
+            "type": "boolean",
+            "title": "Is Forecast"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "percent",
+          "is_forecast"
+        ],
+        "title": "OccupancyPoint"
+      },
+      "OccupancyToday": {
+        "properties": {
+          "canteen_name": {
+            "type": "string",
+            "title": "Canteen Name"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/OccupancyPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "canteen_name",
+          "points"
+        ],
+        "title": "OccupancyToday"
+      },
       "OpeningHours": {
         "properties": {
           "opens": {
@@ -1547,6 +2179,24 @@
           "closes"
         ],
         "title": "OpeningHours"
+      },
+      "RelatedCanteen": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "RelatedCanteen"
       },
       "SafetyEvent": {
         "properties": {
@@ -1613,6 +2263,37 @@
           "instructions"
         ],
         "title": "SafetyEvent"
+      },
+      "SafetySource": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "online": {
+            "type": "boolean",
+            "title": "Online"
+          },
+          "last_heartbeat_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Heartbeat At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "online",
+          "last_heartbeat_at"
+        ],
+        "title": "SafetySource"
       },
       "SafetyStatus": {
         "properties": {
@@ -1809,6 +2490,236 @@
           "above"
         ],
         "title": "SimulationProfile"
+      },
+      "StaffAlert": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "crowding",
+              "sensor_offline",
+              "data_stale"
+            ],
+            "title": "Type"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "normal",
+                  "busy",
+                  "crowded",
+                  "near_capacity",
+                  "unknown"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "acknowledged",
+              "suspended",
+              "resolved"
+            ],
+            "title": "Status"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged At"
+          },
+          "acknowledged_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "level",
+          "title",
+          "detail",
+          "status",
+          "opened_at",
+          "acknowledged_at",
+          "acknowledged_by"
+        ],
+        "title": "StaffAlert"
+      },
+      "StaffAlertList": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StaffAlert"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "items"
+        ],
+        "title": "StaffAlertList"
+      },
+      "StaffAlertResult": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "crowding",
+              "sensor_offline",
+              "data_stale"
+            ],
+            "title": "Type"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "normal",
+                  "busy",
+                  "crowded",
+                  "near_capacity",
+                  "unknown"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "acknowledged",
+              "suspended",
+              "resolved"
+            ],
+            "title": "Status"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged At"
+          },
+          "acknowledged_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acknowledged By"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "level",
+          "title",
+          "detail",
+          "status",
+          "opened_at",
+          "acknowledged_at",
+          "acknowledged_by",
+          "server_time"
+        ],
+        "title": "StaffAlertResult"
       },
       "StudentSummary": {
         "properties": {

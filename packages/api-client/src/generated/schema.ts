@@ -191,10 +191,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Notices */
+        get: operations["get_notices_api_v1_notices_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Alerts */
+        get: operations["list_alerts_api_v1_alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alerts/{alert_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge Alert */
+        post: operations["acknowledge_alert_api_v1_alerts__alert_id__acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/console/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Console Overview */
+        get: operations["get_console_overview_api_v1_console_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AlertFeed */
+        AlertFeed: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            safety: components["schemas"]["SafetyStatus"];
+            /** Notices */
+            notices: components["schemas"]["Notice"][];
+        };
         /** BestCanteen */
         BestCanteen: {
             /** Canteen Id */
@@ -304,6 +383,64 @@ export interface components {
                 number
             ][];
         };
+        /** ConsoleOverview */
+        ConsoleOverview: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Is Sample */
+            is_sample: boolean;
+            /** Zones */
+            zones: components["schemas"]["ConsoleZone"][];
+            /** Alerts */
+            alerts: components["schemas"]["StaffAlert"][];
+            /** Devices */
+            devices: components["schemas"]["DeviceHealth"][];
+            occupancy_today: components["schemas"]["OccupancyToday"];
+            safety: components["schemas"]["ConsoleSafety"];
+        };
+        /** ConsoleSafety */
+        ConsoleSafety: {
+            /** Simulation Mode */
+            simulation_mode: boolean;
+            /** Events */
+            events: components["schemas"]["SafetyEvent"][];
+            source: components["schemas"]["SafetySource"];
+            /** Real Integration Connected */
+            real_integration_connected: boolean;
+        };
+        /** ConsoleZone */
+        ConsoleZone: {
+            /** Zone Id */
+            zone_id: string;
+            /** Name */
+            name: string;
+            /** Canteen Name */
+            canteen_name: string;
+            /** Capacity */
+            capacity: number;
+            /**
+             * Freshness
+             * @enum {string}
+             */
+            freshness: "live" | "stale" | "unavailable";
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "normal" | "busy" | "crowded" | "near_capacity" | "unknown";
+            /** Occupied */
+            occupied: number | null;
+            /** Occupied Range */
+            occupied_range: [
+                number,
+                number
+            ] | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
         /** DeviceConfig */
         DeviceConfig: {
             /**
@@ -331,6 +468,24 @@ export interface components {
             simulation: {
                 [key: string]: components["schemas"]["SimulationProfile"];
             } | null;
+        };
+        /** DeviceHealth */
+        DeviceHealth: {
+            /** Id */
+            id: string;
+            /** Where */
+            where: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "not_reporting" | "offline";
+            /** Fps */
+            fps: number | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /** Last Seen At */
+            last_seen_at: string | null;
         };
         /** ErrorDetail */
         ErrorDetail: {
@@ -505,6 +660,28 @@ export interface components {
             /** Is Available */
             is_available: boolean;
         };
+        /** Notice */
+        Notice: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "crowding" | "data_unavailable" | "sold_out" | "shop_closing" | "meal_starting";
+            /** Title */
+            title: string;
+            /** Body */
+            body: string;
+            /** Context */
+            context: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            related_canteen: components["schemas"]["RelatedCanteen"] | null;
+        };
         /** OccupancyAccepted */
         OccupancyAccepted: {
             /**
@@ -527,12 +704,38 @@ export interface components {
             /** Readings */
             readings: components["schemas"]["ZoneReadingIn"][];
         };
+        /** OccupancyPoint */
+        OccupancyPoint: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Percent */
+            percent: number;
+            /** Is Forecast */
+            is_forecast: boolean;
+        };
+        /** OccupancyToday */
+        OccupancyToday: {
+            /** Canteen Name */
+            canteen_name: string;
+            /** Points */
+            points: components["schemas"]["OccupancyPoint"][];
+        };
         /** OpeningHours */
         OpeningHours: {
             /** Opens */
             opens: string;
             /** Closes */
             closes: string;
+        };
+        /** RelatedCanteen */
+        RelatedCanteen: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** SafetyEvent */
         SafetyEvent: {
@@ -560,6 +763,15 @@ export interface components {
             source_name: string;
             /** Instructions */
             instructions: string;
+        };
+        /** SafetySource */
+        SafetySource: {
+            /** Name */
+            name: string;
+            /** Online */
+            online: boolean;
+            /** Last Heartbeat At */
+            last_heartbeat_at: string | null;
         };
         /** SafetyStatus */
         SafetyStatus: {
@@ -625,6 +837,81 @@ export interface components {
             below: number;
             /** Above */
             above: number;
+        };
+        /** StaffAlert */
+        StaffAlert: {
+            /** Id */
+            id: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "crowding" | "sensor_offline" | "data_stale";
+            /** Level */
+            level: ("normal" | "busy" | "crowded" | "near_capacity" | "unknown") | null;
+            /** Title */
+            title: string;
+            /** Detail */
+            detail: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "acknowledged" | "suspended" | "resolved";
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Acknowledged At */
+            acknowledged_at: string | null;
+            /** Acknowledged By */
+            acknowledged_by: string | null;
+        };
+        /** StaffAlertList */
+        StaffAlertList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["StaffAlert"][];
+        };
+        /** StaffAlertResult */
+        StaffAlertResult: {
+            /** Id */
+            id: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "crowding" | "sensor_offline" | "data_stale";
+            /** Level */
+            level: ("normal" | "busy" | "crowded" | "near_capacity" | "unknown") | null;
+            /** Title */
+            title: string;
+            /** Detail */
+            detail: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "acknowledged" | "suspended" | "resolved";
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Acknowledged At */
+            acknowledged_at: string | null;
+            /** Acknowledged By */
+            acknowledged_by: string | null;
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
         };
         /** StudentSummary */
         StudentSummary: {
@@ -1181,6 +1468,170 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_notices_api_v1_notices_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertFeed"];
+                };
+            };
+        };
+    };
+    list_alerts_api_v1_alerts_get: {
+        parameters: {
+            query?: {
+                status?: "active" | "open" | "acknowledged" | "suspended" | "resolved" | "all";
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffAlertList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_alert_api_v1_alerts__alert_id__acknowledge_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                alert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffAlertResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_console_overview_api_v1_console_overview_get: {
+        parameters: {
+            query?: {
+                canteen_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsoleOverview"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

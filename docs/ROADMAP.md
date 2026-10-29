@@ -71,13 +71,20 @@ Notes from Phase 1:
 
 ## Phase 3 — Crowding & accuracy (Week 5)
 
-- [ ] Crowding state machine as a pure Python module (hysteresis + 2 min dwell, plan 8.3), with unit tests including the flapping test
-- [ ] Crowding alerts: one open alert per zone, suspend on stale data, cooldown; `GET /alerts`, `POST /alerts/{id}/acknowledge`
-- [ ] Console Overview reads the real API (zones table, alert queue, device health)
-- [ ] Student Alerts tab shows real notices
-- [ ] Validation script: manual counts (CSV) vs worker output on the canteen videos → MAE, bias, % within ±2, interval coverage
+- [x] Crowding state machine as a pure Python module (`app/services/crowding.py`: hysteresis + 2 min dwell + 10 min cooldown, plan 8.3), with unit tests including the flapping test
+- [x] Crowding alerts: one active alert per zone, escalate/de-escalate, re-open on escalation after acknowledge, suspend on stale data; rules engine runs every 15 s in the API; also `data_stale` and `sensor_offline` staff alerts; `GET /alerts`, `POST /alerts/{id}/acknowledge`
+- [x] Console Overview reads the real API (`GET /console/overview`: zones table, alert queue with Acknowledge, device health, today's occupancy chart) — `pnpm dev:console:api`
+- [x] Student Alerts tab shows real notices (`GET /notices`: crowding with a suggested alternative, no-live-data zones, sold out, closing soon, meal started)
+- [x] Validation script: `python -m vision.validate counts.csv` → MAE, bias, % within ±2, interval coverage, level accuracy per video and overall
+- [ ] **You:** count seated people by hand in at least 3 canteen videos and run the validation script (steps in `services/vision/README.md`)
 
-**Done when:** a 1-hour flapping simulation opens no duplicate alerts, and you have an accuracy table for at least 3 videos.
+**Done when:** a 1-hour flapping simulation opens no duplicate alerts ✅ (unit and database tests), and you have an accuracy table for at least 3 videos (waiting on your counts).
+
+Notes from Phase 3:
+
+- Staff endpoints use a temporary bearer token (`DINEMATE_STAFF_TOKEN`, default `dev-staff-token`) until Phase 4 adds real sign-in and roles. Don't expose the API beyond your laptop until then.
+- Per-zone thresholds live in `crowding_thresholds` (defaults 60/80/95, 5-point hysteresis, 2 min dwell); the Thresholds page comes in Phase 4.
+- Forecast bars on the console chart are still empty; the baseline forecast is Phase 6.
 
 ## Phase 4 — Staff tools (Weeks 6–7)
 

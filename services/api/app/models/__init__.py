@@ -1,3 +1,4 @@
+from app.models.alerts import CrowdingThreshold, StaffAlert, ZoneCrowdState
 from app.models.app_state import AppState
 from app.models.base import Base
 from app.models.canteen import Canteen, CanteenHours, SeatingZone, WalkingTime
@@ -10,6 +11,7 @@ __all__ = [
     "Base",
     "Canteen",
     "CanteenHours",
+    "CrowdingThreshold",
     "Device",
     "DeviceHeartbeat",
     "MealSchedule",
@@ -21,6 +23,8 @@ __all__ = [
     "Shop",
     "ShopHourException",
     "ShopHours",
+    "StaffAlert",
     "WalkingTime",
+    "ZoneCrowdState",
     "ZoneLayout",
 ]

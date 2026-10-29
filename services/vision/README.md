@@ -66,6 +66,27 @@ uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout lay
 
 Boxes in the studio and in `--preview`: green = counted, yellow = waiting for the dwell, grey = outside zones or in a walkway. Both windows scale to fit the screen.
 
+## Checking accuracy against your own counts (plan Section 7.6)
+
+1. Draw zones for each video with the studio (names matter: they go in the CSV).
+2. Pause the video at a few moments (every 10–30 s works) and count the **seated** people in each zone yourself. Better still, have two people count separately and use the average.
+3. Write the counts in a CSV like `validation/counts.example.csv`:
+
+   ```csv
+   video,layout,t_seconds,zone,count
+   ../../../data/videos/lunch-1.mp4,,30,Front tables,12
+   ```
+
+   `video` and `layout` are relative to the CSV file. Leave `layout` empty to use `layouts/<video name>.json`.
+
+4. Run it (use the same `--dwell-s` / `--smoothing-s` you'd use live; short clips need short values):
+
+   ```bash
+   uv run python -m vision.validate validation/counts.csv --out validation/results.csv
+   ```
+
+It prints, per video and overall: **MAE** (average seats off), **bias** (+ means over-counting), **±2** (share within 2 seats), **in range** (share where your count falls inside the shown range; aim for about 80%) and **level ok** (same status word). The plan's targets: MAE ≤ 3 seats and ≥ 80% within ±3 on a 24–48-seat zone (Section 20). Keep counts files out of git if they name real places or times you don't want shared; `validation/*.csv` other than the example is ignored.
+
 ## Settings
 
 Detection size: the worker uses YOLO at 1280 px for sources 1920 px wide or more (Full HD, 4K) and 640 px otherwise; people in high-resolution canteen footage are too small at 640. Override with `--imgsz`. The chosen size is logged at start.

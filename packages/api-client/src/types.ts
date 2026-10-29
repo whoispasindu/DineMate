@@ -223,7 +223,7 @@ export interface DeviceHealth {
   status: DeviceStatus;
   fps: number | null;
   latency_ms: number | null;
-  last_seen_at: string;
+  last_seen_at: string | null;
 }
 
 export interface OccupancyPoint {
@@ -241,7 +241,7 @@ export interface ConsoleOverview extends Timestamped {
   safety: {
     simulation_mode: boolean;
     events: SafetyEvent[];
-    source: { name: string; online: boolean; last_heartbeat_at: string };
+    source: { name: string; online: boolean; last_heartbeat_at: string | null };
     real_integration_connected: boolean;
   };
 }

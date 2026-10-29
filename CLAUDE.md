@@ -11,8 +11,9 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - packages/api-client — hand-written API types, TanStack Query hooks, and a client that calls the real API when `configureApi({ baseUrl })` is set, else a labelled sample "server". `src/contract.ts` makes typecheck fail if the types drift from the generated OpenAPI types in `src/generated/`.
 - services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
 - infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.
-- Still on sample data: student Alerts tab and the console (until Phases 3 and 5).
-- services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts; `studio.py` draws zones then plays a video with live counts (offline, scaled to the screen). See services/vision/README.md. Videos live in git-ignored `data/videos/`.
+- Crowding rules: `app/services/crowding.py` (pure state machine) + `app/services/rules.py` (DB, runs every 15 s via `app/jobs.py`; set DINEMATE_RULES_INTERVAL_S=0 to stop). Staff endpoints (`/alerts`, `/console/overview`) need `Authorization: Bearer $DINEMATE_STAFF_TOKEN` until Phase 4.
+- Still on sample data: safety events (Phase 5) and forecasts (Phase 6).
+- services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts; `studio.py` draws zones then plays a video with live counts (offline, scaled to the screen); `validate.py` compares estimates with hand counts. See services/vision/README.md. Videos live in git-ignored `data/videos/`.
 - Devices authenticate with `Authorization: Device <token>`; register cameras with `uv run python -m app.devices_cli register` (services/api).
 
 ## Rules
@@ -34,7 +35,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 ## Commands
 
 - pnpm install
-- pnpm dev:student (sample data) / pnpm dev:student:api (real API on :8000) / pnpm dev:console
+- pnpm dev:student / pnpm dev:console (sample data) — add `:api` (dev:student:api, dev:console:api) to use the real API on :8000
 - pnpm typecheck / pnpm build / pnpm lint / pnpm format
 - pnpm stack:up / pnpm stack:down — Postgres + API + simulator in Docker (API on :8000)
 - pnpm dev:api — API with reload against a local or Docker Postgres
