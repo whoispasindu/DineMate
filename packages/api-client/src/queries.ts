@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
-import type { DeviceLayout, ShopEditor, StaffSafetyEventResult, ThresholdList, ThresholdValues } from "./types";
+import { serverNow } from "./clock";
+import type { HistoryBucket, DeviceLayout, ShopEditor, StaffSafetyEventResult, ThresholdList, ThresholdValues } from "./types";
 
 const LIVE_POLL_MS = 15_000;
 const INFO_POLL_MS = 60_000;
@@ -23,6 +24,8 @@ export const queryKeys = {
   safetyActive: ["safety", "active"] as const,
   safetyEvents: (status: string) => ["safety", "events", status] as const,
   safetySources: ["safety", "sources"] as const,
+  recommendation: (fromCanteen: string | null) => ["recommendation", fromCanteen ?? "any"] as const,
+  zoneHistory: (zoneId: string, hours: number, bucket: string) => ["zone-history", zoneId, hours, bucket] as const,
 };
 
 export function useStudentSummary() {
@@ -190,5 +193,24 @@ export function useSafetyAction<A>(run: (arg: A) => Promise<StaffSafetyEventResu
       void client.invalidateQueries({ queryKey: ["safety"] });
       void client.invalidateQueries({ queryKey: queryKeys.consoleOverview });
     },
+  });
+}
+
+export function useRecommendation(fromCanteen: string | null, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.recommendation(fromCanteen),
+    queryFn: () => api.recommendation(fromCanteen),
+    refetchInterval: LIVE_POLL_MS,
+    enabled,
+  });
+}
+
+export function useZoneHistory(zoneId: string | undefined, hours: number, bucket: HistoryBucket) {
+  return useQuery({
+    queryKey: queryKeys.zoneHistory(zoneId ?? "", hours, bucket),
+    queryFn: () => api.zoneHistory(zoneId ?? "", new Date(serverNow() - hours * 3_600_000).toISOString(), bucket),
+    enabled: zoneId !== undefined,
+    refetchInterval: 60_000,
+    retry: false,
   });
 }

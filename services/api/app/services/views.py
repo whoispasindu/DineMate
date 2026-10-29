@@ -1,19 +1,25 @@
+import uuid
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.orm import Session, selectinload
 
 from app import models, schemas
+from app.services.forecast import Prediction, slot_start
+from app.services.history import canteen_forecast, canteen_series
 from app.services.meal_status import Override, ScheduleBook, WeeklySlot, Window, meal_status, weekday_short
 from app.services.occupancy import CanteenOccupancy, Reading, ZoneView, best_candidate, canteen_occupancy, zone_view
 from app.services.shop_status import HoursException, hours_label, shop_status
-from app.services.timeutil import hm, local_date
+from app.services.timeutil import at_local, hm, local, local_date
 
 FEATURED_SHOPS_PER_CANTEEN = 2
 FEATURED_SHOPS_LIMIT = 4
+BUSY_WINDOW = timedelta(minutes=30)
+BUSY_MEASURED_POINTS = 5
+BUSY_FORECAST_HORIZONS = (30, 60)
 
 
 @dataclass
@@ -213,4 +219,47 @@ def meal_status_schema(session: Session, now: datetime, canteen_id: str | None) 
             )
             for d in state.week
         ],
+    )
+
+
+def zone_uuids(bundle: CanteenBundle) -> list[uuid.UUID]:
+    return [uuid.UUID(z.zone_id) for z in bundle.zones]
+
+
+def bundle_forecast(session: Session, bundle: CanteenBundle, now: datetime) -> list[Prediction]:
+    o = bundle.occupancy
+    if o.freshness != "live" or o.percent is None:
+        return []
+    return canteen_forecast(session, bundle.canteen.id, zone_uuids(bundle), now, float(o.percent))
+
+
+def forecast_schema(predictions: list[Prediction]) -> list[schemas.ForecastPoint]:
+    return [schemas.ForecastPoint(at=p.at, low=p.low, high=p.high) for p in predictions]
+
+
+def busy_today(session: Session, bundles: list[CanteenBundle], now: datetime) -> schemas.BusyToday | None:
+    bundle = next((b for b in bundles if b.occupancy.freshness == "live" and b.occupancy.percent is not None), None)
+    if bundle is None or bundle.occupancy.percent is None:
+        return None
+    start = at_local(local_date(now), time.min)
+    series = canteen_series(session, zone_uuids(bundle), start, slot_start(now))
+    windows: dict[datetime, list[float]] = defaultdict(list)
+    for t, value in series.points.items():
+        windows[start + ((t - start) // BUSY_WINDOW) * BUSY_WINDOW].append(value)
+    current_window = start + ((now - start) // BUSY_WINDOW) * BUSY_WINDOW
+    measured = [
+        schemas.BusyPoint(label=hm(local(t).time()), percent=round(sum(v) / len(v)), is_forecast=False, is_now=False)
+        for t, v in sorted(windows.items())
+        if t < current_window
+    ][-(BUSY_MEASURED_POINTS - 1) :]
+    now_point = schemas.BusyPoint(label="Now", percent=bundle.occupancy.percent, is_forecast=False, is_now=True)
+    ahead = [
+        schemas.BusyPoint(
+            label=hm(local(slot_start(p.at)).time()), percent=round(p.mean), is_forecast=True, is_now=False
+        )
+        for p in bundle_forecast(session, bundle, now)
+        if p.horizon in BUSY_FORECAST_HORIZONS
+    ]
+    return schemas.BusyToday(
+        canteen_id=bundle.canteen.id, canteen_name=bundle.canteen.name, points=[*measured, now_point, *ahead]
     )

@@ -3,11 +3,14 @@ import { heldToken, setSession } from "./session";
 import { acknowledgeAlert, consoleOverview } from "./sample/console";
 import { mealStatus } from "./sample/schedule";
 import { menuItems, shopById, shopsFor } from "./sample/shops";
-import { alertFeed, canteenDetail, canteenIds, safetyStatus, studentSummary } from "./sample/student";
+import { alertFeed, canteenDetail, canteenIds, safetyStatus, sampleRecommendation, studentSummary } from "./sample/student";
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
   AlertFeed,
+  HistoryBucket,
+  RecommendationResult,
+  ZoneHistory,
   SafetyActive,
   SafetySourceList,
   StaffSafetyEventList,
@@ -275,4 +278,12 @@ export const api = {
     staffOnly(`/safety/events/${enc(id)}/resolve`, { method: "POST", body: { note } }),
   simulateSafety: (body: { event_type: string; canteen_id: string | null; note: string | null }): Promise<StaffSafetyEventResult> =>
     staffOnly("/safety/simulate", { method: "POST", body }),
+  recommendation: (fromCanteen: string | null): Promise<RecommendationResult> =>
+    either(
+      fromCanteen ? `/recommendations?from_canteen=${enc(fromCanteen)}` : "/recommendations",
+      (now) => sampleRecommendation(fromCanteen, now),
+      "Recommendation unavailable",
+    ),
+  zoneHistory: (zoneId: string, from: string, bucket: HistoryBucket): Promise<ZoneHistory> =>
+    staffOnly(`/zones/${enc(zoneId)}/occupancy/history?from=${enc(from)}&bucket=${bucket}`),
 };

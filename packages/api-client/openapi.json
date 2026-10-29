@@ -920,6 +920,167 @@
         }
       }
     },
+    "/api/v1/zones/{zone_id}/occupancy/history": {
+      "get": {
+        "tags": [
+          "insights"
+        ],
+        "summary": "Get Zone History",
+        "operationId": "get_zone_history_api_v1_zones__zone_id__occupancy_history_get",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Zone Id"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "5m",
+                "10m",
+                "15m",
+                "1h"
+              ],
+              "type": "string",
+              "default": "5m",
+              "title": "Bucket"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneHistory"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recommendations": {
+      "get": {
+        "tags": [
+          "insights"
+        ],
+        "summary": "Get Recommendation",
+        "operationId": "get_recommendation_api_v1_recommendations_get",
+        "parameters": [
+          {
+            "name": "from_canteen",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From Canteen"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "tags": [
@@ -4716,6 +4877,33 @@
         "type": "object",
         "title": "EventLocation"
       },
+      "Excluded": {
+        "properties": {
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "no_live_data",
+              "too_crowded"
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "canteen_id",
+          "name",
+          "reason"
+        ],
+        "title": "Excluded"
+      },
       "ForecastPoint": {
         "properties": {
           "at": {
@@ -4872,6 +5060,40 @@
           "status"
         ],
         "title": "HeartbeatIn"
+      },
+      "HistoryPointOut": {
+        "properties": {
+          "t": {
+            "type": "string",
+            "format": "date-time",
+            "title": "T"
+          },
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          },
+          "low": {
+            "type": "integer",
+            "title": "Low"
+          },
+          "high": {
+            "type": "integer",
+            "title": "High"
+          },
+          "samples": {
+            "type": "integer",
+            "title": "Samples"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t",
+          "mean",
+          "low",
+          "high",
+          "samples"
+        ],
+        "title": "HistoryPointOut"
       },
       "HoursException-Input": {
         "properties": {
@@ -6270,6 +6492,137 @@
           "closes"
         ],
         "title": "OpeningHours"
+      },
+      "Recommendation": {
+        "properties": {
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "busy",
+              "crowded",
+              "near_capacity",
+              "unknown"
+            ],
+            "title": "Level"
+          },
+          "free_about": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free About"
+          },
+          "available_range": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Available Range"
+          },
+          "walk_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Walk Minutes"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "canteen_id",
+          "name",
+          "level",
+          "free_about",
+          "available_range",
+          "walk_minutes",
+          "reason"
+        ],
+        "title": "Recommendation"
+      },
+      "RecommendationResult": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "from_canteen_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Canteen Id"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Recommendation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/Excluded"
+            },
+            "type": "array",
+            "title": "Excluded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "from_canteen_id",
+          "recommendation",
+          "message",
+          "excluded"
+        ],
+        "title": "RecommendationResult"
       },
       "RelatedCanteen": {
         "properties": {
@@ -7903,6 +8256,64 @@
           "h_stand_b"
         ],
         "title": "WorkerSettings"
+      },
+      "ZoneHistory": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "zone_name": {
+            "type": "string",
+            "title": "Zone Name"
+          },
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "bucket": {
+            "type": "string",
+            "enum": [
+              "5m",
+              "10m",
+              "15m",
+              "1h"
+            ],
+            "title": "Bucket"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "title": "Is Simulated"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryPointOut"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "zone_id",
+          "zone_name",
+          "canteen_id",
+          "capacity",
+          "bucket",
+          "is_simulated",
+          "points"
+        ],
+        "title": "ZoneHistory"
       },
       "ZoneIn": {
         "properties": {

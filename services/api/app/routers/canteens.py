@@ -3,7 +3,16 @@ from fastapi import APIRouter
 from app import schemas
 from app.core.deps import NowDep, SessionDep
 from app.core.errors import NOT_FOUND_RESPONSE, not_found
-from app.services.views import CanteenBundle, canteen_summary, hours_today, load_bundles, nearest_walks, zone_schema
+from app.services.views import (
+    CanteenBundle,
+    bundle_forecast,
+    canteen_summary,
+    forecast_schema,
+    hours_today,
+    load_bundles,
+    nearest_walks,
+    zone_schema,
+)
 
 router = APIRouter(tags=["canteens"])
 
@@ -29,7 +38,7 @@ def get_canteen(canteen_id: str, session: SessionDep, now: NowDep) -> schemas.Ca
         canteen=canteen_summary(bundle, nearest_walks(session)),
         hours_today=hours_today(bundle.canteen, now),
         zones=[zone_schema(z) for z in bundle.zones],
-        forecast=[],
+        forecast=forecast_schema(bundle_forecast(session, bundle, now)),
         shops=bundle.shops,
     )
 

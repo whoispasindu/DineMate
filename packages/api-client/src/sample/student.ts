@@ -8,6 +8,7 @@ import type {
   Freshness,
   Notice,
   OpeningHours,
+  RecommendationResult,
   SafetyStatus,
   StudentSummary,
   WalkTime,
@@ -283,5 +284,32 @@ export function alertFeed(now: number): AlertFeed {
         related_canteen: null,
       }),
     ],
+  };
+}
+
+export function sampleRecommendation(fromCanteen: string | null, now: number): RecommendationResult {
+  const others = studentSummary(now).canteens.filter((c) => c.id !== fromCanteen);
+  const eligible = others
+    .filter((c) => c.freshness === "live" && (c.level === "normal" || c.level === "busy") && c.free_range !== null)
+    .sort((a, b) => (b.free_range?.[0] ?? 0) - (a.free_range?.[0] ?? 0));
+  const best = eligible[0];
+  return {
+    server_time: iso(now),
+    from_canteen_id: fromCanteen,
+    recommendation: best
+      ? {
+          canteen_id: best.id,
+          name: best.name,
+          level: best.level,
+          free_about: best.free_about,
+          available_range: best.free_range ?? [0, 0],
+          walk_minutes: best.walk?.minutes ?? null,
+          reason: fromCanteen ? "Lower crowding with live data" : "Most seats free with live data",
+        }
+      : null,
+    message: best ? null : "No reliable alternative right now.",
+    excluded: others
+      .filter((c) => !eligible.includes(c))
+      .map((c) => ({ canteen_id: c.id, name: c.name, reason: c.freshness === "live" ? "too_crowded" : "no_live_data" })),
   };
 }

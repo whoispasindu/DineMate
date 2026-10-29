@@ -259,6 +259,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/zones/{zone_id}/occupancy/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Zone History */
+        get: operations["get_zone_history_api_v1_zones__zone_id__occupancy_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Recommendation */
+        get: operations["get_recommendation_api_v1_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -1092,6 +1126,18 @@ export interface components {
             /** Zone Id */
             zone_id?: string | null;
         };
+        /** Excluded */
+        Excluded: {
+            /** Canteen Id */
+            canteen_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "no_live_data" | "too_crowded";
+        };
         /** ForecastPoint */
         ForecastPoint: {
             /**
@@ -1159,6 +1205,22 @@ export interface components {
             stream_ok: boolean;
             /** Message */
             message?: string | null;
+        };
+        /** HistoryPointOut */
+        HistoryPointOut: {
+            /**
+             * T
+             * Format: date-time
+             */
+            t: string;
+            /** Mean */
+            mean: number;
+            /** Low */
+            low: number;
+            /** High */
+            high: number;
+            /** Samples */
+            samples: number;
         };
         /** HoursException */
         "HoursException-Input": {
@@ -1603,6 +1665,44 @@ export interface components {
             opens: string;
             /** Closes */
             closes: string;
+        };
+        /** Recommendation */
+        Recommendation: {
+            /** Canteen Id */
+            canteen_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "normal" | "busy" | "crowded" | "near_capacity" | "unknown";
+            /** Free About */
+            free_about: number | null;
+            /** Available Range */
+            available_range: [
+                number,
+                number
+            ];
+            /** Walk Minutes */
+            walk_minutes: number | null;
+            /** Reason */
+            reason: string;
+        };
+        /** RecommendationResult */
+        RecommendationResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** From Canteen Id */
+            from_canteen_id: string | null;
+            recommendation: components["schemas"]["Recommendation"] | null;
+            /** Message */
+            message: string | null;
+            /** Excluded */
+            excluded: components["schemas"]["Excluded"][];
         };
         /** RelatedCanteen */
         RelatedCanteen: {
@@ -2190,6 +2290,31 @@ export interface components {
             h_stand_a: number | null;
             /** H Stand B */
             h_stand_b: number | null;
+        };
+        /** ZoneHistory */
+        ZoneHistory: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Zone Id */
+            zone_id: string;
+            /** Zone Name */
+            zone_name: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Capacity */
+            capacity: number;
+            /**
+             * Bucket
+             * @enum {string}
+             */
+            bucket: "5m" | "10m" | "15m" | "1h";
+            /** Is Simulated */
+            is_simulated: boolean;
+            /** Points */
+            points: components["schemas"]["HistoryPointOut"][];
         };
         /** ZoneIn */
         ZoneIn: {
@@ -2908,6 +3033,90 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_zone_history_api_v1_zones__zone_id__occupancy_history_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+                bucket?: "5m" | "10m" | "15m" | "1h";
+            };
+            header?: never;
+            path: {
+                zone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZoneHistory"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_recommendation_api_v1_recommendations_get: {
+        parameters: {
+            query?: {
+                from_canteen?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendationResult"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

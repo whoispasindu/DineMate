@@ -491,3 +491,40 @@ export interface SafetySourceHealth {
 export interface SafetySourceList extends Timestamped {
   items: SafetySourceHealth[];
 }
+
+export type HistoryBucket = "5m" | "10m" | "15m" | "1h";
+
+export interface ZoneHistoryPoint {
+  t: string;
+  mean: number;
+  low: number;
+  high: number;
+  samples: number;
+}
+
+export interface ZoneHistory extends Timestamped {
+  zone_id: string;
+  zone_name: string;
+  canteen_id: string;
+  capacity: number;
+  bucket: HistoryBucket;
+  is_simulated: boolean;
+  points: ZoneHistoryPoint[];
+}
+
+export interface Recommendation {
+  canteen_id: string;
+  name: string;
+  level: CrowdLevel;
+  free_about: number | null;
+  available_range: FreeRange;
+  walk_minutes: number | null;
+  reason: string;
+}
+
+export interface RecommendationResult extends Timestamped {
+  from_canteen_id: string | null;
+  recommendation: Recommendation | null;
+  message: string | null;
+  excluded: { canteen_id: string; name: string; reason: "no_live_data" | "too_crowded" }[];
+}

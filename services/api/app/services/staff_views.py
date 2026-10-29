@@ -14,7 +14,7 @@ from app.services.meal_status import meal_status
 from app.services.occupancy import best_candidate
 from app.services.rules import OFFLINE_AFTER, zone_devices
 from app.services.timeutil import at_local, local, local_date, twelve_hour
-from app.services.views import CanteenBundle, load_bundles, schedule_book
+from app.services.views import CanteenBundle, bundle_forecast, load_bundles, schedule_book
 
 BUCKET = timedelta(minutes=10)
 PERIOD_LABEL = {"breakfast": "Breakfast", "lunch": "Lunch", "dinner": "Dinner"}
@@ -176,6 +176,10 @@ def _occupancy_today(session: Session, bundle: CanteenBundle | None, now: dateti
                     at=start + index * BUCKET, percent=round(occupied / capacity * 100), is_forecast=False
                 )
             )
+    points += [
+        staff.OccupancyPoint(at=p.at, percent=round(p.mean), is_forecast=True)
+        for p in bundle_forecast(session, bundle, now)
+    ]
     return staff.OccupancyToday(canteen_name=bundle.canteen.name, points=points)
 
 

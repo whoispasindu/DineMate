@@ -1,6 +1,14 @@
 from datetime import UTC, datetime, timedelta
 
-from app.services.occupancy import Reading, best_candidate, canteen_occupancy, freshness_for, level_for, zone_view
+from app.services.occupancy import (
+    Reading,
+    best_candidate,
+    canteen_occupancy,
+    freshness_for,
+    level_for,
+    rank_alternatives,
+    zone_view,
+)
 
 NOW = datetime(2026, 11, 20, 7, 11, 18, tzinfo=UTC)
 
@@ -72,3 +80,18 @@ def test_best_prefers_most_free_seats_among_not_crowded_live() -> None:
     ]
     assert best_candidate(candidates) == "b"
     assert best_candidate([("c", summary(63, 59, 67, 72))]) is None
+
+
+def test_rank_alternatives_breaks_ties_by_walk_and_explains_exclusions() -> None:
+    def summary(occupied: int, low: int, high: int, capacity: int, age_s: int = 40):
+        return canteen_occupancy([zone_view("z", "Zone", capacity, reading(occupied, low, high, capacity, age_s), NOW)])
+
+    candidates = [
+        ("a", summary(28, 22, 34, 60)),
+        ("b", summary(28, 22, 34, 60)),
+        ("c", summary(63, 59, 67, 72)),
+        ("d", summary(5, 3, 7, 60, age_s=300)),
+    ]
+    ranked, excluded = rank_alternatives(candidates, {"a": 6, "b": 4})
+    assert ranked == ["b", "a"]
+    assert excluded == {"c": "too_crowded", "d": "no_live_data"}

@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app import schemas
 from app.core.deps import NowDep, SessionDep
 from app.safety.service import public_status
-from app.services.views import canteen_summary, featured_shops, load_bundles, nearest_walks, pick_best
+from app.services.views import busy_today, canteen_summary, featured_shops, load_bundles, nearest_walks, pick_best
 
 router = APIRouter(tags=["student"])
 
@@ -18,6 +18,6 @@ def get_student_summary(session: SessionDep, now: NowDep) -> schemas.StudentSumm
         best=pick_best(bundles),
         canteens=[canteen_summary(b, walks) for b in bundles],
         shops_now=featured_shops(bundles),
-        busy_today=None,
+        busy_today=busy_today(session, bundles, now),
         safety=schemas.SafetyStatus(active=active, events=events),
     )
