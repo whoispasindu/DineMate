@@ -30,7 +30,7 @@ class HistoryPoint:
     samples: int
 
 
-def _bin(bucket: timedelta) -> ColumnElement[datetime]:
+def time_bin(bucket: timedelta) -> ColumnElement[datetime]:
     seconds = int(bucket.total_seconds())
     return func.date_bin(
         literal_column(f"interval '{seconds} seconds'"), models.OccupancyReading.captured_at, literal(ORIGIN)
@@ -41,7 +41,7 @@ def zone_history(
     session: Session, zone_id: uuid.UUID, start: datetime, end: datetime, bucket: timedelta
 ) -> list[HistoryPoint]:
     r = models.OccupancyReading
-    t = _bin(bucket).label("t")
+    t = time_bin(bucket).label("t")
     rows = session.execute(
         select(t, func.avg(r.estimated_occupied), func.avg(r.occupied_low), func.avg(r.occupied_high), func.count())
         .where(r.zone_id == zone_id, r.captured_at >= start, r.captured_at < end)
@@ -58,7 +58,7 @@ def canteen_series(session: Session, zone_ids: list[uuid.UUID], start: datetime,
     if not zone_ids:
         return Series({})
     r = models.OccupancyReading
-    t = _bin(SLOT).label("t")
+    t = time_bin(SLOT).label("t")
     rows = session.execute(
         select(t, r.zone_id, func.avg(r.estimated_occupied), func.max(r.capacity_snapshot))
         .where(r.zone_id.in_(zone_ids), r.captured_at >= start, r.captured_at < end)
