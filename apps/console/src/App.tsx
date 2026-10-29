@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { ConsoleShell, navFor } from "./layout";
 import { OverviewScreen } from "./screens/Overview";
+import { OccupancyScreen } from "./screens/Occupancy";
 import { PlannedScreen } from "./screens/Planned";
 import { SafetyScreen } from "./screens/Safety";
 import { SchedulesScreen } from "./screens/Schedules";
@@ -17,6 +18,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/zones": ZonesScreen,
   "/config": ThresholdsScreen,
   "/safety": SafetyScreen,
+  "/occupancy": OccupancyScreen,
 };
 
 function Home({ user }: { user: StaffUser }) {
