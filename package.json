@@ -17,7 +17,8 @@
     "format:check": "prettier --check .",
     "api:types": "uv run --directory services/api python -m app.openapi_export ../../packages/api-client/openapi.json && pnpm --filter @dinemate/api-client gen",
     "dev:student:api": "pnpm --filter student dev --mode api",
-    "e2e": "pnpm --filter @dinemate/e2e test"
+    "e2e": "pnpm --filter @dinemate/e2e test",
+    "screenshots": "pnpm --filter @dinemate/e2e screenshots"
   },
   "packageManager": "pnpm@12.15.0",
   "devDependencies": {

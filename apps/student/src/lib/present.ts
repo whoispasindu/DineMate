@@ -1,4 +1,4 @@
-import type { CanteenSummary, MealPeriod, MealWindow, NoticeKind, ShopKind, ZoneOccupancy } from "@dinemate/api-client";
+import type { CanteenSummary, MealPeriod, MealWindow, NoticeKind, ZoneOccupancy } from "@dinemate/api-client";
 import { formatClock, formatIn, formatWeekday, type IconName } from "@dinemate/ui";
 
 const CANTEEN_WALLS: Record<string, string> = {
@@ -74,15 +74,3 @@ export const NOTICE_LOOK: Record<NoticeKind, { icon: IconName; tile: string }> =
   shop_closing: { icon: "clock", tile: "bg-busy-bg text-busy" },
   meal_starting: { icon: "utensils", tile: "bg-ok-bg text-ok" },
 };
-
-export const SHOP_LOOK: Record<ShopKind, { icon: IconName; tile: string }> = {
-  rice: { icon: "bowl", tile: "bg-busy-bg text-busy" },
-  kottu: { icon: "pan", tile: "bg-crowd-bg text-crowd" },
-  short_eats: { icon: "bun", tile: "bg-indigo-bg text-indigo" },
-  tea: { icon: "cup", tile: "bg-neutral text-neutral-ink" },
-  noodles: { icon: "bowl", tile: "bg-ok-bg text-ok" },
-  bakery: { icon: "bun", tile: "bg-busy-bg text-busy" },
-  drinks: { icon: "cup", tile: "bg-indigo-bg text-indigo" },
-};
-
-export const ITEM_TINTS = ["bg-busy-bg text-busy", "bg-ok-bg text-ok", "bg-crowd-bg text-crowd", "bg-indigo-bg text-indigo"];

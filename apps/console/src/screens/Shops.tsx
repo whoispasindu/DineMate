@@ -14,7 +14,7 @@ import {
   type ShopEditor,
   type ShopState,
 } from "@dinemate/api-client";
-import { cx, formatAgo, formatClock, formatPrice } from "@dinemate/ui";
+import { cx, FoodArt, foodArtFor, formatAgo, formatClock, formatPrice } from "@dinemate/ui";
 import { useCallback, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput } from "../kit";
@@ -98,8 +98,18 @@ function MenuRow({ item, editor, now }: { item: EditableMenuItem; editor: ShopEd
   return (
     <tr className={cx("border-b border-line-soft align-middle", item.pending === "delete" && "opacity-60")}>
       <td className="py-2.5 pr-2">
-        <span className={cx("block text-sm font-bold", item.pending === "delete" && "line-through")}>{fields.name}</span>
-        {item.pending !== "none" ? <span className="text-xs font-semibold text-busy">{PENDING_LABEL[item.pending]}</span> : null}
+        <span className="flex items-center gap-3">
+          <FoodArt
+            kind={foodArtFor(fields.name, fields.category ? [fields.category] : [])}
+            name={fields.name}
+            muted={soldOut}
+            className="h-10 w-10 shrink-0 rounded-[10px]"
+          />
+          <span className="flex flex-col">
+            <span className={cx("text-sm font-bold", item.pending === "delete" && "line-through")}>{fields.name}</span>
+            {item.pending !== "none" ? <span className="text-xs font-semibold text-busy">{PENDING_LABEL[item.pending]}</span> : null}
+          </span>
+        </span>
       </td>
       <td className="px-2 text-xs text-muted">
         {PERIODS.filter((p) => fields.periods.includes(p))

@@ -42,6 +42,11 @@ def prepare() -> None:
         if settings.demo_clock_start is not None:
             clock.reset_demo_clock(session, settings.demo_clock_start)
         seed(session, clock.now(settings), settings.demo_password)
+        history_days = int(os.environ.get("DINEMATE_E2E_HISTORY_DAYS", "0"))
+        if history_days > 0:
+            from app.seed_history import generate
+
+            generate(session, clock.now(settings), history_days)
     engine.dispose()
 
 
