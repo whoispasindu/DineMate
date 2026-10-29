@@ -95,6 +95,7 @@ jobs:
       - run: docker compose -f infra/docker-compose.yml up -d --build --wait
       - run: curl --fail --silent --show-error http://localhost:8000/api/v1/health
       - run: curl --fail --silent --show-error http://localhost:8000/api/v1/student/summary | grep -q '"canteens"'
+      - run: 'curl --fail --silent --show-error -X POST -H ''Content-Type: application/json'' -d ''{"email":"admin@dinemate.test","password":"dinemate-demo-pass"}'' http://localhost:8000/api/v1/auth/login | grep -q access_token'
       - if: always()
         run: docker compose -f infra/docker-compose.yml logs api simulator
       - if: always()

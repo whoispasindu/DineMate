@@ -245,3 +245,187 @@ export interface ConsoleOverview extends Timestamped {
     real_integration_connected: boolean;
   };
 }
+
+export type StaffRole = "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer";
+
+export interface StaffUser {
+  id: string;
+  email: string;
+  display_name: string;
+  role: StaffRole;
+  canteen_ids: string[];
+  shop_ids: string[];
+}
+
+export interface StaffSession {
+  access_token: string;
+  token_type: "bearer";
+  expires_in: number;
+  user: StaffUser;
+}
+
+export type MenuCategory = "rice" | "kottu" | "short_eats" | "drinks";
+export type PendingChange = "none" | "new" | "edit" | "delete";
+
+export interface MenuItemFields {
+  name: string;
+  price_lkr: number;
+  category: MenuCategory | null;
+  dietary_tags: "vegetarian"[];
+  periods: MealPeriod[];
+}
+
+export interface EditableMenuItem {
+  id: string;
+  live: MenuItemFields | null;
+  draft: MenuItemFields | null;
+  pending: PendingChange;
+  is_available: boolean;
+  availability_updated_at: string;
+}
+
+export interface WeeklyHours {
+  weekday: number;
+  opens: string;
+  closes: string;
+}
+
+export interface HoursException {
+  date: string;
+  is_closed: boolean;
+  opens: string | null;
+  closes: string | null;
+  reason: string | null;
+}
+
+export interface ManagedShop {
+  shop: Shop;
+  pending_changes: number;
+}
+
+export interface ManagedShopList extends Timestamped {
+  items: ManagedShop[];
+}
+
+export interface ShopEditor extends Timestamped {
+  shop: Shop;
+  weekly: WeeklyHours[];
+  exceptions: HoursException[];
+  temporarily_closed_until: string | null;
+  closure_reason: string | null;
+  items: EditableMenuItem[];
+  pending_changes: number;
+}
+
+export interface AvailabilityResult extends Timestamped {
+  item: EditableMenuItem;
+}
+
+export interface MealSlot {
+  weekday: number;
+  period: MealPeriod;
+  starts: string;
+  ends: string;
+}
+
+export interface MealOverride {
+  date: string;
+  period: MealPeriod | null;
+  is_cancelled: boolean;
+  starts: string | null;
+  ends: string | null;
+  reason: string | null;
+}
+
+export interface MealScheduleSet extends Timestamped {
+  canteen_id: string | null;
+  canteen_name: string;
+  uses_campus_weekly: boolean;
+  weekly: MealSlot[];
+  campus_weekly: MealSlot[];
+  overrides: MealOverride[];
+  can_edit: boolean;
+}
+
+export type AlertFrom = "busy" | "crowded" | "near_capacity";
+
+export interface ThresholdValues {
+  busy_pct: number;
+  crowded_pct: number;
+  near_capacity_pct: number;
+  hysteresis_pct: number;
+  dwell_seconds: number;
+  alert_from: AlertFrom;
+}
+
+export interface ZoneThresholds {
+  zone_id: string;
+  zone_name: string;
+  canteen_id: string;
+  canteen_name: string;
+  capacity: number;
+  is_monitored: boolean;
+  is_default: boolean;
+  values: ThresholdValues;
+}
+
+export interface ThresholdList extends Timestamped {
+  defaults: ThresholdValues;
+  items: ZoneThresholds[];
+}
+
+export interface ThresholdResult extends Timestamped {
+  item: ZoneThresholds;
+}
+
+export type PolygonType = "seating" | "queue" | "walkway" | "ignore";
+
+export interface LayoutPolygon {
+  type: PolygonType;
+  zone_id: string | null;
+  points: [number, number][];
+}
+
+export interface EditableZone {
+  id: string;
+  name: string;
+  capacity: number;
+  is_active: boolean;
+  is_monitored: boolean;
+}
+
+export interface LayoutVersion {
+  version: number;
+  created_at: string;
+  is_current: boolean;
+  seating_zones: number;
+}
+
+export interface DeviceLayout extends Timestamped {
+  device_id: string;
+  canteen_id: string;
+  canteen_name: string;
+  kind: "camera" | "simulator";
+  version: number | null;
+  polygons: LayoutPolygon[];
+  zones: EditableZone[];
+  history: LayoutVersion[];
+}
+
+export interface ManagedDevice {
+  id: string;
+  kind: "camera" | "simulator";
+  canteen_id: string;
+  canteen_name: string;
+  layout_version: number | null;
+  last_heartbeat_at: string | null;
+  is_enabled: boolean;
+}
+
+export interface ManagedDeviceList extends Timestamped {
+  items: ManagedDevice[];
+}
+
+export interface ZoneResult extends Timestamped {
+  zone: EditableZone;
+}

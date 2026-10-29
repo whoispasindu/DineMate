@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.clock import get_now
 from app.core.db import get_session
+from app.core.security import login_limiter
 from app.main import app
 from app.seed import reset, seed
 from app.services.timeutil import CAMPUS_TZ
@@ -25,6 +26,7 @@ REQUIRE_DB = os.environ.get("DINEMATE_REQUIRE_DB_TESTS") == "1"
 ALEMBIC_INI = Path(__file__).resolve().parents[2] / "alembic.ini"
 
 LUNCH_NOW = datetime(2026, 11, 20, 12, 41, 18, tzinfo=CAMPUS_TZ).astimezone(UTC)
+TEST_PASSWORD = "test-password-123"
 
 
 def _ensure_database() -> None:
@@ -63,7 +65,7 @@ def db_engine() -> Iterator[Engine]:
 def seeded(db_engine: Engine) -> Engine:
     with Session(db_engine) as session:
         reset(session)
-        seed(session, LUNCH_NOW)
+        seed(session, LUNCH_NOW, TEST_PASSWORD)
     return db_engine
 
 
@@ -74,6 +76,7 @@ def client_at(engine: Engine, now: datetime) -> TestClient:
 
     app.dependency_overrides[get_session] = session_override
     app.dependency_overrides[get_now] = lambda: now
+    login_limiter.reset()
     return TestClient(app)
 
 
@@ -82,3 +85,9 @@ def api(seeded: Engine) -> Iterator[TestClient]:
     with client_at(seeded, LUNCH_NOW) as client:
         yield client
     app.dependency_overrides.clear()
+
+
+def login(client: TestClient, email: str, password: str = TEST_PASSWORD) -> dict[str, str]:
+    response = client.post("/api/v1/auth/login", json={"email": email, "password": password})
+    assert response.status_code == 200, response.text
+    return {"Authorization": f"Bearer {response.json()['access_token']}"}

@@ -60,12 +60,25 @@ def device_zones(session: Session) -> dict[str, list[str]]:
     return grouped
 
 
-def staff_alerts(session: Session, statuses: tuple[str, ...] | None = None) -> list[staff.StaffAlert]:
+def alert_canteen(session: Session, alert: models.StaffAlert) -> str | None:
+    if alert.zone_id is not None:
+        zone = session.get(models.SeatingZone, alert.zone_id)
+        return zone.canteen_id if zone else None
+    device = session.get(models.Device, alert.device_id) if alert.device_id else None
+    return device.canteen_id if device else None
+
+
+def staff_alerts(
+    session: Session, statuses: tuple[str, ...] | None = None, canteen_ids: set[str] | None = None
+) -> list[staff.StaffAlert]:
     stmt = select(models.StaffAlert).order_by(models.StaffAlert.opened_at.desc())
     if statuses:
         stmt = stmt.where(models.StaffAlert.status.in_(statuses))
     zones, by_device = zone_names(session), device_zones(session)
-    return [alert_schema(a, zones, by_device) for a in session.scalars(stmt)]
+    alerts = list(session.scalars(stmt))
+    if canteen_ids is not None:
+        alerts = [a for a in alerts if alert_canteen(session, a) in canteen_ids]
+    return [alert_schema(a, zones, by_device) for a in alerts]
 
 
 def _console_zones(bundles: list[CanteenBundle]) -> list[staff.ConsoleZone]:
@@ -165,7 +178,11 @@ def _occupancy_today(session: Session, bundle: CanteenBundle | None, now: dateti
 
 
 def console_overview(
-    session: Session, now: datetime, simulation_mode: bool, canteen_id: str | None
+    session: Session,
+    now: datetime,
+    simulation_mode: bool,
+    canteen_id: str | None,
+    scope: set[str] | None = None,
 ) -> staff.ConsoleOverview:
     bundles = load_bundles(session, now)
     chosen = next((b for b in bundles if b.canteen.id == canteen_id), None) if canteen_id else None
@@ -175,7 +192,7 @@ def console_overview(
         server_time=now,
         is_sample=any(b.canteen.is_sample for b in bundles),
         zones=_console_zones(bundles),
-        alerts=staff_alerts(session, ("open", "acknowledged", "suspended")),
+        alerts=staff_alerts(session, ("open", "acknowledged", "suspended"), scope),
         devices=_devices(session, now),
         occupancy_today=_occupancy_today(session, chosen, now),
         safety=staff.ConsoleSafety(

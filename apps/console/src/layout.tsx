@@ -1,5 +1,6 @@
-import { useConsoleOverview } from "@dinemate/api-client";
+import { signOut, useConsoleOverview, type StaffRole, type StaffUser } from "@dinemate/api-client";
 import { APP_NAME, cx, Icon, type IconName } from "@dinemate/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { NavLink, Outlet } from "react-router";
 
 interface NavItem {
@@ -8,26 +9,43 @@ interface NavItem {
   icon: IconName;
   end?: boolean;
   badge?: "alerts";
+  roles: StaffRole[];
 }
 
+const MANAGERS: StaffRole[] = ["campus_admin", "canteen_manager"];
+
 export const NAV: NavItem[] = [
-  { to: "/", label: "Overview", icon: "grid", end: true },
-  { to: "/occupancy", label: "Occupancy", icon: "pulse" },
-  { to: "/alerts", label: "Alerts", icon: "bell", badge: "alerts" },
-  { to: "/shops", label: "Shops & menus", icon: "store" },
-  { to: "/schedules", label: "Meal schedules", icon: "calendar" },
-  { to: "/devices", label: "Devices", icon: "camera" },
-  { to: "/safety", label: "Safety", icon: "shield" },
-  { to: "/config", label: "Thresholds & config", icon: "sliders" },
+  { to: "/", label: "Overview", icon: "grid", end: true, roles: MANAGERS },
+  { to: "/occupancy", label: "Occupancy", icon: "pulse", roles: MANAGERS },
+  { to: "/alerts", label: "Alerts", icon: "bell", badge: "alerts", roles: MANAGERS },
+  { to: "/shops", label: "Shops & menus", icon: "store", roles: [...MANAGERS, "shop_manager"] },
+  { to: "/schedules", label: "Meal schedules", icon: "calendar", roles: MANAGERS },
+  { to: "/zones", label: "Zones", icon: "seat", roles: MANAGERS },
+  { to: "/devices", label: "Devices", icon: "camera", roles: ["campus_admin"] },
+  { to: "/safety", label: "Safety", icon: "shield", roles: ["campus_admin", "safety_officer"] },
+  { to: "/config", label: "Thresholds & config", icon: "sliders", roles: MANAGERS },
 ];
 
-function useOpenAlertCount(): number {
-  const overview = useConsoleOverview();
+export function navFor(user: StaffUser): NavItem[] {
+  return NAV.filter((n) => n.roles.includes(user.role));
+}
+
+const ROLE_LABEL: Record<StaffRole, string> = {
+  campus_admin: "Campus admin",
+  canteen_manager: "Canteen manager",
+  shop_manager: "Shop manager",
+  safety_officer: "Safety officer",
+};
+
+function useOpenAlertCount(enabled: boolean): number {
+  const overview = useConsoleOverview(enabled);
   return overview.data?.alerts.filter((a) => a.status === "open").length ?? 0;
 }
 
-function Sidebar() {
-  const openAlerts = useOpenAlertCount();
+function Sidebar({ user }: { user: StaffUser }) {
+  const items = navFor(user);
+  const openAlerts = useOpenAlertCount(MANAGERS.includes(user.role));
+  const queryClient = useQueryClient();
   return (
     <aside className="box-border flex flex-[1_1_232px] flex-col gap-6 bg-side px-4 py-6 text-white">
       <div className="flex items-center gap-2.5 px-2">
@@ -36,11 +54,11 @@ function Sidebar() {
         </span>
         <span className="flex flex-col">
           <span className="text-[17px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
-          <span className="text-xs text-side-muted">Admin console</span>
+          <span className="text-xs text-side-muted">Staff console</span>
         </span>
       </div>
-      <nav aria-label="Admin" className="flex flex-col gap-1">
-        {NAV.map((item) => (
+      <nav aria-label="Console" className="flex flex-col gap-1">
+        {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -63,14 +81,23 @@ function Sidebar() {
         ))}
       </nav>
       <div className="mt-auto flex flex-col gap-0.5 rounded-xl bg-side-card p-3">
-        <span className="text-xs text-side-muted">Signed in as</span>
-        <span className="text-sm font-bold">Campus administrator</span>
+        <span className="text-xs text-side-muted">Signed in as · {ROLE_LABEL[user.role]}</span>
+        <span className="text-sm font-bold">{user.display_name}</span>
+        <button
+          type="button"
+          onClick={() => {
+            void signOut().then(() => queryClient.clear());
+          }}
+          className="mt-2 min-h-9 rounded-lg border border-side-active bg-transparent px-3 text-left text-[13px] font-semibold text-side-ink hover:bg-side-active hover:text-white"
+        >
+          Sign out
+        </button>
       </div>
     </aside>
   );
 }
 
-export function ConsoleShell() {
+export function ConsoleShell({ user }: { user: StaffUser }) {
   return (
     <div className="flex min-h-dvh flex-wrap bg-page">
       <a
@@ -79,7 +106,7 @@ export function ConsoleShell() {
       >
         Skip to content
       </a>
-      <Sidebar />
+      <Sidebar user={user} />
       <Outlet />
     </div>
   );

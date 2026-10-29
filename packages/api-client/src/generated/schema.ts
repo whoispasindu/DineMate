@@ -259,6 +259,382 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login */
+        post: operations["login_api_v1_auth_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh */
+        post: operations["refresh_api_v1_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout */
+        post: operations["logout_api_v1_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Me */
+        get: operations["me_api_v1_auth_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/shops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Managed Shops */
+        get: operations["list_managed_shops_api_v1_manage_shops_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/shops/{shop_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Shop Editor */
+        get: operations["get_shop_editor_api_v1_manage_shops__shop_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Shop Hours */
+        put: operations["put_shop_hours_api_v1_shops__shop_id__hours_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/closure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Shop Closure */
+        put: operations["put_shop_closure_api_v1_shops__shop_id__closure_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Menu Item */
+        post: operations["create_menu_item_api_v1_shops__shop_id__menu_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menu-items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Menu Item */
+        delete: operations["delete_menu_item_api_v1_menu_items__item_id__delete"];
+        options?: never;
+        head?: never;
+        /** Patch Menu Item */
+        patch: operations["patch_menu_item_api_v1_menu_items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/menu-items/{item_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set Availability */
+        patch: operations["set_availability_api_v1_menu_items__item_id__availability_patch"];
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish Menu */
+        post: operations["publish_menu_api_v1_shops__shop_id__menu_publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Discard Menu Draft */
+        post: operations["discard_menu_draft_api_v1_shops__shop_id__menu_discard_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/meal-schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Meal Schedules */
+        get: operations["get_meal_schedules_api_v1_manage_meal_schedules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/meal-schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Meal Schedules */
+        put: operations["put_meal_schedules_api_v1_meal_schedules_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/thresholds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Thresholds */
+        get: operations["list_thresholds_api_v1_manage_thresholds_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zones/{zone_id}/thresholds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Thresholds */
+        put: operations["put_thresholds_api_v1_zones__zone_id__thresholds_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Managed Devices */
+        get: operations["list_managed_devices_api_v1_manage_devices_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/layout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Layout */
+        get: operations["get_layout_api_v1_devices__device_id__layout_get"];
+        /** Put Layout */
+        put: operations["put_layout_api_v1_devices__device_id__layout_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/layout/rollback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rollback Layout */
+        post: operations["rollback_layout_api_v1_devices__device_id__layout_rollback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zones/{zone_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Patch Zone */
+        patch: operations["patch_zone_api_v1_zones__zone_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/canteens/{canteen_id}/zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Zone */
+        post: operations["create_zone_api_v1_canteens__canteen_id__zones_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -273,6 +649,20 @@ export interface components {
             safety: components["schemas"]["SafetyStatus"];
             /** Notices */
             notices: components["schemas"]["Notice"][];
+        };
+        /** AvailabilityIn */
+        AvailabilityIn: {
+            /** Is Available */
+            is_available: boolean;
+        };
+        /** AvailabilityResult */
+        AvailabilityResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            item: components["schemas"]["EditableMenuItem"];
         };
         /** BestCanteen */
         BestCanteen: {
@@ -368,6 +758,13 @@ export interface components {
             walk: components["schemas"]["WalkTime"] | null;
             /** Updated At */
             updated_at: string | null;
+        };
+        /** ClosureIn */
+        ClosureIn: {
+            /** Until */
+            until: string | null;
+            /** Reason */
+            reason?: string | null;
         };
         /** ConfigZone */
         ConfigZone: {
@@ -487,6 +884,65 @@ export interface components {
             /** Last Seen At */
             last_seen_at: string | null;
         };
+        /** DeviceLayout */
+        DeviceLayout: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Canteen Name */
+            canteen_name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "camera" | "simulator";
+            /** Version */
+            version: number | null;
+            /** Polygons */
+            polygons: components["schemas"]["LayoutPolygon-Output"][];
+            /** Zones */
+            zones: components["schemas"]["EditableZone"][];
+            /** History */
+            history: components["schemas"]["LayoutVersion"][];
+        };
+        /** EditableMenuItem */
+        EditableMenuItem: {
+            /** Id */
+            id: string;
+            live: components["schemas"]["MenuItemFields-Output"] | null;
+            draft: components["schemas"]["MenuItemFields-Output"] | null;
+            /**
+             * Pending
+             * @enum {string}
+             */
+            pending: "none" | "new" | "edit" | "delete";
+            /** Is Available */
+            is_available: boolean;
+            /**
+             * Availability Updated At
+             * Format: date-time
+             */
+            availability_updated_at: string;
+        };
+        /** EditableZone */
+        EditableZone: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Capacity */
+            capacity: number;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Monitored */
+            is_monitored: boolean;
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -572,6 +1028,38 @@ export interface components {
             /** Message */
             message?: string | null;
         };
+        /** HoursException */
+        "HoursException-Input": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Is Closed */
+            is_closed: boolean;
+            /** Opens */
+            opens?: string | null;
+            /** Closes */
+            closes?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** HoursException */
+        "HoursException-Output": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Is Closed */
+            is_closed: boolean;
+            /** Opens */
+            opens: string | null;
+            /** Closes */
+            closes: string | null;
+            /** Reason */
+            reason: string | null;
+        };
         /** IgnoreArea */
         IgnoreArea: {
             /**
@@ -584,6 +1072,221 @@ export interface components {
                 number,
                 number
             ][];
+        };
+        /** LayoutIn */
+        LayoutIn: {
+            /** Base Version */
+            base_version: number | null;
+            /** Polygons */
+            polygons: components["schemas"]["LayoutPolygon-Input"][];
+        };
+        /** LayoutPolygon */
+        "LayoutPolygon-Input": {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "seating" | "queue" | "walkway" | "ignore";
+            /** Zone Id */
+            zone_id?: string | null;
+            /** Points */
+            points: [
+                number,
+                number
+            ][];
+        };
+        /** LayoutPolygon */
+        "LayoutPolygon-Output": {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "seating" | "queue" | "walkway" | "ignore";
+            /** Zone Id */
+            zone_id: string | null;
+            /** Points */
+            points: [
+                number,
+                number
+            ][];
+        };
+        /** LayoutVersion */
+        LayoutVersion: {
+            /** Version */
+            version: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Is Current */
+            is_current: boolean;
+            /** Seating Zones */
+            seating_zones: number;
+        };
+        /** LoginIn */
+        LoginIn: {
+            /** Email */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** ManagedDevice */
+        ManagedDevice: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "camera" | "simulator";
+            /** Canteen Id */
+            canteen_id: string;
+            /** Canteen Name */
+            canteen_name: string;
+            /** Layout Version */
+            layout_version: number | null;
+            /** Last Heartbeat At */
+            last_heartbeat_at: string | null;
+            /** Is Enabled */
+            is_enabled: boolean;
+        };
+        /** ManagedDeviceList */
+        ManagedDeviceList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["ManagedDevice"][];
+        };
+        /** ManagedShop */
+        ManagedShop: {
+            shop: components["schemas"]["Shop"];
+            /** Pending Changes */
+            pending_changes: number;
+        };
+        /** ManagedShopList */
+        ManagedShopList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["ManagedShop"][];
+        };
+        /** Me */
+        Me: {
+            /** Id */
+            id: string;
+            /** Email */
+            email: string;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer";
+            /** Canteen Ids */
+            canteen_ids: string[];
+            /** Shop Ids */
+            shop_ids: string[];
+        };
+        /** MealOverride */
+        "MealOverride-Input": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Period */
+            period?: ("breakfast" | "lunch" | "dinner") | null;
+            /**
+             * Is Cancelled
+             * @default false
+             */
+            is_cancelled: boolean;
+            /** Starts */
+            starts?: string | null;
+            /** Ends */
+            ends?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** MealOverride */
+        "MealOverride-Output": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Period */
+            period: ("breakfast" | "lunch" | "dinner") | null;
+            /**
+             * Is Cancelled
+             * @default false
+             */
+            is_cancelled: boolean;
+            /** Starts */
+            starts: string | null;
+            /** Ends */
+            ends: string | null;
+            /** Reason */
+            reason: string | null;
+        };
+        /** MealScheduleIn */
+        MealScheduleIn: {
+            /** Canteen Id */
+            canteen_id?: string | null;
+            /** Weekly */
+            weekly: components["schemas"]["MealSlot"][] | null;
+            /** Overrides */
+            overrides: components["schemas"]["MealOverride-Input"][];
+        };
+        /** MealScheduleSet */
+        MealScheduleSet: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Canteen Id */
+            canteen_id: string | null;
+            /** Canteen Name */
+            canteen_name: string;
+            /** Uses Campus Weekly */
+            uses_campus_weekly: boolean;
+            /** Weekly */
+            weekly: components["schemas"]["MealSlot"][];
+            /** Campus Weekly */
+            campus_weekly: components["schemas"]["MealSlot"][];
+            /** Overrides */
+            overrides: components["schemas"]["MealOverride-Output"][];
+            /** Can Edit */
+            can_edit: boolean;
+        };
+        /** MealSlot */
+        MealSlot: {
+            /** Weekday */
+            weekday: number;
+            /**
+             * Period
+             * @enum {string}
+             */
+            period: "breakfast" | "lunch" | "dinner";
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             */
+            ends: string;
         };
         /** MealStatus */
         MealStatus: {
@@ -659,6 +1362,45 @@ export interface components {
             periods: ("breakfast" | "lunch" | "dinner")[];
             /** Is Available */
             is_available: boolean;
+        };
+        /** MenuItemFields */
+        "MenuItemFields-Input": {
+            /** Name */
+            name: string;
+            /** Price Lkr */
+            price_lkr: number | string;
+            /** Category */
+            category?: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags?: "vegetarian"[];
+            /** Periods */
+            periods: ("breakfast" | "lunch" | "dinner")[];
+        };
+        /** MenuItemFields */
+        "MenuItemFields-Output": {
+            /** Name */
+            name: string;
+            /** Price Lkr */
+            price_lkr: number;
+            /** Category */
+            category: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags: "vegetarian"[];
+            /** Periods */
+            periods: ("breakfast" | "lunch" | "dinner")[];
+        };
+        /** MenuItemPatch */
+        MenuItemPatch: {
+            /** Name */
+            name?: string | null;
+            /** Price Lkr */
+            price_lkr?: number | string | null;
+            /** Category */
+            category?: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags?: "vegetarian"[] | null;
+            /** Periods */
+            periods?: ("breakfast" | "lunch" | "dinner")[] | null;
         };
         /** Notice */
         Notice: {
@@ -737,6 +1479,11 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** RollbackIn */
+        RollbackIn: {
+            /** Version */
+            version: number;
+        };
         /** SafetyEvent */
         SafetyEvent: {
             /** Id */
@@ -780,6 +1527,19 @@ export interface components {
             /** Events */
             events: components["schemas"]["SafetyEvent"][];
         };
+        /** Session */
+        Session: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Token Type
+             * @constant
+             */
+            token_type: "bearer";
+            /** Expires In */
+            expires_in: number;
+            user: components["schemas"]["Me"];
+        };
         /** Shop */
         Shop: {
             /** Id */
@@ -802,6 +1562,34 @@ export interface components {
             hours_label: string;
             /** Menu Updated At */
             menu_updated_at: string | null;
+        };
+        /** ShopEditor */
+        ShopEditor: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            shop: components["schemas"]["Shop"];
+            /** Weekly */
+            weekly: components["schemas"]["WeeklyHours"][];
+            /** Exceptions */
+            exceptions: components["schemas"]["HoursException-Output"][];
+            /** Temporarily Closed Until */
+            temporarily_closed_until: string | null;
+            /** Closure Reason */
+            closure_reason: string | null;
+            /** Items */
+            items: components["schemas"]["EditableMenuItem"][];
+            /** Pending Changes */
+            pending_changes: number;
+        };
+        /** ShopHoursIn */
+        ShopHoursIn: {
+            /** Weekly */
+            weekly: components["schemas"]["WeeklyHours"][];
+            /** Exceptions */
+            exceptions: components["schemas"]["HoursException-Input"][];
         };
         /** ShopList */
         ShopList: {
@@ -928,6 +1716,44 @@ export interface components {
             busy_today: components["schemas"]["BusyToday"] | null;
             safety: components["schemas"]["SafetyStatus"];
         };
+        /** ThresholdList */
+        ThresholdList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            defaults: components["schemas"]["ThresholdValues"];
+            /** Items */
+            items: components["schemas"]["ZoneThresholds"][];
+        };
+        /** ThresholdResult */
+        ThresholdResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            item: components["schemas"]["ZoneThresholds"];
+        };
+        /** ThresholdValues */
+        ThresholdValues: {
+            /** Busy Pct */
+            busy_pct: number;
+            /** Crowded Pct */
+            crowded_pct: number;
+            /** Near Capacity Pct */
+            near_capacity_pct: number;
+            /** Hysteresis Pct */
+            hysteresis_pct: number;
+            /** Dwell Seconds */
+            dwell_seconds: number;
+            /**
+             * Alert From
+             * @enum {string}
+             */
+            alert_from: "busy" | "crowded" | "near_capacity";
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -966,6 +1792,21 @@ export interface components {
             /** Is Today */
             is_today: boolean;
         };
+        /** WeeklyHours */
+        WeeklyHours: {
+            /** Weekday */
+            weekday: number;
+            /**
+             * Opens
+             * Format: time
+             */
+            opens: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            closes: string;
+        };
         /** WorkerSettings */
         WorkerSettings: {
             /** Post Every S */
@@ -984,6 +1825,13 @@ export interface components {
             h_stand_a: number | null;
             /** H Stand B */
             h_stand_b: number | null;
+        };
+        /** ZoneIn */
+        ZoneIn: {
+            /** Name */
+            name: string;
+            /** Capacity */
+            capacity: number;
         };
         /** ZoneOccupancy */
         ZoneOccupancy: {
@@ -1027,6 +1875,15 @@ export interface components {
             /** Zones */
             zones: components["schemas"]["ZoneOccupancy"][];
         };
+        /** ZonePatch */
+        ZonePatch: {
+            /** Name */
+            name?: string | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Is Active */
+            is_active?: boolean | null;
+        };
         /** ZoneReadingIn */
         ZoneReadingIn: {
             /** Zone Id */
@@ -1045,6 +1902,33 @@ export interface components {
             confidence: "high" | "medium" | "low";
             /** Samples */
             samples?: number | null;
+        };
+        /** ZoneResult */
+        ZoneResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            zone: components["schemas"]["EditableZone"];
+        };
+        /** ZoneThresholds */
+        ZoneThresholds: {
+            /** Zone Id */
+            zone_id: string;
+            /** Zone Name */
+            zone_name: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Canteen Name */
+            canteen_name: string;
+            /** Capacity */
+            capacity: number;
+            /** Is Monitored */
+            is_monitored: boolean;
+            /** Is Default */
+            is_default: boolean;
+            values: components["schemas"]["ThresholdValues"];
         };
     };
     responses: never;
@@ -1537,6 +2421,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -1572,6 +2465,15 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1632,6 +2534,1429 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_api_v1_auth_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Session"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    refresh_api_v1_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                dinemate_refresh?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Session"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    logout_api_v1_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                dinemate_refresh?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    me_api_v1_auth_me_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_managed_shops_api_v1_manage_shops_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedShopList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_shop_editor_api_v1_manage_shops__shop_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_shop_hours_api_v1_shops__shop_id__hours_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShopHoursIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_shop_closure_api_v1_shops__shop_id__closure_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_menu_item_api_v1_shops__shop_id__menu_items_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuItemFields-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_menu_item_api_v1_menu_items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_menu_item_api_v1_menu_items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuItemPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_availability_api_v1_menu_items__item_id__availability_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvailabilityIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilityResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_menu_api_v1_shops__shop_id__menu_publish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_menu_draft_api_v1_shops__shop_id__menu_discard_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_meal_schedules_api_v1_manage_meal_schedules_get: {
+        parameters: {
+            query?: {
+                canteen_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealScheduleSet"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_meal_schedules_api_v1_meal_schedules_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MealScheduleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealScheduleSet"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_thresholds_api_v1_manage_thresholds_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThresholdList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_thresholds_api_v1_zones__zone_id__thresholds_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                zone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ThresholdValues"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThresholdResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_managed_devices_api_v1_manage_devices_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedDeviceList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_layout_api_v1_devices__device_id__layout_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_layout_api_v1_devices__device_id__layout_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LayoutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rollback_layout_api_v1_devices__device_id__layout_rollback_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RollbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_zone_api_v1_zones__zone_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                zone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZonePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZoneResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_zone_api_v1_canteens__canteen_id__zones_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                canteen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZoneIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZoneResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

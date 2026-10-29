@@ -1,5 +1,6 @@
 import uuid
 from datetime import date, datetime, time
+from typing import Any
 
 from sqlalchemy import (
     Boolean,
@@ -15,7 +16,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import PERIOD_VALUES, WEEKDAY_CHECK, Base, Timestamps
@@ -95,6 +96,7 @@ class MenuItem(Timestamps, Base):
     is_available: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
     availability_updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_published: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    draft: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
     periods: Mapped[list["MenuItemPeriod"]] = relationship(cascade="all, delete-orphan")
 
