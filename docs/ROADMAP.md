@@ -117,16 +117,16 @@ Notes from Phase 4:
 **Done when:** the safety tests in plan Section 20 pass, and "SIMULATION" shows on every surface.
 ✅ 29 Oct, plan Section 20 safety rows:
 
-| Test | Result |
-|---|---|
-| Simulated event on the safety dashboard ≤ 5 s | Dashboard polls every 5 s; a CLI event showed up on the next poll |
-| Simulation label on every surface | Student banner (Home, Alerts), console Safety page and Overview, API response and audit rows. There are no push notifications yet, so no notification text to label |
-| Simulator payload with `is_simulation=false` | Stored as simulation (test + live CLI `--claim-real`) |
-| Invalid signature / replayed timestamp | 401 `invalid_signature`, logged and audited (test) |
-| Duplicate burst of 50 | 1 event, `repeat_count=50` (test); 20-event live burst merged to 1 |
-| Ack/resolve recorded with user + time | Test + live: audit rows carry user, time, note and the simulation label |
-| Source heartbeat lost | Warning after 60 s plus at most one 15 s rules run (≤ 75 s), staff only; seen live |
-| Client disconnect | "Safety alert status unknown" about 14 s after stopping the API container |
+| Test                                          | Result                                                                                                                                                              |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Simulated event on the safety dashboard ≤ 5 s | Dashboard polls every 5 s; a CLI event showed up on the next poll                                                                                                   |
+| Simulation label on every surface             | Student banner (Home, Alerts), console Safety page and Overview, API response and audit rows. There are no push notifications yet, so no notification text to label |
+| Simulator payload with `is_simulation=false`  | Stored as simulation (test + live CLI `--claim-real`)                                                                                                               |
+| Invalid signature / replayed timestamp        | 401 `invalid_signature`, logged and audited (test)                                                                                                                  |
+| Duplicate burst of 50                         | 1 event, `repeat_count=50` (test); 20-event live burst merged to 1                                                                                                  |
+| Ack/resolve recorded with user + time         | Test + live: audit rows carry user, time, note and the simulation label                                                                                             |
+| Source heartbeat lost                         | Warning after 60 s plus at most one 15 s rules run (≤ 75 s), staff only; seen live                                                                                  |
+| Client disconnect                             | "Safety alert status unknown" about 14 s after stopping the API container                                                                                           |
 
 Notes from Phase 5:
 
