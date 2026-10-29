@@ -1,6 +1,6 @@
 import { ApiError } from "@dinemate/api-client";
 import { cx, Icon, SampleBadge } from "@dinemate/ui";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import { useEffect, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
 
 export function Page({
   title,
@@ -118,4 +118,13 @@ export function Banner({ tone = "info", children }: { tone?: "info" | "error" | 
       <span>{children}</span>
     </div>
   );
+}
+
+export function useUnsavedGuard(dirty: boolean): void {
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 }

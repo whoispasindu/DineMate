@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
-import type { ShopEditor } from "./types";
+import type { DeviceLayout, ShopEditor, ThresholdList, ThresholdValues } from "./types";
 
 const LIVE_POLL_MS = 15_000;
 const INFO_POLL_MS = 60_000;
@@ -16,6 +16,10 @@ export const queryKeys = {
   consoleOverview: ["console", "overview"] as const,
   managedShops: ["manage", "shops"] as const,
   shopEditor: (shopId: string) => ["manage", "shop", shopId] as const,
+  mealSchedules: (canteenId: string | null) => ["manage", "meal-schedules", canteenId ?? "campus"] as const,
+  thresholds: ["manage", "thresholds"] as const,
+  managedDevices: ["manage", "devices"] as const,
+  deviceLayout: (deviceId: string) => ["manage", "layout", deviceId] as const,
 };
 
 export function useStudentSummary() {
@@ -97,6 +101,60 @@ export function useSetAvailability(shopId: string) {
         old ? { ...old, items: old.items.map((i) => (i.id === item.id ? item : i)) } : old,
       );
       void client.invalidateQueries({ queryKey: queryKeys.menu(shopId) });
+    },
+  });
+}
+
+export function useMealSchedules(canteenId: string | null) {
+  return useQuery({ queryKey: queryKeys.mealSchedules(canteenId), queryFn: () => api.mealSchedules(canteenId), retry: false });
+}
+
+export function useSaveMealSchedules() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: api.saveMealSchedules,
+    onSuccess: (set) => {
+      client.setQueryData(queryKeys.mealSchedules(set.canteen_id), set);
+      void client.invalidateQueries({ queryKey: queryKeys.mealStatus });
+    },
+  });
+}
+
+export function useThresholds() {
+  return useQuery({ queryKey: queryKeys.thresholds, queryFn: api.thresholds, retry: false });
+}
+
+export function useSaveThresholds() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ zoneId, values }: { zoneId: string; values: ThresholdValues }) => api.saveThresholds(zoneId, values),
+    onSuccess: ({ item }) =>
+      client.setQueryData<ThresholdList>(queryKeys.thresholds, (old) =>
+        old ? { ...old, items: old.items.map((z) => (z.zone_id === item.zone_id ? item : z)) } : old,
+      ),
+  });
+}
+
+export function useManagedDevices() {
+  return useQuery({ queryKey: queryKeys.managedDevices, queryFn: api.managedDevices, retry: false });
+}
+
+export function useDeviceLayout(deviceId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.deviceLayout(deviceId ?? ""),
+    queryFn: () => api.deviceLayout(deviceId ?? ""),
+    enabled: deviceId !== undefined,
+    retry: false,
+  });
+}
+
+export function useLayoutMutation<A>(deviceId: string, run: (arg: A) => Promise<DeviceLayout>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: (layout) => {
+      client.setQueryData(queryKeys.deviceLayout(deviceId), layout);
+      void client.invalidateQueries({ queryKey: queryKeys.managedDevices });
     },
   });
 }

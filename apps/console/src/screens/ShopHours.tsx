@@ -1,6 +1,6 @@
 import { api, useShopMutation, type HoursException, type ShopEditor, type WeeklyHours } from "@dinemate/api-client";
 import { useEffect, useMemo, useState } from "react";
-import { Banner, Button, errorText, Panel, TextInput } from "../kit";
+import { Banner, Button, errorText, Panel, TextInput, useUnsavedGuard } from "../kit";
 
 export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -18,15 +18,6 @@ function fromEditor(editor: ShopEditor): Draft {
     weekly: editor.weekly.map((w) => ({ ...w, opens: hm(w.opens), closes: hm(w.closes) })),
     exceptions: editor.exceptions.map((e) => ({ ...e, opens: e.opens && hm(e.opens), closes: e.closes && hm(e.closes) })),
   };
-}
-
-export function useUnsavedGuard(dirty: boolean): void {
-  useEffect(() => {
-    if (!dirty) return;
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
 }
 
 export function HoursPanel({ editor, onDirty }: { editor: ShopEditor; onDirty: (dirty: boolean) => void }) {

@@ -9,6 +9,17 @@ import { sampleUser } from "./sample/users";
 import type {
   AlertFeed,
   AvailabilityResult,
+  DeviceLayout,
+  EditableZone,
+  LayoutPolygon,
+  ManagedDeviceList,
+  MealOverride,
+  MealScheduleSet,
+  MealSlot,
+  ThresholdList,
+  ThresholdResult,
+  ThresholdValues,
+  ZoneResult,
   HoursException,
   ManagedShopList,
   MenuItemFields,
@@ -230,4 +241,24 @@ export const api = {
     staffOnly(`/menu-items/${enc(itemId)}/availability`, { method: "PATCH", body: { is_available: isAvailable } }),
   publishMenu: (shopId: string): Promise<ShopEditor> => staffOnly(`/shops/${enc(shopId)}/menu/publish`, { method: "POST" }),
   discardMenu: (shopId: string): Promise<ShopEditor> => staffOnly(`/shops/${enc(shopId)}/menu/discard`, { method: "POST" }),
+  mealSchedules: (canteenId: string | null): Promise<MealScheduleSet> =>
+    staffOnly(canteenId ? `/manage/meal-schedules?canteen_id=${enc(canteenId)}` : "/manage/meal-schedules"),
+  saveMealSchedules: (body: {
+    canteen_id: string | null;
+    weekly: MealSlot[] | null;
+    overrides: MealOverride[];
+  }): Promise<MealScheduleSet> => staffOnly("/meal-schedules", { method: "PUT", body }),
+  thresholds: (): Promise<ThresholdList> => staffOnly("/manage/thresholds"),
+  saveThresholds: (zoneId: string, body: ThresholdValues): Promise<ThresholdResult> =>
+    staffOnly(`/zones/${enc(zoneId)}/thresholds`, { method: "PUT", body }),
+  managedDevices: (): Promise<ManagedDeviceList> => staffOnly("/manage/devices"),
+  deviceLayout: (deviceId: string): Promise<DeviceLayout> => staffOnly(`/devices/${enc(deviceId)}/layout`),
+  saveLayout: (deviceId: string, body: { base_version: number | null; polygons: LayoutPolygon[] }): Promise<DeviceLayout> =>
+    staffOnly(`/devices/${enc(deviceId)}/layout`, { method: "PUT", body }),
+  rollbackLayout: (deviceId: string, version: number): Promise<DeviceLayout> =>
+    staffOnly(`/devices/${enc(deviceId)}/layout/rollback`, { method: "POST", body: { version } }),
+  updateZone: (zoneId: string, body: Partial<Pick<EditableZone, "name" | "capacity" | "is_active">>): Promise<ZoneResult> =>
+    staffOnly(`/zones/${enc(zoneId)}`, { method: "PATCH", body }),
+  createZone: (canteenId: string, body: { name: string; capacity: number }): Promise<ZoneResult> =>
+    staffOnly(`/canteens/${enc(canteenId)}/zones`, { method: "POST", body }),
 };

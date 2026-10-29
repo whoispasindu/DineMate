@@ -4,10 +4,18 @@ import { Navigate, Route, Routes } from "react-router";
 import { ConsoleShell, navFor } from "./layout";
 import { OverviewScreen } from "./screens/Overview";
 import { PlannedScreen } from "./screens/Planned";
+import { SchedulesScreen } from "./screens/Schedules";
 import { ShopsScreen } from "./screens/Shops";
 import { SignInScreen } from "./screens/SignIn";
+import { ThresholdsScreen } from "./screens/Thresholds";
+import { ZonesScreen } from "./screens/Zones";
 
-const BUILT: Record<string, () => React.JSX.Element> = { "/shops": ShopsScreen };
+const BUILT: Record<string, () => React.JSX.Element> = {
+  "/shops": ShopsScreen,
+  "/schedules": SchedulesScreen,
+  "/zones": ZonesScreen,
+  "/config": ThresholdsScreen,
+};
 
 function Home({ user }: { user: StaffUser }) {
   const first = navFor(user)[0];
