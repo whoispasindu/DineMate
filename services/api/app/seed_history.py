@@ -1,5 +1,4 @@
 import argparse
-import math
 import random
 from datetime import datetime, time, timedelta
 
@@ -10,21 +9,14 @@ from app import models
 from app.core import clock
 from app.core.db import get_engine
 from app.services.timeutil import at_local, local_date
+from app.sim_shape import daily_shape
 
 STEP = timedelta(minutes=5)
 DAY_START = time(7, 0)
 DAY_END = time(20, 0)
-PEAKS = ((8.25, 0.6, 0.35), (12.75, 0.9, 0.78), (19.0, 0.8, 0.4))
-WEEKEND_SCALE = 0.4
 
 
-def busy_fraction(hours: float, weekday: int, zone_bias: float) -> float:
-    base = 0.08 + sum(height * math.exp(-(((hours - centre) / width) ** 2)) for centre, width, height in PEAKS)
-    scale = WEEKEND_SCALE if weekday >= 5 else 1.0
-    return min(0.98, base * scale * zone_bias)
-
-
-def simulator_zones(session: Session) -> list[tuple[models.SeatingZone, str]]:
+def simulator_zones(session: Session) -> list[tuple[models.SeatingZone, str, int]]:
     devices = {d.id: d for d in session.scalars(select(models.Device).where(models.Device.kind == "simulator"))}
     result = []
     for layout in session.scalars(select(models.ZoneLayout).where(models.ZoneLayout.is_current)):
@@ -33,8 +25,9 @@ def simulator_zones(session: Session) -> list[tuple[models.SeatingZone, str]]:
         for polygon in layout.polygons:
             if polygon.get("type") == "seating" and polygon.get("zone_id"):
                 zone = session.get(models.SeatingZone, polygon["zone_id"])
-                if zone is not None:
-                    result.append((zone, layout.device_id))
+                profile = devices[layout.device_id].config.get("profiles", {}).get(str(polygon["zone_id"]))
+                if zone is not None and profile is not None:
+                    result.append((zone, layout.device_id, int(profile["base"])))
     return result
 
 
@@ -44,7 +37,7 @@ def generate(session: Session, now: datetime, days: int, seed: int = 11) -> int:
     first = at_local(today - timedelta(days=days), DAY_START)
     cutoff = at_local(today, time.min)
     rows = []
-    for zone, device_id in simulator_zones(session):
+    for zone, device_id, base in simulator_zones(session):
         session.execute(
             delete(models.OccupancyReading).where(
                 models.OccupancyReading.zone_id == zone.id,
@@ -53,13 +46,12 @@ def generate(session: Session, now: datetime, days: int, seed: int = 11) -> int:
                 models.OccupancyReading.captured_at < cutoff,
             )
         )
-        bias = 0.85 + rng.random() * 0.3
+        bias = 0.9 + rng.random() * 0.2
         for offset in range(days, 0, -1):
             day = today - timedelta(days=offset)
             t, end = at_local(day, DAY_START), at_local(day, DAY_END)
             while t < end:
-                hours = (t - at_local(day, time.min)).total_seconds() / 3600
-                occupied = round(zone.capacity * busy_fraction(hours, day.weekday(), bias) + rng.gauss(0, 1.5))
+                occupied = round(base * daily_shape(t) * bias + rng.gauss(0, 1.5))
                 occupied = max(0, min(zone.capacity, occupied))
                 spread = max(1, round(zone.capacity * 0.06))
                 rows.append(
