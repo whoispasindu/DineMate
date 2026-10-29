@@ -404,6 +404,10 @@ def main(argv: list[str] | None = None) -> int:
         if has_data and not args.reset:
             if args.if_empty:
                 print("Sample data already present; skipping seed.")
+                if settings.demo_password and not session.scalar(select(func.count()).select_from(models.User)):
+                    seed_demo_users(session, settings.demo_password)
+                    session.commit()
+                    print(f"Created {len(DEMO_USERS)} demo staff accounts (password from DINEMATE_DEMO_PASSWORD).")
                 return 0
             print("Data already present. Re-run with --reset to replace it.", file=sys.stderr)
             return 1

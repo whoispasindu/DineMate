@@ -17,4 +17,9 @@ export type ApiContract = [
   Expect<Assignable<Schemas["ConsoleOverview"], T.ConsoleOverview>>,
   Expect<Assignable<Schemas["StaffAlertList"], { server_time: string; items: T.StaffAlert[] }>>,
   Expect<Assignable<Schemas["StaffAlertResult"], T.StaffAlert & T.Timestamped>>,
+  Expect<Assignable<Schemas["Me"], T.StaffUser>>,
+  Expect<Assignable<Schemas["Session"], T.StaffSession>>,
+  Expect<Assignable<Schemas["ManagedShopList"], T.ManagedShopList>>,
+  Expect<Assignable<Schemas["ShopEditor"], T.ShopEditor>>,
+  Expect<Assignable<Schemas["AvailabilityResult"], T.AvailabilityResult>>,
 ];

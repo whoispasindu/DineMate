@@ -327,6 +327,160 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/manage/shops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Managed Shops */
+        get: operations["list_managed_shops_api_v1_manage_shops_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manage/shops/{shop_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Shop Editor */
+        get: operations["get_shop_editor_api_v1_manage_shops__shop_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Shop Hours */
+        put: operations["put_shop_hours_api_v1_shops__shop_id__hours_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/closure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Shop Closure */
+        put: operations["put_shop_closure_api_v1_shops__shop_id__closure_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Menu Item */
+        post: operations["create_menu_item_api_v1_shops__shop_id__menu_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menu-items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Menu Item */
+        delete: operations["delete_menu_item_api_v1_menu_items__item_id__delete"];
+        options?: never;
+        head?: never;
+        /** Patch Menu Item */
+        patch: operations["patch_menu_item_api_v1_menu_items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/menu-items/{item_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set Availability */
+        patch: operations["set_availability_api_v1_menu_items__item_id__availability_patch"];
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish Menu */
+        post: operations["publish_menu_api_v1_shops__shop_id__menu_publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{shop_id}/menu/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Discard Menu Draft */
+        post: operations["discard_menu_draft_api_v1_shops__shop_id__menu_discard_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -341,6 +495,20 @@ export interface components {
             safety: components["schemas"]["SafetyStatus"];
             /** Notices */
             notices: components["schemas"]["Notice"][];
+        };
+        /** AvailabilityIn */
+        AvailabilityIn: {
+            /** Is Available */
+            is_available: boolean;
+        };
+        /** AvailabilityResult */
+        AvailabilityResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            item: components["schemas"]["EditableMenuItem"];
         };
         /** BestCanteen */
         BestCanteen: {
@@ -436,6 +604,13 @@ export interface components {
             walk: components["schemas"]["WalkTime"] | null;
             /** Updated At */
             updated_at: string | null;
+        };
+        /** ClosureIn */
+        ClosureIn: {
+            /** Until */
+            until: string | null;
+            /** Reason */
+            reason?: string | null;
         };
         /** ConfigZone */
         ConfigZone: {
@@ -555,6 +730,25 @@ export interface components {
             /** Last Seen At */
             last_seen_at: string | null;
         };
+        /** EditableMenuItem */
+        EditableMenuItem: {
+            /** Id */
+            id: string;
+            live: components["schemas"]["MenuItemFields-Output"] | null;
+            draft: components["schemas"]["MenuItemFields-Output"] | null;
+            /**
+             * Pending
+             * @enum {string}
+             */
+            pending: "none" | "new" | "edit" | "delete";
+            /** Is Available */
+            is_available: boolean;
+            /**
+             * Availability Updated At
+             * Format: date-time
+             */
+            availability_updated_at: string;
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -640,6 +834,38 @@ export interface components {
             /** Message */
             message?: string | null;
         };
+        /** HoursException */
+        "HoursException-Input": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Is Closed */
+            is_closed: boolean;
+            /** Opens */
+            opens?: string | null;
+            /** Closes */
+            closes?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** HoursException */
+        "HoursException-Output": {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Is Closed */
+            is_closed: boolean;
+            /** Opens */
+            opens: string | null;
+            /** Closes */
+            closes: string | null;
+            /** Reason */
+            reason: string | null;
+        };
         /** IgnoreArea */
         IgnoreArea: {
             /**
@@ -659,6 +885,22 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** ManagedShop */
+        ManagedShop: {
+            shop: components["schemas"]["Shop"];
+            /** Pending Changes */
+            pending_changes: number;
+        };
+        /** ManagedShopList */
+        ManagedShopList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["ManagedShop"][];
         };
         /** Me */
         Me: {
@@ -752,6 +994,45 @@ export interface components {
             periods: ("breakfast" | "lunch" | "dinner")[];
             /** Is Available */
             is_available: boolean;
+        };
+        /** MenuItemFields */
+        "MenuItemFields-Input": {
+            /** Name */
+            name: string;
+            /** Price Lkr */
+            price_lkr: number | string;
+            /** Category */
+            category?: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags?: "vegetarian"[];
+            /** Periods */
+            periods: ("breakfast" | "lunch" | "dinner")[];
+        };
+        /** MenuItemFields */
+        "MenuItemFields-Output": {
+            /** Name */
+            name: string;
+            /** Price Lkr */
+            price_lkr: number;
+            /** Category */
+            category: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags: "vegetarian"[];
+            /** Periods */
+            periods: ("breakfast" | "lunch" | "dinner")[];
+        };
+        /** MenuItemPatch */
+        MenuItemPatch: {
+            /** Name */
+            name?: string | null;
+            /** Price Lkr */
+            price_lkr?: number | string | null;
+            /** Category */
+            category?: ("rice" | "kottu" | "short_eats" | "drinks") | null;
+            /** Dietary Tags */
+            dietary_tags?: "vegetarian"[] | null;
+            /** Periods */
+            periods?: ("breakfast" | "lunch" | "dinner")[] | null;
         };
         /** Notice */
         Notice: {
@@ -908,6 +1189,34 @@ export interface components {
             hours_label: string;
             /** Menu Updated At */
             menu_updated_at: string | null;
+        };
+        /** ShopEditor */
+        ShopEditor: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            shop: components["schemas"]["Shop"];
+            /** Weekly */
+            weekly: components["schemas"]["WeeklyHours"][];
+            /** Exceptions */
+            exceptions: components["schemas"]["HoursException-Output"][];
+            /** Temporarily Closed Until */
+            temporarily_closed_until: string | null;
+            /** Closure Reason */
+            closure_reason: string | null;
+            /** Items */
+            items: components["schemas"]["EditableMenuItem"][];
+            /** Pending Changes */
+            pending_changes: number;
+        };
+        /** ShopHoursIn */
+        ShopHoursIn: {
+            /** Weekly */
+            weekly: components["schemas"]["WeeklyHours"][];
+            /** Exceptions */
+            exceptions: components["schemas"]["HoursException-Input"][];
         };
         /** ShopList */
         ShopList: {
@@ -1071,6 +1380,21 @@ export interface components {
             note: string | null;
             /** Is Today */
             is_today: boolean;
+        };
+        /** WeeklyHours */
+        WeeklyHours: {
+            /** Weekday */
+            weekday: number;
+            /**
+             * Opens
+             * Format: time
+             */
+            opens: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            closes: string;
         };
         /** WorkerSettings */
         WorkerSettings: {
@@ -1934,6 +2258,624 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_managed_shops_api_v1_manage_shops_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedShopList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_shop_editor_api_v1_manage_shops__shop_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_shop_hours_api_v1_shops__shop_id__hours_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShopHoursIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_shop_closure_api_v1_shops__shop_id__closure_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_menu_item_api_v1_shops__shop_id__menu_items_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuItemFields-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_menu_item_api_v1_menu_items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_menu_item_api_v1_menu_items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenuItemPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_availability_api_v1_menu_items__item_id__availability_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvailabilityIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilityResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_menu_api_v1_shops__shop_id__menu_publish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_menu_draft_api_v1_shops__shop_id__menu_discard_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                shop_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopEditor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

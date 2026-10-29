@@ -245,3 +245,78 @@ export interface ConsoleOverview extends Timestamped {
     real_integration_connected: boolean;
   };
 }
+
+export type StaffRole = "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer";
+
+export interface StaffUser {
+  id: string;
+  email: string;
+  display_name: string;
+  role: StaffRole;
+  canteen_ids: string[];
+  shop_ids: string[];
+}
+
+export interface StaffSession {
+  access_token: string;
+  token_type: "bearer";
+  expires_in: number;
+  user: StaffUser;
+}
+
+export type MenuCategory = "rice" | "kottu" | "short_eats" | "drinks";
+export type PendingChange = "none" | "new" | "edit" | "delete";
+
+export interface MenuItemFields {
+  name: string;
+  price_lkr: number;
+  category: MenuCategory | null;
+  dietary_tags: "vegetarian"[];
+  periods: MealPeriod[];
+}
+
+export interface EditableMenuItem {
+  id: string;
+  live: MenuItemFields | null;
+  draft: MenuItemFields | null;
+  pending: PendingChange;
+  is_available: boolean;
+  availability_updated_at: string;
+}
+
+export interface WeeklyHours {
+  weekday: number;
+  opens: string;
+  closes: string;
+}
+
+export interface HoursException {
+  date: string;
+  is_closed: boolean;
+  opens: string | null;
+  closes: string | null;
+  reason: string | null;
+}
+
+export interface ManagedShop {
+  shop: Shop;
+  pending_changes: number;
+}
+
+export interface ManagedShopList extends Timestamped {
+  items: ManagedShop[];
+}
+
+export interface ShopEditor extends Timestamped {
+  shop: Shop;
+  weekly: WeeklyHours[];
+  exceptions: HoursException[];
+  temporarily_closed_until: string | null;
+  closure_reason: string | null;
+  items: EditableMenuItem[];
+  pending_changes: number;
+}
+
+export interface AvailabilityResult extends Timestamped {
+  item: EditableMenuItem;
+}
