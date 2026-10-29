@@ -183,7 +183,7 @@ def list_events(
         stmt = stmt.where(SafetyEvent.status.in_(service.OPEN))
     elif status == "resolved":
         stmt = stmt.where(SafetyEvent.status == "resolved", SafetyEvent.resolved_at >= now - RECENT_RESOLVED)
-    events = sorted(session.scalars(stmt.limit(200)), key=lambda e: (e.status != "active", e.status != "acknowledged"))
+    events = service.desk_order(list(session.scalars(stmt.limit(200))))
     canteens, zones = service.canteen_names(session), service.zone_names(session, events)
     return StaffSafetyEventList(
         server_time=now,

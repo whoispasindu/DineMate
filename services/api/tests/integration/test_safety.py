@@ -199,6 +199,12 @@ def test_heartbeat_loss_warns_officers_only(client: TestClient, seeded: Engine) 
             ("integration_offline", "warning", True)
         ]
         assert check_sources(s, LUNCH_NOW + timedelta(seconds=90)) == []
+        officer_resolved = s.scalars(select(SafetyEvent)).one()
+        officer_resolved.status, officer_resolved.resolution_note = "resolved", "Checked by officer"
+        s.commit()
+        assert check_sources(s, LUNCH_NOW + timedelta(seconds=105)) == []
+        officer_resolved.status, officer_resolved.resolution_note = "active", None
+        s.commit()
     assert client.get("/api/v1/safety/active").json()["active"] is False
     staff = client.get("/api/v1/safety/events", headers=login(client, OFFICER)).json()["items"]
     assert [e["title"] for e in staff] == ["Alarm integration offline (simulated)"]

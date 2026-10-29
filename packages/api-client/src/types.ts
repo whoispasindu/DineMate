@@ -429,3 +429,65 @@ export interface ManagedDeviceList extends Timestamped {
 export interface ZoneResult extends Timestamped {
   zone: EditableZone;
 }
+
+export type SafetyEventType = "fire_alarm" | "evacuation" | "test_notice" | "integration_offline";
+export type SafetySeverity = "critical" | "warning" | "info";
+
+export interface SafetyActive extends Timestamped {
+  active: boolean;
+  events: SafetyEvent[];
+}
+
+export interface SafetyAck {
+  user_name: string;
+  acknowledged_at: string;
+  note: string | null;
+}
+
+export interface StaffSafetyEvent {
+  id: string;
+  event_type: SafetyEventType;
+  title: string;
+  severity: SafetySeverity;
+  status: "active" | "acknowledged" | "resolved";
+  is_simulation: boolean;
+  label: string | null;
+  canteen_id: string | null;
+  canteen_name: string | null;
+  zone_name: string | null;
+  source_id: string;
+  source_name: string;
+  source_kind: "simulator" | "approved_integration";
+  occurred_at: string;
+  received_at: string;
+  last_seen_at: string;
+  repeat_count: number;
+  note: string | null;
+  instructions: string;
+  acks: SafetyAck[];
+  resolved_by_name: string | null;
+  resolved_at: string | null;
+  resolution_note: string | null;
+}
+
+export interface StaffSafetyEventList extends Timestamped {
+  simulation_mode: boolean;
+  items: StaffSafetyEvent[];
+}
+
+export interface StaffSafetyEventResult extends Timestamped {
+  event: StaffSafetyEvent;
+}
+
+export interface SafetySourceHealth {
+  id: string;
+  name: string;
+  kind: "simulator" | "approved_integration";
+  is_enabled: boolean;
+  last_heartbeat_at: string | null;
+  state: "online" | "offline" | "never_connected";
+}
+
+export interface SafetySourceList extends Timestamped {
+  items: SafetySourceHealth[];
+}

@@ -28,4 +28,8 @@ export type ApiContract = [
   Expect<Assignable<Schemas["DeviceLayout"], T.DeviceLayout>>,
   Expect<Assignable<Schemas["ManagedDeviceList"], T.ManagedDeviceList>>,
   Expect<Assignable<Schemas["ZoneResult"], T.ZoneResult>>,
+  Expect<Assignable<Schemas["SafetyActive"], T.SafetyActive>>,
+  Expect<Assignable<Schemas["StaffSafetyEventList"], T.StaffSafetyEventList>>,
+  Expect<Assignable<Schemas["StaffSafetyEventResult"], T.StaffSafetyEventResult>>,
+  Expect<Assignable<Schemas["SafetySourceList"], T.SafetySourceList>>,
 ];

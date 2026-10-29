@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
-import type { DeviceLayout, ShopEditor, ThresholdList, ThresholdValues } from "./types";
+import type { DeviceLayout, ShopEditor, StaffSafetyEventResult, ThresholdList, ThresholdValues } from "./types";
 
 const LIVE_POLL_MS = 15_000;
 const INFO_POLL_MS = 60_000;
@@ -20,6 +20,9 @@ export const queryKeys = {
   thresholds: ["manage", "thresholds"] as const,
   managedDevices: ["manage", "devices"] as const,
   deviceLayout: (deviceId: string) => ["manage", "layout", deviceId] as const,
+  safetyActive: ["safety", "active"] as const,
+  safetyEvents: (status: string) => ["safety", "events", status] as const,
+  safetySources: ["safety", "sources"] as const,
 };
 
 export function useStudentSummary() {
@@ -155,6 +158,37 @@ export function useLayoutMutation<A>(deviceId: string, run: (arg: A) => Promise<
     onSuccess: (layout) => {
       client.setQueryData(queryKeys.deviceLayout(deviceId), layout);
       void client.invalidateQueries({ queryKey: queryKeys.managedDevices });
+    },
+  });
+}
+
+const SAFETY_POLL_MS = 10_000;
+const SAFETY_DESK_POLL_MS = 5_000;
+
+export function useSafetyActive() {
+  return useQuery({ queryKey: queryKeys.safetyActive, queryFn: api.safetyActive, refetchInterval: SAFETY_POLL_MS, retry: false });
+}
+
+export function useSafetyEvents(status: "open" | "resolved" | "all") {
+  return useQuery({
+    queryKey: queryKeys.safetyEvents(status),
+    queryFn: () => api.safetyEvents(status),
+    refetchInterval: SAFETY_DESK_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useSafetySources() {
+  return useQuery({ queryKey: queryKeys.safetySources, queryFn: api.safetySources, refetchInterval: 15_000, retry: false });
+}
+
+export function useSafetyAction<A>(run: (arg: A) => Promise<StaffSafetyEventResult>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ["safety"] });
+      void client.invalidateQueries({ queryKey: queryKeys.consoleOverview });
     },
   });
 }

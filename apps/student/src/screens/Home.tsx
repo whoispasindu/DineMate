@@ -3,8 +3,9 @@ import { APP_NAME, BrandMark, formatAgo, formatClock, greeting, Icon, LiveLine, 
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { BestSpotMobile, BestSpotWeb, BusyTimesChart, CanteenCard, CanteenRow, NoBestSpot } from "../components/canteen";
-import { Footnote, Loading, MessageCard, OfflineCard, SafetyBanner, ShopStatusText, Skeleton } from "../components/common";
+import { Footnote, Loading, MessageCard, OfflineCard, ShopStatusText, Skeleton } from "../components/common";
 import { MealCountdownCard, MealPill } from "../components/meal";
+import { SafetySlot } from "../components/safety";
 import { BellLink } from "../components/shell";
 import { useIsDesktop, useOnline } from "../lib/device";
 import { NOTICE_LOOK } from "../lib/present";
@@ -57,9 +58,7 @@ function HomeMobile({ summary, now, online }: HomeProps) {
           <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em]">{greeting(now)}</h1>
           <span className="text-sm text-muted">Where will you sit today?</span>
         </div>
-        {data?.safety.events.map((event) => (
-          <SafetyBanner key={event.id} event={event} layout="mobile" />
-        ))}
+        <SafetySlot layout="mobile" />
         <MealPill />
         {!online ? (
           <OfflineCard />
@@ -111,9 +110,7 @@ function HomeWeb({ summary, now, online }: HomeProps) {
           {data?.canteens.some((c) => c.is_sample) ? <SampleBadge /> : null}
         </div>
       </div>
-      {data?.safety.events.map((event) => (
-        <SafetyBanner key={event.id} event={event} layout="web" />
-      ))}
+      <SafetySlot layout="web" />
       {!online ? <OfflineCard /> : null}
       <div className="flex flex-wrap gap-5">
         {!online ? null : !data ? (

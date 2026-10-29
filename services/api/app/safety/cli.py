@@ -59,7 +59,7 @@ def trigger(args: argparse.Namespace, token: str) -> int:
             return 1
         if i + 1 < args.repeat:
             time.sleep(1.05 / INGEST_PER_SECOND)
-    label = result.get("label") or "REAL EVENT"
+    label = "SIMULATION" if result.get("is_simulation") else "REAL EVENT"
     print(f"{label}: event {result['id']} status={result['status']} repeat_count={result['repeat_count']}")
     return 0
 

@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +10,7 @@ from app import models, schemas
 from app.core.config import get_settings
 from app.core.device_auth import hash_token
 from app.safety.models import SafetyEvent, SafetyInstruction, SafetySource
+from app.services.audit import record
 
 SIMULATOR_SOURCE_ID = "safety-sim"
 SIMULATION_LABEL = "SIMULATION — NOT A REAL EMERGENCY"
@@ -17,6 +18,7 @@ FALLBACK_INSTRUCTIONS = "Follow instructions from campus staff and official alar
 MERGE_WINDOW = timedelta(minutes=5)
 OFFLINE_AFTER = timedelta(seconds=60)
 OPEN = ("active", "acknowledged")
+SEVERITY_ORDER = {"critical": 0, "warning": 1, "info": 2}
 SEVERITY = {"fire_alarm": "critical", "evacuation": "critical", "test_notice": "info", "integration_offline": "warning"}
 TITLES = {
     "fire_alarm": "Fire alarm",
@@ -144,8 +146,12 @@ def open_events(session: Session, public: bool) -> list[SafetyEvent]:
     stmt = select(SafetyEvent).where(SafetyEvent.status.in_(OPEN))
     if public:
         stmt = stmt.where(SafetyEvent.severity != "warning")
-    events = list(session.scalars(stmt.order_by(SafetyEvent.received_at.desc())))
-    return sorted(events, key=lambda e: e.status != "active")
+    return desk_order(list(session.scalars(stmt.order_by(SafetyEvent.received_at.desc()))))
+
+
+def desk_order(events: list[SafetyEvent]) -> list[SafetyEvent]:
+    rank = {"active": 0, "acknowledged": 1, "resolved": 2}
+    return sorted(events, key=lambda e: (rank.get(e.status, 3), SEVERITY_ORDER.get(e.severity, 3)))
 
 
 def source_online(source: SafetySource, now: datetime) -> bool:
@@ -164,26 +170,49 @@ def check_sources(session: Session, now: datetime) -> list[SafetyEvent]:
                 SafetyEvent.status.in_(OPEN),
             )
         ).first()
-        if not source_online(source, now) and warning is None:
-            changed.append(
-                ingest(
-                    session,
-                    source,
-                    f"offline-{source.id}-{int(source.last_heartbeat_at.timestamp())}",
-                    "integration_offline",
-                    None,
-                    None,
-                    source.last_heartbeat_at + OFFLINE_AFTER,
-                    False,
-                    now,
-                    note=f"No heartbeat from {source.name} since {source.last_heartbeat_at.isoformat()}.",
-                    merge=False,
-                ).event
+        offline_id = f"offline-{source.id}-{int(source.last_heartbeat_at.timestamp())}"
+        already_raised = session.scalars(
+            select(SafetyEvent.id).where(
+                SafetyEvent.source_id == source.id, SafetyEvent.external_event_id == offline_id
             )
+        ).first()
+        if not source_online(source, now) and warning is None and already_raised is None:
+            created = ingest(
+                session,
+                source,
+                offline_id,
+                "integration_offline",
+                None,
+                None,
+                source.last_heartbeat_at + OFFLINE_AFTER,
+                False,
+                now,
+                note=f"No heartbeat from {source.name} for over 60 s.",
+                merge=False,
+            ).event
+            record(
+                session,
+                datetime.now(UTC),
+                "safety.source_offline",
+                "safety_event",
+                str(created.id),
+                device_id=source.id,
+                after={"status": created.status, "is_simulation": created.is_simulation},
+            )
+            changed.append(created)
         elif source_online(source, now) and warning is not None:
             warning.status = "resolved"
             warning.resolved_at = now
             warning.resolution_note = "Heartbeat resumed."
+            record(
+                session,
+                datetime.now(UTC),
+                "safety.source_online",
+                "safety_event",
+                str(warning.id),
+                device_id=source.id,
+                after={"status": "resolved", "is_simulation": warning.is_simulation},
+            )
             changed.append(warning)
     return changed
 
