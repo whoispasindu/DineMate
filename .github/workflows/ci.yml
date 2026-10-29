@@ -72,6 +72,45 @@ jobs:
           uv run python -m app.openapi_export ../../packages/api-client/openapi.json
           git diff --exit-code ../../packages/api-client/openapi.json
 
+  e2e:
+    name: E2E (Playwright demo flows)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dinemate
+          POSTGRES_PASSWORD: dinemate
+          POSTGRES_DB: dinemate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dinemate"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.5"
+          enable-cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --frozen --directory services/api
+      - run: pnpm --filter @dinemate/e2e exec playwright install --with-deps chromium
+      - run: pnpm e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          retention-days: 7
+
   vision:
     name: Vision (ruff, counting tests)
     runs-on: ubuntu-latest
