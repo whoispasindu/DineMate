@@ -8,7 +8,7 @@ import {
   type MenuTag,
   type Shop,
 } from "@dinemate/api-client";
-import { cx, formatClock, formatPrice, Icon, SampleBadge, type IconName } from "@dinemate/ui";
+import { cx, FoodArt, foodArtFor, formatClock, formatPrice, SampleBadge, shopArtFor } from "@dinemate/ui";
 import { useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import {
@@ -23,7 +23,7 @@ import {
   Skeleton,
 } from "../components/common";
 import { useIsDesktop } from "../lib/device";
-import { ITEM_TINTS, PERIOD_LABEL, PERIODS, SHOP_LOOK } from "../lib/present";
+import { PERIOD_LABEL, PERIODS } from "../lib/present";
 
 type Category = "all" | MenuTag;
 
@@ -38,11 +38,12 @@ const CATEGORIES: { value: Category; label: string }[] = [
 
 const PERIOD_OPTIONS = PERIODS.map((p) => ({ value: p, label: PERIOD_LABEL[p] }));
 
-function itemIcon(item: MenuItem): IconName {
-  if (item.tags.includes("kottu")) return "pan";
-  if (item.tags.includes("short_eats")) return "bun";
-  if (item.tags.includes("drinks")) return "cup";
-  return "bowl";
+function ItemArt({ item, className, fit }: { item: MenuItem; className: string; fit?: "cover" | "contain" }) {
+  return <FoodArt kind={foodArtFor(item.name, item.tags)} name={item.name} muted={!item.is_available} className={className} fit={fit} />;
+}
+
+function ShopArt({ shop, className }: { shop: Shop; className: string }) {
+  return <FoodArt kind={shopArtFor(shop.kind)} name={shop.name} className={className} />;
 }
 
 function defaultShop(shops: Shop[]): Shop | undefined {
@@ -154,7 +155,6 @@ function AvailabilityChip({ available }: { available: boolean }) {
 }
 
 function ShopCard({ shop, href, selected }: { shop: Shop; href: string; selected: boolean }) {
-  const look = SHOP_LOOK[shop.kind];
   return (
     <Link
       to={href}
@@ -165,9 +165,7 @@ function ShopCard({ shop, href, selected }: { shop: Shop; href: string; selected
         selected ? "border-mint-line bg-card" : "border-line bg-card opacity-80",
       )}
     >
-      <span className={cx("flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]", look.tile)}>
-        <Icon name={look.icon} size={24} />
-      </span>
+      <ShopArt shop={shop} className="h-12 w-12 shrink-0 rounded-[14px]" />
       <span className="flex flex-1 flex-col gap-[3px]">
         <span className="text-base font-extrabold">{shop.name}</span>
         <ShopStatusDot status={shop.status} />
@@ -224,15 +222,7 @@ function FoodMobile(props: FoodViewProps) {
             <ul className="m-0 flex list-none flex-col rounded-[18px] border border-line bg-card px-3 py-0.5">
               {items.map((item, i) => (
                 <li key={item.id} className={cx("flex items-center gap-3 py-3", i < items.length - 1 && "border-b border-line-soft")}>
-                  <span
-                    className={cx(
-                      "flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[14px]",
-                      ITEM_TINTS[i % ITEM_TINTS.length],
-                      !item.is_available && "opacity-55",
-                    )}
-                  >
-                    <Icon name={itemIcon(item)} size={24} />
-                  </span>
+                  <ItemArt item={item} className="h-[52px] w-[52px] shrink-0 rounded-[14px]" />
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
                     <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>
                       {item.name}
@@ -296,7 +286,6 @@ function FoodWeb(props: FoodViewProps) {
           {!props.shopsLoading && shops.length === 0 ? <span className="p-3 text-sm text-muted">No shops listed yet</span> : null}
           {shops.map((s) => {
             const selected = s.id === shop?.id;
-            const look = SHOP_LOOK[s.kind];
             return (
               <Link
                 key={s.id}
@@ -305,9 +294,7 @@ function FoodWeb(props: FoodViewProps) {
                 aria-current={selected ? "true" : undefined}
                 className={cx("flex items-center gap-3 rounded-2xl p-3 text-ink no-underline", selected ? "bg-mint" : "hover:bg-page")}
               >
-                <span className={cx("flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]", look.tile)}>
-                  <Icon name={look.icon} size={22} />
-                </span>
+                <ShopArt shop={s} className="h-11 w-11 shrink-0 rounded-[14px]" />
                 <span className="flex flex-1 flex-col gap-0.5">
                   <span className={cx("text-[15px]", selected ? "font-extrabold" : "font-bold")}>{s.name}</span>
                   <ShopStatusDot status={s.status} />
@@ -353,17 +340,9 @@ function FoodWeb(props: FoodViewProps) {
               <MenuEmpty {...props} />
             ) : (
               <ul className="m-0 flex list-none flex-wrap gap-3.5 p-0">
-                {items.map((item, i) => (
+                {items.map((item) => (
                   <li key={item.id} className="flex flex-[1_1_220px] flex-col overflow-hidden rounded-[18px] border border-line">
-                    <span
-                      className={cx(
-                        "flex h-[104px] items-center justify-center",
-                        ITEM_TINTS[i % ITEM_TINTS.length],
-                        !item.is_available && "opacity-50",
-                      )}
-                    >
-                      <Icon name={itemIcon(item)} size={40} strokeWidth={1.8} />
-                    </span>
+                    <ItemArt item={item} className="h-[120px]" fit="contain" />
                     <span className="flex flex-col gap-1.5 px-3.5 pb-3.5 pt-3">
                       <span className={cx("text-[15px] font-bold", item.is_available ? "text-ink" : "text-faint line-through")}>
                         {item.name}
@@ -380,7 +359,9 @@ function FoodWeb(props: FoodViewProps) {
             )}
           </div>
           {props.isSample ? (
-            <Footnote>Sample data — shop names, items and prices are placeholders until real shops provide them.</Footnote>
+            <Footnote>
+              Sample data — shop names, items and prices are placeholders until real shops provide them. Pictures are illustrations.
+            </Footnote>
           ) : null}
         </section>
       </div>

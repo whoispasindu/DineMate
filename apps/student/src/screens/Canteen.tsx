@@ -11,6 +11,7 @@ import {
 import {
   CanteenArt,
   cx,
+  FoodArt,
   formatClock,
   formatClock24,
   formatLocalRange,
@@ -18,6 +19,7 @@ import {
   Icon,
   levelFor,
   LiveLine,
+  shopArtFor,
   StatusPill,
   type IconName,
 } from "@dinemate/ui";
@@ -384,7 +386,10 @@ function CanteenWeb({ data, now, online }: ViewProps) {
                   to={`/food?canteen=${canteen.id}&shop=${shop.id}`}
                   className="flex min-h-[52px] items-center justify-between gap-2 text-ink no-underline hover:text-brand-dark"
                 >
-                  <span className="text-sm font-bold">{shop.name}</span>
+                  <span className="flex items-center gap-2.5">
+                    <FoodArt kind={shopArtFor(shop.kind)} className="h-9 w-9 shrink-0 rounded-[10px]" />
+                    <span className="text-sm font-bold">{shop.name}</span>
+                  </span>
                   <ShopStatusText status={shop.status} />
                 </Link>
               </li>
