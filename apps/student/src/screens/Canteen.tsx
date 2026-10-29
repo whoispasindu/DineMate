@@ -23,7 +23,7 @@ import {
 } from "@dinemate/ui";
 import type { ReactNode } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
-import { freshnessText, ZoneBarRow, ZoneCard } from "../components/canteen";
+import { AlternativeCard, freshnessText, ZoneBarRow, ZoneCard } from "../components/canteen";
 import { Footnote, Loading, MessageCard, OfflineCard, ShopStatusText, Skeleton } from "../components/common";
 import { useIsDesktop, useOnline } from "../lib/device";
 import { favourites } from "../lib/prefs";
@@ -209,6 +209,7 @@ function CanteenMobile({ data, now, online }: ViewProps) {
         ) : (
           <OfflineCard />
         )}
+        {online ? <AlternativeCard canteen={canteen} /> : null}
         <div className="grid grid-cols-3 gap-2">
           <Tile
             icon="clock"
@@ -361,6 +362,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
         <OfflineCard />
       )}
       <div className="flex flex-wrap gap-5">
+        {online ? <AlternativeCard canteen={canteen} /> : null}
         {online && forecast.length > 0 && canteen.freshness === "live" ? <NextHour canteen={canteen} forecast={forecast} /> : null}
         <section
           aria-labelledby="shops-title"

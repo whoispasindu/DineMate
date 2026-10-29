@@ -24,7 +24,11 @@ def test_student_summary_matches_sample_design(api: TestClient) -> None:
     assert [(x["shops_open"], x["shops_total"]) for x in (a, b, c)] == [(3, 4), (2, 3), (1, 2)]
     assert a["walk"] == {"from_name": "Canteen B", "minutes": 4}
     assert body["safety"] == {"active": False, "events": []}
-    assert body["busy_today"] is None
+    busy = body["busy_today"]
+    assert busy["canteen_id"] == "a"
+    now_point = next(p for p in busy["points"] if p["is_now"])
+    assert (now_point["label"], now_point["percent"]) == ("Now", 79)
+    assert [p["label"] for p in busy["points"] if p["is_forecast"]] == ["13:10", "13:40"]
     assert len(body["shops_now"]) == 4
 
 

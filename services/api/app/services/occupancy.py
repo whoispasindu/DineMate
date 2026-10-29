@@ -128,12 +128,26 @@ def canteen_occupancy(zones: list[ZoneView]) -> CanteenOccupancy:
     )
 
 
-def best_candidate(candidates: list[tuple[str, CanteenOccupancy]]) -> str | None:
-    eligible = [
-        (canteen_id, o)
-        for canteen_id, o in candidates
-        if o.freshness == "live" and o.level in ("normal", "busy") and o.free_range is not None
-    ]
-    if not eligible:
-        return None
-    return max(eligible, key=lambda item: item[1].free_range[0] if item[1].free_range else 0)[0]
+Exclusion = Literal["no_live_data", "too_crowded"]
+
+
+def rank_alternatives(
+    candidates: list[tuple[str, CanteenOccupancy]], walks: dict[str, int] | None = None
+) -> tuple[list[str], dict[str, Exclusion]]:
+    walk = walks or {}
+    excluded: dict[str, Exclusion] = {}
+    eligible: list[tuple[str, int]] = []
+    for canteen_id, o in candidates:
+        if o.freshness != "live" or o.free_range is None:
+            excluded[canteen_id] = "no_live_data"
+        elif o.level not in ("normal", "busy"):
+            excluded[canteen_id] = "too_crowded"
+        else:
+            eligible.append((canteen_id, o.free_range[0]))
+    eligible.sort(key=lambda item: (-item[1], walk.get(item[0], 10_000)))
+    return [canteen_id for canteen_id, _ in eligible], excluded
+
+
+def best_candidate(candidates: list[tuple[str, CanteenOccupancy]], walks: dict[str, int] | None = None) -> str | None:
+    ranked, _ = rank_alternatives(candidates, walks)
+    return ranked[0] if ranked else None

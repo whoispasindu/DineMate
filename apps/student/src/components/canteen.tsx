@@ -1,4 +1,4 @@
-import type { BusyPoint, CanteenSummary, Freshness, ZoneOccupancy } from "@dinemate/api-client";
+import { useRecommendation, type BusyPoint, type CanteenSummary, type Freshness, type ZoneOccupancy } from "@dinemate/api-client";
 import { CanteenArt, cx, formatAgo, formatClock, Icon, levelFor, Ring, StatusPill } from "@dinemate/ui";
 import { Link } from "react-router";
 import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText } from "../lib/present";
@@ -286,5 +286,45 @@ export function ZoneCard({ zone, now }: { zone: ZoneOccupancy; now: number }) {
         </span>
       </div>
     </div>
+  );
+}
+
+export function AlternativeCard({ canteen }: { canteen: CanteenSummary }) {
+  const needsAlternative = canteen.freshness !== "live" || canteen.level === "crowded" || canteen.level === "near_capacity";
+  const result = useRecommendation(canteen.id, needsAlternative);
+  if (!needsAlternative || !result.data) return null;
+  const pick = result.data.recommendation;
+  if (!pick) {
+    return (
+      <section
+        aria-label="Less crowded nearby"
+        className="flex items-start gap-3 rounded-[22px] border-[1.5px] border-dashed border-dash bg-surface-soft p-4"
+      >
+        <Icon name="question" size={20} className="mt-0.5 shrink-0 text-neutral-ink" />
+        <span className="text-[13px] font-bold text-ink-2">{result.data.message}</span>
+      </section>
+    );
+  }
+  return (
+    <Link
+      to={`/canteens/${pick.canteen_id}`}
+      aria-label={`Less crowded nearby: ${pick.name}, about ${pick.free_about ?? pick.available_range[0]} seats free`}
+      className="flex items-center gap-3 rounded-[22px] border border-line bg-card p-4 text-ink no-underline hover:border-brand"
+    >
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mint-soft text-brand">
+        <Icon name="walk" size={20} />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-xs font-bold uppercase tracking-[0.04em] text-muted">Less crowded nearby</span>
+        <span className="text-[15px] font-extrabold">
+          {pick.name} · about {pick.free_about ?? pick.available_range[0]} free
+        </span>
+        <span className="text-xs text-muted">
+          {pick.available_range[0]}–{pick.available_range[1]} seats (est.)
+          {pick.walk_minutes !== null ? ` · ${pick.walk_minutes} min walk` : ""}
+        </span>
+      </span>
+      <Icon name="chevronRight" size={18} className="shrink-0 text-muted" />
+    </Link>
   );
 }

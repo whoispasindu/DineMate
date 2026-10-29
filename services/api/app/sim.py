@@ -6,13 +6,15 @@ import time as systime
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from app.core.config import Settings, get_settings
+from app.sim_shape import daily_shape
 
 DRIFT = 4
 STEPS = (-1, 0, 0, 1)
+CATCH_UP = 3
 
 log = logging.getLogger("dinemate.sim")
 
@@ -21,9 +23,16 @@ def _clamp(value: int, low: int, high: int) -> int:
     return max(low, min(high, value))
 
 
-def next_occupancy(previous: int | None, base: int, capacity: int, rng: random.Random) -> int:
-    start = base if previous is None else previous
-    return _clamp(_clamp(start + rng.choice(STEPS), base - DRIFT, base + DRIFT), 0, capacity)
+def target_for(base: int, at: datetime) -> int:
+    return round(base * daily_shape(at))
+
+
+def next_occupancy(previous: int | None, target: int, capacity: int, rng: random.Random) -> int:
+    start = target if previous is None else previous
+    if abs(start - target) > DRIFT:
+        start += CATCH_UP if target > start else -CATCH_UP
+        return _clamp(start, 0, capacity)
+    return _clamp(_clamp(start + rng.choice(STEPS), target - DRIFT, target + DRIFT), 0, capacity)
 
 
 @dataclass
@@ -32,6 +41,7 @@ class SimulatedDevice:
     etag: str | None = None
     config: dict[str, Any] | None = None
     occupancy: dict[str, int] = field(default_factory=dict)
+    server_offset: timedelta = timedelta(0)
 
 
 class ApiClient:
@@ -63,6 +73,7 @@ class ApiClient:
         status, body, etag = self._request("GET", f"/devices/{device.device_id}/config", etag=device.etag)
         if status == 200 and body is not None:
             device.config, device.etag = body, etag
+            device.server_offset = datetime.fromisoformat(body["server_time"]) - datetime.now(UTC)
 
     def post(self, device_id: str, readings: list[dict[str, Any]]) -> None:
         payload = {"captured_at": datetime.now(UTC).isoformat(), "readings": readings}
@@ -72,12 +83,14 @@ class ApiClient:
 def readings_for(device: SimulatedDevice, rng: random.Random) -> list[dict[str, Any]]:
     config = device.config or {}
     profiles: dict[str, dict[str, int]] = config.get("simulation") or {}
+    server_now = datetime.now(UTC) + device.server_offset
     readings = []
     for zone in config.get("zones", []):
         profile = profiles.get(zone["zone_id"])
         if profile is None:
             continue
-        occupied = next_occupancy(device.occupancy.get(zone["zone_id"]), profile["base"], zone["capacity"], rng)
+        target = target_for(profile["base"], server_now)
+        occupied = next_occupancy(device.occupancy.get(zone["zone_id"]), target, zone["capacity"], rng)
         device.occupancy[zone["zone_id"]] = occupied
         readings.append(
             {
