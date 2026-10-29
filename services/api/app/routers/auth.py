@@ -30,6 +30,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 AUTH_ERRORS: dict[int | str, dict[str, Any]] = {401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}}
 DUMMY_HASH = hash_password("timing-equaliser-not-a-real-password")
+REUSE_GRACE = timedelta(seconds=30)
 
 
 def me_schema(user: models.User) -> Me:
@@ -109,11 +110,11 @@ def refresh(
     if stored is None or stored.expires_at <= now:
         _clear_cookie(response)
         raise ApiError(401, "unauthenticated", "Your session has expired. Please sign in again.")
-    if stored.revoked_at is not None:
+    if stored.revoked_at is not None and now - stored.revoked_at > REUSE_GRACE:
         session.execute(
             update(models.RefreshToken)
-            .where(models.RefreshToken.user_id == stored.user_id, models.RefreshToken.revoked_at.is_(None))
-            .values(revoked_at=now)
+            .where(models.RefreshToken.user_id == stored.user_id, models.RefreshToken.expires_at > now)
+            .values(revoked_at=func.coalesce(models.RefreshToken.revoked_at, now), expires_at=now)
         )
         session.commit()
         _clear_cookie(response)
@@ -122,7 +123,7 @@ def refresh(
     if user is None or not user.is_active:
         _clear_cookie(response)
         raise ApiError(401, "unauthenticated", "Please sign in.")
-    stored.revoked_at = now
+    stored.revoked_at = stored.revoked_at or now
     result = _issue(session, user, response, settings, now)
     session.commit()
     return result
@@ -140,8 +141,9 @@ def logout(
         stored = session.scalars(
             select(models.RefreshToken).where(models.RefreshToken.token_hash == hash_refresh_token(dinemate_refresh))
         ).first()
-        if stored is not None and stored.revoked_at is None:
-            stored.revoked_at = now
+        if stored is not None and stored.expires_at > now:
+            stored.revoked_at = stored.revoked_at or now
+            stored.expires_at = now
             record(session, now, "auth.logout", "user", str(stored.user_id), request=request)
             session.commit()
     _clear_cookie(response)

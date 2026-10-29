@@ -115,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
                             models.RefreshToken.user_id == user.id, models.RefreshToken.revoked_at.is_(None)
                         )
                     ):
-                        token.revoked_at = now
+                        token.revoked_at = token.expires_at = now
                 record(session, now, f"user.{args.command}", "user", str(user.id))
             session.commit()
             print(f"Updated {user.email}.")

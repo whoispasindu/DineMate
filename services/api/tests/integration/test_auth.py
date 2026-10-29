@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -7,6 +7,7 @@ from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from app import models
+from app.core.device_auth import get_real_now
 from app.core.security import REFRESH_COOKIE
 from app.main import app
 from app.seed import reset, seed
@@ -33,10 +34,11 @@ def client(db: Engine) -> Iterator[TestClient]:
         yield c
 
 
-def refresh_with(client: TestClient, token: str) -> int:
+def refresh_with(client: TestClient, token: str) -> tuple[int, str]:
     client.cookies.clear()
     client.cookies.set(REFRESH_COOKIE, token)
-    return client.post("/api/v1/auth/refresh").status_code
+    response = client.post("/api/v1/auth/refresh")
+    return response.status_code, response.cookies.get(REFRESH_COOKIE) or ""
 
 
 def test_login_me_and_wrong_password(client: TestClient) -> None:
@@ -63,21 +65,26 @@ def test_login_rate_limit(client: TestClient) -> None:
 
 
 def test_refresh_rotates_and_reuse_revokes_everything(client: TestClient) -> None:
+    start = datetime.now(UTC)
+    app.dependency_overrides[get_real_now] = lambda: start
     client.post("/api/v1/auth/login", json={"email": ADMIN, "password": TEST_PASSWORD})
-    first = client.cookies.get(REFRESH_COOKIE)
+    first = client.cookies.get(REFRESH_COOKIE) or ""
     rotated = client.post("/api/v1/auth/refresh")
     assert rotated.status_code == 200 and rotated.json()["user"]["email"] == ADMIN
     second = client.cookies.get(REFRESH_COOKIE)
     assert second and second != first
-    assert refresh_with(client, first or "") == 401
-    assert refresh_with(client, second) == 401
+    status, raced = refresh_with(client, first)
+    assert status == 200 and raced not in ("", first, second)
+
+    app.dependency_overrides[get_real_now] = lambda: start + timedelta(seconds=31)
+    assert [refresh_with(client, t)[0] for t in (first, second, raced)] == [401, 401, 401]
 
 
 def test_logout_revokes_refresh(client: TestClient) -> None:
     client.post("/api/v1/auth/login", json={"email": ADMIN, "password": TEST_PASSWORD})
     token = client.cookies.get(REFRESH_COOKIE)
     assert client.post("/api/v1/auth/logout").status_code == 204
-    assert refresh_with(client, token or "") == 401
+    assert refresh_with(client, token or "")[0] == 401
 
 
 def test_disabled_user_cannot_sign_in_or_use_token(client: TestClient, db: Engine) -> None:
