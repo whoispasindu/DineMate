@@ -94,7 +94,7 @@ function DayCell({ day }: { day: WeekDay }) {
         !day.is_today && day.kind === "closed" && "border border-dashed border-dash bg-page",
       )}
     >
-      <span className={cx("text-[11px]", day.is_today ? "text-on-dark-strong" : day.kind === "special" ? "text-busy" : "text-muted")}>
+      <span className={cx("text-[11px]", day.is_today ? "font-semibold text-white" : day.kind === "special" ? "text-busy" : "text-muted")}>
         {day.weekday}
       </span>
       <span
