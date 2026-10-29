@@ -18,6 +18,7 @@ from app.routers import (
     shops,
     student,
 )
+from app.safety import router as safety
 
 API_PREFIX = "/api/v1"
 
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
         manage_shops.router,
         manage_config.router,
         manage_zones.router,
+        safety.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

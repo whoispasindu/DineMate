@@ -1,3 +1,4 @@
+from importlib import import_module
 from logging.config import fileConfig
 
 from alembic import context
@@ -14,6 +15,7 @@ if config.config_file_name is not None and config.attributes.get("configure_logg
 if not config.get_main_option("sqlalchemy.url"):
     config.set_main_option("sqlalchemy.url", get_settings().database_url.replace("%", "%%"))
 
+import_module("app.safety.models")
 target_metadata = Base.metadata
 
 

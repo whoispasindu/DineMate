@@ -635,10 +635,135 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/safety/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Events */
+        get: operations["list_events_api_v1_safety_events_get"];
+        put?: never;
+        /** Post Event */
+        post: operations["post_event_api_v1_safety_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Heartbeat */
+        post: operations["post_heartbeat_api_v1_safety_heartbeat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Active */
+        get: operations["get_active_api_v1_safety_active_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/events/{event_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge Event */
+        post: operations["acknowledge_event_api_v1_safety_events__event_id__acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/events/{event_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Event */
+        post: operations["resolve_event_api_v1_safety_events__event_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Simulate */
+        post: operations["simulate_api_v1_safety_simulate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/safety/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Sources */
+        get: operations["list_sources_api_v1_safety_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcknowledgeIn */
+        AcknowledgeIn: {
+            /** Note */
+            note?: string | null;
+        };
         /** AlertFeed */
         AlertFeed: {
             /**
@@ -959,6 +1084,13 @@ export interface components {
             error: components["schemas"]["ErrorDetail"];
             /** Request Id */
             request_id: string;
+        };
+        /** EventLocation */
+        EventLocation: {
+            /** Canteen Id */
+            canteen_id?: string | null;
+            /** Zone Id */
+            zone_id?: string | null;
         };
         /** ForecastPoint */
         ForecastPoint: {
@@ -1479,10 +1611,39 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** ResolveIn */
+        ResolveIn: {
+            /** Note */
+            note: string;
+        };
         /** RollbackIn */
         RollbackIn: {
             /** Version */
             version: number;
+        };
+        /** SafetyAck */
+        SafetyAck: {
+            /** User Name */
+            user_name: string;
+            /**
+             * Acknowledged At
+             * Format: date-time
+             */
+            acknowledged_at: string;
+            /** Note */
+            note: string | null;
+        };
+        /** SafetyActive */
+        SafetyActive: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Active */
+            active: boolean;
+            /** Events */
+            events: components["schemas"]["SafetyEvent"][];
         };
         /** SafetyEvent */
         SafetyEvent: {
@@ -1511,6 +1672,52 @@ export interface components {
             /** Instructions */
             instructions: string;
         };
+        /** SafetyEventAccepted */
+        SafetyEventAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "acknowledged" | "resolved";
+            /** Is Simulation */
+            is_simulation: boolean;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "critical" | "warning" | "info";
+            /** Repeat Count */
+            repeat_count: number;
+            /** Merged */
+            merged: boolean;
+            /** Label */
+            label: string | null;
+        };
+        /** SafetyEventIn */
+        SafetyEventIn: {
+            /** External Event Id */
+            external_event_id: string;
+            /**
+             * Event Type
+             * @enum {string}
+             */
+            event_type: "fire_alarm" | "evacuation" | "test_notice";
+            location?: components["schemas"]["EventLocation"];
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Is Simulation */
+            is_simulation: boolean;
+        };
         /** SafetySource */
         SafetySource: {
             /** Name */
@@ -1519,6 +1726,37 @@ export interface components {
             online: boolean;
             /** Last Heartbeat At */
             last_heartbeat_at: string | null;
+        };
+        /** SafetySourceHealth */
+        SafetySourceHealth: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "simulator" | "approved_integration";
+            /** Is Enabled */
+            is_enabled: boolean;
+            /** Last Heartbeat At */
+            last_heartbeat_at: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "online" | "offline" | "never_connected";
+        };
+        /** SafetySourceList */
+        SafetySourceList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["SafetySourceHealth"][];
         };
         /** SafetyStatus */
         SafetyStatus: {
@@ -1617,6 +1855,21 @@ export interface components {
             /** Reason */
             reason: string | null;
         };
+        /** SimulateIn */
+        SimulateIn: {
+            /**
+             * Event Type
+             * @default fire_alarm
+             * @enum {string}
+             */
+            event_type: "fire_alarm" | "evacuation" | "test_notice";
+            /** Canteen Id */
+            canteen_id?: string | null;
+            /** Zone Id */
+            zone_id?: string | null;
+            /** Note */
+            note?: string | null;
+        };
         /** SimulationProfile */
         SimulationProfile: {
             /** Base */
@@ -1625,6 +1878,27 @@ export interface components {
             below: number;
             /** Above */
             above: number;
+        };
+        /** SourceHeartbeatAccepted */
+        SourceHeartbeatAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Source Id */
+            source_id: string;
+        };
+        /** SourceHeartbeatIn */
+        SourceHeartbeatIn: {
+            /**
+             * Status
+             * @default ok
+             * @enum {string}
+             */
+            status: "ok" | "degraded";
+            /** Message */
+            message?: string | null;
         };
         /** StaffAlert */
         StaffAlert: {
@@ -1700,6 +1974,97 @@ export interface components {
              * Format: date-time
              */
             server_time: string;
+        };
+        /** StaffSafetyEvent */
+        StaffSafetyEvent: {
+            /** Id */
+            id: string;
+            /**
+             * Event Type
+             * @enum {string}
+             */
+            event_type: "fire_alarm" | "evacuation" | "test_notice" | "integration_offline";
+            /** Title */
+            title: string;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "critical" | "warning" | "info";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "acknowledged" | "resolved";
+            /** Is Simulation */
+            is_simulation: boolean;
+            /** Label */
+            label: string | null;
+            /** Canteen Id */
+            canteen_id: string | null;
+            /** Canteen Name */
+            canteen_name: string | null;
+            /** Zone Name */
+            zone_name: string | null;
+            /** Source Id */
+            source_id: string;
+            /** Source Name */
+            source_name: string;
+            /**
+             * Source Kind
+             * @enum {string}
+             */
+            source_kind: "simulator" | "approved_integration";
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** Repeat Count */
+            repeat_count: number;
+            /** Note */
+            note: string | null;
+            /** Instructions */
+            instructions: string;
+            /** Acks */
+            acks: components["schemas"]["SafetyAck"][];
+            /** Resolved By Name */
+            resolved_by_name: string | null;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Resolution Note */
+            resolution_note: string | null;
+        };
+        /** StaffSafetyEventList */
+        StaffSafetyEventList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Simulation Mode */
+            simulation_mode: boolean;
+            /** Items */
+            items: components["schemas"]["StaffSafetyEvent"][];
+        };
+        /** StaffSafetyEventResult */
+        StaffSafetyEventResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            event: components["schemas"]["StaffSafetyEvent"];
         };
         /** StudentSummary */
         StudentSummary: {
@@ -3935,6 +4300,462 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ZoneResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_events_api_v1_safety_events_get: {
+        parameters: {
+            query?: {
+                status?: "open" | "resolved" | "all";
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSafetyEventList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_event_api_v1_safety_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "x-signature"?: string | null;
+                "x-timestamp"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SafetyEventIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SafetyEventAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_heartbeat_api_v1_safety_heartbeat_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "x-signature"?: string | null;
+                "x-timestamp"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SourceHeartbeatIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceHeartbeatAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_active_api_v1_safety_active_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SafetyActive"];
+                };
+            };
+        };
+    };
+    acknowledge_event_api_v1_safety_events__event_id__acknowledge_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcknowledgeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSafetyEventResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_event_api_v1_safety_events__event_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSafetyEventResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_api_v1_safety_simulate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSafetyEventResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sources_api_v1_safety_sources_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SafetySourceList"];
                 };
             };
             /** @description Unauthorized */
