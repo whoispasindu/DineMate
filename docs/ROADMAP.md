@@ -108,13 +108,32 @@ Notes from Phase 4:
 
 ## Phase 5 — Safety module (Week 8)
 
-- [ ] `app/safety/` with its own router, tables, permissions and `/ws/safety` (or a 10 s poll of `/safety/active`)
-- [ ] HMAC-signed ingest with a ±60 s window, idempotency, merging of duplicate bursts
-- [ ] Safety simulator CLI; `is_simulation` forced on for simulator sources
-- [ ] Acknowledge / resolve (note required) with audit trail; console Safety page
-- [ ] Student banner wired to real events; "Safety alert status unknown" when the connection drops
+- [x] `app/safety/` with its own router, tables (`safety_sources`, `safety_events`, `safety_event_acks`, `safety_instructions`), permissions (safety officer + admin) and a 10 s poll of `/safety/active` (WebSocket deferred)
+- [x] HMAC-signed ingest with a ±60 s window, idempotency, merging of duplicate bursts (same id, or same type + place within 5 min → `repeat_count`), 10 messages/s per source
+- [x] Safety simulator CLI (`python -m app.safety.cli trigger|heartbeat|register-source|add-instruction`); `is_simulation` forced on for simulator sources
+- [x] Acknowledge / resolve (note required) with audit trail; console Safety page (simulator panel in simulation mode only, open events, source health, resolved in the last 7 days)
+- [x] Student banner wired to real events; "Safety alert status unknown" when the connection drops
 
 **Done when:** the safety tests in plan Section 20 pass, and "SIMULATION" shows on every surface.
+✅ 29 Oct, plan Section 20 safety rows:
+
+| Test | Result |
+|---|---|
+| Simulated event on the safety dashboard ≤ 5 s | Dashboard polls every 5 s; a CLI event showed up on the next poll |
+| Simulation label on every surface | Student banner (Home, Alerts), console Safety page and Overview, API response and audit rows. There are no push notifications yet, so no notification text to label |
+| Simulator payload with `is_simulation=false` | Stored as simulation (test + live CLI `--claim-real`) |
+| Invalid signature / replayed timestamp | 401 `invalid_signature`, logged and audited (test) |
+| Duplicate burst of 50 | 1 event, `repeat_count=50` (test); 20-event live burst merged to 1 |
+| Ack/resolve recorded with user + time | Test + live: audit rows carry user, time, note and the simulation label |
+| Source heartbeat lost | Warning after 60 s plus at most one 15 s rules run (≤ 75 s), staff only; seen live |
+| Client disconnect | "Safety alert status unknown" about 14 s after stopping the API container |
+
+Notes from Phase 5:
+
+- Sources send `Authorization: Device <token>`, `X-Timestamp` (ISO 8601) and `X-Signature: sha256=<HMAC-SHA256(token, timestamp + "." + body)>`. Only the token hash is stored; the server checks the signature with the token from the request.
+- The Compose stack registers the `safety-sim` source with `DINEMATE_SAFETY_SIMULATOR_TOKEN`. A real gateway gets its own token from `register-source`, but only after written approval from the university (plan 9.6).
+- With no approved instructions, students see "Follow instructions from campus staff and official alarms." No exits or routes are ever shown. `add-instruction` stores approved text with the approver's name.
+- Heartbeat checks start only after a source has sent its first heartbeat. Run `python -m app.safety.cli heartbeat` to keep the simulator source online during a demo.
 
 ## Phase 6 — Forecast, polish & demo (Weeks 9–10)
 
