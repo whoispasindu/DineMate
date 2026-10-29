@@ -14,7 +14,7 @@ from app.core.device_auth import get_real_now, hash_token
 from app.devices_cli import register
 from app.main import app
 from app.seed import reset, seed
-from tests.integration.conftest import LUNCH_NOW, client_at
+from tests.integration.conftest import LUNCH_NOW, TEST_PASSWORD, client_at
 
 SIM_TOKEN = {"Authorization": "Device dev-simulator-token"}
 REAL_NOW = datetime(2026, 10, 27, 15, 0, 0, tzinfo=UTC)
@@ -28,7 +28,7 @@ def device_api(seeded: Engine) -> Iterator[TestClient]:
     app.dependency_overrides.clear()
     with Session(seeded) as session:
         reset(session)
-        seed(session, LUNCH_NOW)
+        seed(session, LUNCH_NOW, TEST_PASSWORD)
 
 
 def zone_ids(client: TestClient, device_id: str) -> list[str]:

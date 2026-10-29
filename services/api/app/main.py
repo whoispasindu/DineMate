@@ -5,7 +5,19 @@ from app import __version__
 from app.core.config import get_settings
 from app.core.errors import install_error_handling
 from app.jobs import lifespan
-from app.routers import alerts, canteens, devices, health, schedules, shops, student
+from app.routers import (
+    alerts,
+    auth,
+    canteens,
+    devices,
+    health,
+    manage_config,
+    manage_shops,
+    manage_zones,
+    schedules,
+    shops,
+    student,
+)
 
 API_PREFIX = "/api/v1"
 
@@ -37,6 +49,10 @@ def create_app() -> FastAPI:
         schedules.router,
         devices.router,
         alerts.router,
+        auth.router,
+        manage_shops.router,
+        manage_config.router,
+        manage_zones.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

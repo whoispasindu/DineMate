@@ -13,7 +13,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App";
 
-configureApi({ baseUrl: import.meta.env.VITE_API_URL, staffToken: import.meta.env.VITE_STAFF_TOKEN });
+configureApi({ baseUrl: import.meta.env.VITE_API_URL });
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 2, refetchIntervalInBackground: false } },

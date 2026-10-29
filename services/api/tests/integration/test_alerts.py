@@ -9,9 +9,9 @@ from app import models
 from app.main import app
 from app.seed import reset, seed
 from app.services.rules import evaluate
-from tests.integration.conftest import LUNCH_NOW, client_at
+from tests.integration.conftest import LUNCH_NOW, TEST_PASSWORD, client_at, login
 
-STAFF = {"Authorization": "Bearer dev-staff-token"}
+ADMIN = "admin@dinemate.test"
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def db(seeded: Engine) -> Iterator[Engine]:
     app.dependency_overrides.clear()
     with Session(seeded) as session:
         reset(session)
-        seed(session, LUNCH_NOW)
+        seed(session, LUNCH_NOW, TEST_PASSWORD)
 
 
 def zone(session: Session, name: str, canteen: str) -> models.SeatingZone:
@@ -65,9 +65,10 @@ def test_crowding_alert_lifecycle(db: Engine) -> None:
 
         with client_at(db, t + timedelta(seconds=150)) as client:
             assert client.get("/api/v1/alerts").status_code == 401
-            listed = client.get("/api/v1/alerts", headers=STAFF).json()["items"]
+            staff = login(client, ADMIN)
+            listed = client.get("/api/v1/alerts", headers=staff).json()["items"]
             alert_id = next(a["id"] for a in listed if a["title"] == "Canteen C — Main hall")
-            acked = client.post(f"/api/v1/alerts/{alert_id}/acknowledge", headers=STAFF).json()
+            acked = client.post(f"/api/v1/alerts/{alert_id}/acknowledge", headers=staff).json()
             assert (acked["status"], acked["acknowledged_by"]) == ("acknowledged", "Campus administrator")
 
         for i in range(6, 12):
@@ -148,7 +149,7 @@ def test_notices_and_console_overview(db: Engine) -> None:
         assert feed["notices"] == sorted(feed["notices"], key=lambda n: n["at"], reverse=True)
 
         assert client.get("/api/v1/console/overview").status_code == 401
-        overview = client.get("/api/v1/console/overview", headers=STAFF).json()
+        overview = client.get("/api/v1/console/overview", headers=login(client, ADMIN)).json()
         assert len(overview["zones"]) == 7
         assert {d["id"] for d in overview["devices"]} == {"sim-a", "sim-b", "sim-c", "cam-a-balcony"}
         assert any(a["type"] == "crowding" for a in overview["alerts"])
@@ -159,6 +160,7 @@ def test_notices_and_console_overview(db: Engine) -> None:
 
 def test_acknowledge_errors(db: Engine) -> None:
     with client_at(db, LUNCH_NOW) as client:
-        assert client.post("/api/v1/alerts/not-a-uuid/acknowledge", headers=STAFF).status_code == 404
+        staff = login(client, ADMIN)
+        assert client.post("/api/v1/alerts/not-a-uuid/acknowledge", headers=staff).status_code == 404
         missing = "00000000-0000-0000-0000-000000000000"
-        assert client.post(f"/api/v1/alerts/{missing}/acknowledge", headers=STAFF).status_code == 404
+        assert client.post(f"/api/v1/alerts/{missing}/acknowledge", headers=staff).status_code == 404

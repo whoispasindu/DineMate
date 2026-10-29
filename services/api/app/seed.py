@@ -13,6 +13,7 @@ from app.core.config import get_settings
 from app.core.db import get_engine
 from app.core.device_auth import hash_token
 from app.services.timeutil import at_local, local_date
+from app.users_cli import create_user
 
 ALL_DAY = ("breakfast", "lunch", "dinner")
 LUNCH = ("lunch",)
@@ -219,6 +220,9 @@ MEALS = [("breakfast", "07:00", "09:30"), ("lunch", "11:30", "14:00"), ("dinner"
 SATURDAY_MEALS = [("lunch", "11:30", "13:30")]
 
 TABLES = [
+    "audit_log",
+    "refresh_tokens",
+    "users",
     "occupancy_readings",
     "zone_layouts",
     "devices",
@@ -361,10 +365,26 @@ def _seed_schedules(session: Session) -> None:
     session.add_all(models.MealSchedule(weekday=5, period=p, starts=t(s), ends=t(e)) for p, s, e in SATURDAY_MEALS)
 
 
-def seed(session: Session, now: datetime) -> None:
+DEMO_USERS = [
+    ("admin@dinemate.test", "Campus administrator", "campus_admin", [], []),
+    ("canteen.a@dinemate.test", "Canteen A manager", "canteen_manager", ["a"], []),
+    ("rice.stall@dinemate.test", "Rice & Curry Stall manager", "shop_manager", [], ["s-rice"]),
+    ("safety@dinemate.test", "Safety officer", "safety_officer", [], []),
+]
+
+
+def seed_demo_users(session: Session, password: str) -> None:
+    for email, name, role, canteens, shops in DEMO_USERS:
+        create_user(session, email, name, role, password, canteens, shops)
+
+
+def seed(session: Session, now: datetime, demo_password: str | None = None) -> None:
     _seed_canteens(session, now)
     _seed_shops(session, now)
     _seed_schedules(session)
+    session.flush()
+    if demo_password:
+        seed_demo_users(session, demo_password)
     session.commit()
 
 
@@ -384,6 +404,10 @@ def main(argv: list[str] | None = None) -> int:
         if has_data and not args.reset:
             if args.if_empty:
                 print("Sample data already present; skipping seed.")
+                if settings.demo_password and not session.scalar(select(func.count()).select_from(models.User)):
+                    seed_demo_users(session, settings.demo_password)
+                    session.commit()
+                    print(f"Created {len(DEMO_USERS)} demo staff accounts (password from DINEMATE_DEMO_PASSWORD).")
                 return 0
             print("Data already present. Re-run with --reset to replace it.", file=sys.stderr)
             return 1
@@ -391,8 +415,10 @@ def main(argv: list[str] | None = None) -> int:
             reset(session)
         if settings.demo_clock_start is not None:
             clock.reset_demo_clock(session, settings.demo_clock_start)
-        seed(session, clock.now(settings))
+        seed(session, clock.now(settings), settings.demo_password)
     print("Seeded sample canteens, zones, shops, menus and meal schedules.")
+    if settings.demo_password:
+        print(f"Created {len(DEMO_USERS)} demo staff accounts (password from DINEMATE_DEMO_PASSWORD).")
     return 0
 
 

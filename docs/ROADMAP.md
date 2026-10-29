@@ -82,20 +82,29 @@ Notes from Phase 1:
 
 Notes from Phase 3:
 
-- Staff endpoints use a temporary bearer token (`DINEMATE_STAFF_TOKEN`, default `dev-staff-token`) until Phase 4 adds real sign-in and roles. Don't expose the API beyond your laptop until then.
-- Per-zone thresholds live in `crowding_thresholds` (defaults 60/80/95, 5-point hysteresis, 2 min dwell); the Thresholds page comes in Phase 4.
+- Staff endpoints used a temporary bearer token until Phase 4 replaced it with sign-in and roles.
+- Per-zone thresholds live in `crowding_thresholds` (defaults 60/80/95, 5-point hysteresis, 2 min dwell); Phase 4 added the Thresholds page.
 - Forecast bars on the console chart are still empty; the baseline forecast is Phase 6.
 
 ## Phase 4 — Staff tools (Weeks 6–7)
 
-- [ ] Auth: admin-created users, Argon2, JWT + refresh cookie, roles and canteen/shop scopes (plan Section 16), login rate limit
-- [ ] Audit log on every write
-- [ ] Console: Shop manager page (weekly hours, exceptions, temporary closure, menu with one-tap sold out, draft → publish)
-- [ ] Console: Meal schedules (campus default + canteen overrides)
-- [ ] Console: Thresholds page
-- [ ] Console: Zone editor (drag points, rename, capacity, save as a new version, rollback); worker picks up changes within 30 s
+- [x] Auth: admin-created users (`app.users_cli`), Argon2, 15 min JWT + rotating httpOnly refresh cookie (reuse after a 30 s grace revokes every session), roles and canteen/shop scopes (plan Section 16), login rate limit (5/min/IP)
+- [x] Audit log on every write (`audit_log`: sign-in, alerts, shops, menus, schedules, thresholds, zones, layouts, users)
+- [x] Console: Shop manager page (weekly hours, exceptions, temporary closure, menu with one-tap sold out, draft → publish)
+- [x] Console: Meal schedules (campus default + canteen overrides)
+- [x] Console: Thresholds page
+- [x] Console: Zone editor (drag points, rename, capacity, save as a new version, rollback); worker picks up changes within 30 s
 
 **Done when:** a shop manager marks an item sold out and the student Food tab shows it on the next refresh, and a shop manager editing another shop gets a 403.
+✅ 29 Oct: signed in as the sample Rice & Curry Stall manager on the Docker stack, marked an item sold out, and `GET /shops/s-rice/menu` showed it right away. Integration tests cover the 403 on another shop's items, hours and publish. A saved layout changes the device config ETag and `layout_version` at once. The worker re-reads its config every 30 s; that wasn't re-checked here with a running worker.
+
+Notes from Phase 4:
+
+- Seeding creates sample staff accounts (admin@, canteen.a@, rice.stall@, safety@dinemate.test) with `DINEMATE_DEMO_PASSWORD` (Compose default in `infra/.env.example`). An already-seeded database gets them on the next `--if-empty` start.
+- Create real accounts with `uv run python -m app.users_cli create --email … --name … --role … [--canteen a] [--shop s-rice]` (password prompted). Set a long random `DINEMATE_JWT_SECRET` outside development; the API refuses to start with the default.
+- Menu edits are drafts (`menu_items.draft`, or unpublished new items) until Publish. Sold out is instant and never a draft.
+- Staff editing pages need the real API (`pnpm dev:console:api`). In sample mode the console signs in with any password for the four sample accounts, and the editing pages say so.
+- The zone editor draws on a blank 16:9 canvas. You can load a local snapshot as a backdrop. It stays in the browser and is never uploaded.
 
 ## Phase 5 — Safety module (Week 8)
 
