@@ -181,7 +181,7 @@ function pickBest(canteens: CanteenSummary[]): StudentSummary["best"] {
   return best ? { canteen_id: best.id, name: best.name } : null;
 }
 
-function safetyStatus(now: number): SafetyStatus {
+export function safetyStatus(now: number): SafetyStatus {
   return {
     active: true,
     events: [

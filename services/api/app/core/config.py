@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     simulator_interval_s: float = 30.0
     simulator_api_url: str = "http://localhost:8000/api/v1"
     simulator_token: str = "dev-simulator-token"
+    safety_simulator_token: str = "dev-safety-sim-token"
     simulator_devices: list[str] = ["sim-a", "sim-b", "sim-c"]
     rules_interval_s: float = 15.0
     jwt_secret: str = DEV_JWT_SECRET

@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app import schemas_staff as staff
+from app.safety.models import SafetySource
+from app.safety.service import public_status, source_online
 from app.services.meal_status import meal_status
 from app.services.occupancy import best_candidate
 from app.services.rules import OFFLINE_AFTER, zone_devices
@@ -177,6 +179,22 @@ def _occupancy_today(session: Session, bundle: CanteenBundle | None, now: dateti
     return staff.OccupancyToday(canteen_name=bundle.canteen.name, points=points)
 
 
+def _console_safety(session: Session, now: datetime, simulation_mode: bool) -> staff.ConsoleSafety:
+    sources = list(session.scalars(select(SafetySource).where(SafetySource.is_enabled)))
+    simulator = next((s for s in sources if s.kind == "simulator"), None)
+    _, events = public_status(session)
+    return staff.ConsoleSafety(
+        simulation_mode=simulation_mode,
+        events=events,
+        source=staff.SafetySource(
+            name=simulator.name if simulator else "Safety simulator",
+            online=simulator is not None and source_online(simulator, now),
+            last_heartbeat_at=simulator.last_heartbeat_at if simulator else None,
+        ),
+        real_integration_connected=any(s.kind == "approved_integration" and source_online(s, now) for s in sources),
+    )
+
+
 def console_overview(
     session: Session,
     now: datetime,
@@ -195,12 +213,7 @@ def console_overview(
         alerts=staff_alerts(session, ("open", "acknowledged", "suspended"), scope),
         devices=_devices(session, now),
         occupancy_today=_occupancy_today(session, chosen, now),
-        safety=staff.ConsoleSafety(
-            simulation_mode=simulation_mode,
-            events=[],
-            source=staff.SafetySource(name="Safety module (Phase 5)", online=False, last_heartbeat_at=None),
-            real_integration_connected=False,
-        ),
+        safety=_console_safety(session, now, simulation_mode),
     )
 
 
@@ -320,4 +333,5 @@ def notices(session: Session, now: datetime) -> staff.AlertFeed:
             )
 
     items.sort(key=lambda n: n.at, reverse=True)
-    return staff.AlertFeed(server_time=now, safety=schemas.SafetyStatus(active=False, events=[]), notices=items)
+    active, events = public_status(session)
+    return staff.AlertFeed(server_time=now, safety=schemas.SafetyStatus(active=active, events=events), notices=items)

@@ -3,11 +3,15 @@ import { heldToken, setSession } from "./session";
 import { acknowledgeAlert, consoleOverview } from "./sample/console";
 import { mealStatus } from "./sample/schedule";
 import { menuItems, shopById, shopsFor } from "./sample/shops";
-import { alertFeed, canteenDetail, canteenIds, studentSummary } from "./sample/student";
+import { alertFeed, canteenDetail, canteenIds, safetyStatus, studentSummary } from "./sample/student";
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
   AlertFeed,
+  SafetyActive,
+  SafetySourceList,
+  StaffSafetyEventList,
+  StaffSafetyEventResult,
   AvailabilityResult,
   DeviceLayout,
   EditableZone,
@@ -261,4 +265,14 @@ export const api = {
     staffOnly(`/zones/${enc(zoneId)}`, { method: "PATCH", body }),
   createZone: (canteenId: string, body: { name: string; capacity: number }): Promise<ZoneResult> =>
     staffOnly(`/canteens/${enc(canteenId)}/zones`, { method: "POST", body }),
+  safetyActive: (): Promise<SafetyActive> =>
+    either("/safety/active", (now) => ({ server_time: iso(now), ...safetyStatus(now) }), "Safety status unavailable"),
+  safetyEvents: (status: "open" | "resolved" | "all"): Promise<StaffSafetyEventList> => staffOnly(`/safety/events?status=${status}`),
+  safetySources: (): Promise<SafetySourceList> => staffOnly("/safety/sources"),
+  acknowledgeSafety: (id: string, note: string | null): Promise<StaffSafetyEventResult> =>
+    staffOnly(`/safety/events/${enc(id)}/acknowledge`, { method: "POST", body: { note } }),
+  resolveSafety: (id: string, note: string): Promise<StaffSafetyEventResult> =>
+    staffOnly(`/safety/events/${enc(id)}/resolve`, { method: "POST", body: { note } }),
+  simulateSafety: (body: { event_type: string; canteen_id: string | null; note: string | null }): Promise<StaffSafetyEventResult> =>
+    staffOnly("/safety/simulate", { method: "POST", body }),
 };

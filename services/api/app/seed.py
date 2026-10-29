@@ -12,6 +12,8 @@ from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
 from app.core.device_auth import hash_token
+from app.safety.models import SAFETY_TABLES
+from app.safety.service import ensure_simulator_source
 from app.services.timeutil import at_local, local_date
 from app.users_cli import create_user
 
@@ -220,6 +222,7 @@ MEALS = [("breakfast", "07:00", "09:30"), ("lunch", "11:30", "14:00"), ("dinner"
 SATURDAY_MEALS = [("lunch", "11:30", "13:30")]
 
 TABLES = [
+    *SAFETY_TABLES,
     "audit_log",
     "refresh_tokens",
     "users",
@@ -382,6 +385,7 @@ def seed(session: Session, now: datetime, demo_password: str | None = None) -> N
     _seed_canteens(session, now)
     _seed_shops(session, now)
     _seed_schedules(session)
+    ensure_simulator_source(session)
     session.flush()
     if demo_password:
         seed_demo_users(session, demo_password)
@@ -404,6 +408,8 @@ def main(argv: list[str] | None = None) -> int:
         if has_data and not args.reset:
             if args.if_empty:
                 print("Sample data already present; skipping seed.")
+                ensure_simulator_source(session)
+                session.commit()
                 if settings.demo_password and not session.scalar(select(func.count()).select_from(models.User)):
                     seed_demo_users(session, settings.demo_password)
                     session.commit()

@@ -3,6 +3,7 @@ import { APP_NAME, cx, formatClock, formatClock24, Icon } from "@dinemate/ui";
 import { useId, useState } from "react";
 import { Link } from "react-router";
 import { FilterChips, Loading, MessageCard, SafetyBanner, SafetyUnknown, Segmented, Skeleton } from "../components/common";
+import { useSafety } from "../components/safety";
 import { useIsDesktop } from "../lib/device";
 import { alertsSeenAt, notificationPrefs, type NotificationPrefs } from "../lib/prefs";
 import { NOTICE_LOOK } from "../lib/present";
@@ -116,16 +117,19 @@ export function AlertsScreen() {
   const prefsId = useId();
   const data = feed.data;
   const showSafety = filter === "all" || filter === "safety";
-  const events = showSafety ? (data?.safety.events ?? []) : [];
+  const safety = useSafety();
+  const events = showSafety ? safety.events : [];
   const notices = data ? visibleNotices(data.notices, filter) : [];
   const markAllRead = () => alertsSeenAt.set(new Date(serverNow()).toISOString());
 
-  const safetyBlock =
-    feed.isError && !data ? (
-      <SafetyUnknown />
-    ) : (
-      events.map((event) => <SafetyBanner key={event.id} event={event} layout={isDesktop ? "web" : "mobile"} />)
-    );
+  const safetyBlock = (
+    <>
+      {showSafety && safety.unknown ? <SafetyUnknown /> : null}
+      {events.map((event) => (
+        <SafetyBanner key={event.id} event={event} layout={isDesktop ? "web" : "mobile"} />
+      ))}
+    </>
+  );
   const empty = data && events.length === 0 && notices.length === 0;
   const loading = !data && !feed.isError;
 

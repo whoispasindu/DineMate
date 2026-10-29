@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { ConsoleShell, navFor } from "./layout";
 import { OverviewScreen } from "./screens/Overview";
 import { PlannedScreen } from "./screens/Planned";
+import { SafetyScreen } from "./screens/Safety";
 import { SchedulesScreen } from "./screens/Schedules";
 import { ShopsScreen } from "./screens/Shops";
 import { SignInScreen } from "./screens/SignIn";
@@ -15,6 +16,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/schedules": SchedulesScreen,
   "/zones": ZonesScreen,
   "/config": ThresholdsScreen,
+  "/safety": SafetyScreen,
 };
 
 function Home({ user }: { user: StaffUser }) {

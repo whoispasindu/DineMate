@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
+from app.safety.service import check_sources
 from app.services.rules import evaluate
 
 log = logging.getLogger("dinemate.rules")
@@ -18,6 +19,10 @@ log = logging.getLogger("dinemate.rules")
 def run_rules_once() -> None:
     with Session(get_engine()) as session:
         result = evaluate(session, clock.now())
+        offline = check_sources(session, clock.now())
+        session.commit()
+    if offline:
+        log.info("safety sources changed state: %s", len(offline))
     if result.opened or result.changed or result.resolved:
         log.info("alerts opened=%s changed=%s resolved=%s", result.opened, result.changed, result.resolved)
 
