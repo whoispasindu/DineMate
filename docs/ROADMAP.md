@@ -137,15 +137,22 @@ Notes from Phase 5:
 
 ## Phase 6 — Forecast, polish & demo (Weeks 9–10)
 
-- [ ] History endpoint + baseline forecast (persistence vs historical average), labelled experimental
-- [ ] Recommendation endpoint drives "Best spot now"
-- [ ] Accessibility pass (keyboard, screen reader labels, 200% text), Lighthouse PWA installable, offline shows no seat numbers
-- [ ] Playwright E2E for the 5 demo flows (plan 25.1)
-- [ ] Sustainability measurements and accuracy report written up
-- [ ] Demo script, two rehearsals, recorded backup demo (blur faces in any canteen footage)
+- [x] History endpoint (`GET /zones/{id}/occupancy/history`) + baseline forecast (persistence, historical average, blend with α fitted on the validation week), labelled experimental; `app.forecast_report` backtests it
+- [x] Recommendation endpoint (`GET /recommendations`, plan 8.5) drives "Best spot now" and the "Less crowded nearby" card
+- [ ] Accessibility pass. Automated part done: axe (WCAG 2.1 A/AA) finds no serious or critical issues on the six student pages, and a contrast fix landed. **You:** keyboard-only run, screen reader spot check, 200% text. The installable PWA check now runs in E2E, because recent Lighthouse versions dropped the PWA audit. Offline shows no seat numbers (E2E)
+- [x] Playwright E2E for the demo flows (plan 25.1): `pnpm e2e` uses its own `dinemate_e2e` database and API on :8001
+- [ ] Sustainability measurements and accuracy report written up. Scaffold in `docs/RESULTS.md`; `app.utilisation_report` gives seat-hours, empty-zone hours and peak balance. **You:** hand counts, survey, smart-plug reading
+- [ ] Demo script, two rehearsals, recorded backup demo (blur faces in any canteen footage). Script in `docs/DEMO.md`; **you:** rehearse twice, record the backup
 - [ ] Feature freeze Monday of Week 10
 
 **Done when:** the full demo runs twice in a row on a clean laptop.
+
+Notes from Phase 6:
+
+- `python -m app.seed_history --days 21` (services/api) adds **simulated** past weekdays for the simulator zones so the forecast has history. Re-running replaces them. The live simulator follows the same daily shape, normalised so the lunch peak equals each zone's seeded base.
+- On simulated history the blend matches the historical average (α ≈ 0) with about 75% coverage of the 80% band. That only shows the pipeline works.
+- The console Occupancy page charts zone history (4 h, 24 h, 7 days).
+- A database seeded with the demo clock and later run on real time keeps future-dated readings, which hide live ones. Reset with `pnpm stack:down`, `docker volume rm dinemate_db-data` and `pnpm stack:up`, or keep using the demo clock.
 
 ---
 

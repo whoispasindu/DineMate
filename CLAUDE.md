@@ -12,7 +12,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
 - infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.
 - Crowding rules: `app/services/crowding.py` (pure state machine) + `app/services/rules.py` (DB, runs every 15 s via `app/jobs.py`; set DINEMATE_RULES_INTERVAL_S=0 to stop). Staff endpoints need a signed-in user.
-- Still on sample data: forecasts (Phase 6).
+- Forecast: `app/services/forecast.py` (pure baseline + backtest) and `app/services/history.py` (DB series, 10 min cache). Always labelled experimental. Simulated history: `python -m app.seed_history`.
 - services/vision — separate uv project (YOLO11n + ByteTrack, CPU PyTorch). `vision/counting.py` holds the pure zone-counting rules (unit-tested without YOLO); `worker.py` posts counts only, never stores frames; `zone_tool.py` draws layouts; `studio.py` draws zones then plays a video with live counts (offline, scaled to the screen); `validate.py` compares estimates with hand counts. See services/vision/README.md. Videos live in git-ignored `data/videos/`.
 - Devices authenticate with `Authorization: Device <token>`; register cameras with `uv run python -m app.devices_cli register` (services/api).
 - Staff auth: `app/core/security.py` (Argon2, JWT, refresh tokens, rate limit) + `app/core/auth.py` (roles, `can_manage_canteen`/`can_manage_shop`, 403 `forbidden_scope`). The console holds the access token in memory and refreshes from the httpOnly cookie on `/api/v1/auth`. Create users with `uv run python -m app.users_cli create`. Every write calls `app.services.audit.record`.
@@ -43,4 +43,6 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - pnpm dev:api — API with reload against a local or Docker Postgres
 - pnpm test:api — pytest; integration tests use `dinemate_test` on localhost:5432 and skip if Postgres is down (set DINEMATE_REQUIRE_DB_TESTS=1 to fail instead)
 - pnpm api:types — after changing API schemas: re-export openapi.json and regenerate TS types (CI checks both)
+- pnpm e2e — Playwright demo flows + axe + PWA check; starts its own API on :8001 (`app.e2e_server`, database `dinemate_e2e`) and web apps on 5183/5184/4183. Needs Postgres on :5432 and Chrome locally
+- Reports (services/api): `uv run python -m app.forecast_report`, `uv run python -m app.utilisation_report`; demo steps in docs/DEMO.md, results in docs/RESULTS.md
 - In services/api: `uv run alembic revision --autogenerate -m "..."`, `uv run alembic upgrade head`, `uv run python -m app.seed --reset`
