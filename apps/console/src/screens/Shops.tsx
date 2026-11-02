@@ -14,7 +14,7 @@ import {
   type ShopEditor,
   type ShopState,
 } from "@dinemate/api-client";
-import { cx, FoodArt, foodArtFor, formatAgo, formatClock, formatPrice } from "@dinemate/ui";
+import { cx, FoodArt, foodArtFor, foodPhotoFor, formatAgo, formatClock, formatPrice } from "@dinemate/ui";
 import { useCallback, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput } from "../kit";
@@ -102,6 +102,7 @@ function MenuRow({ item, editor, now }: { item: EditableMenuItem; editor: ShopEd
           <FoodArt
             kind={foodArtFor(fields.name, fields.category ? [fields.category] : [])}
             name={fields.name}
+            photo={foodPhotoFor(fields.name)}
             muted={soldOut}
             className="h-10 w-10 shrink-0 rounded-[10px]"
           />

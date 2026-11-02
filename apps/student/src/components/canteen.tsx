@@ -1,5 +1,5 @@
 import { useRecommendation, type BusyPoint, type CanteenSummary, type Freshness, type ZoneOccupancy } from "@dinemate/api-client";
-import { CanteenArt, cx, formatAgo, formatClock, Icon, levelFor, Ring, StatusPill } from "@dinemate/ui";
+import { CanteenArt, canteenPhotoFor, cx, emptyArtFor, formatAgo, formatClock, Icon, levelFor, Ring, StatusPill } from "@dinemate/ui";
 import { Link } from "react-router";
 import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText } from "../lib/present";
 
@@ -24,7 +24,12 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
       className="flex items-center gap-3 rounded-[18px] border border-line bg-card p-2.5 text-ink no-underline hover:border-mint-line"
     >
       <div className="h-16 w-16 shrink-0">
-        <CanteenArt wall={canteenWall(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-[14px]" />
+        <CanteenArt
+          wall={canteenWall(canteen.id)}
+          photo={canteenPhotoFor(canteen.id)}
+          label={canteenInitial(canteen.name)}
+          className="rounded-[14px]"
+        />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-[15px] font-extrabold">{canteen.name}</span>
@@ -50,7 +55,12 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
       className="flex flex-[1_1_300px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-3 text-ink no-underline hover:border-mint-line"
     >
       <div className="h-[150px]">
-        <CanteenArt wall={canteenWall(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-2xl" />
+        <CanteenArt
+          wall={canteenWall(canteen.id)}
+          photo={canteenPhotoFor(canteen.id)}
+          label={canteenInitial(canteen.name)}
+          className="rounded-2xl"
+        />
       </div>
       <div className="flex items-center gap-3.5 px-1.5 pb-1.5">
         <Ring
@@ -88,7 +98,7 @@ export function BestSpotMobile({ canteen }: { canteen: CanteenSummary }) {
   return (
     <section aria-label="Best spot now" className="flex flex-col overflow-hidden rounded-[22px] border border-line bg-card">
       <div className="relative h-32">
-        <CanteenArt wall={canteenWall(canteen.id)} />
+        <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} />
         <BestBadge className="absolute left-3 top-3" />
       </div>
       <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
@@ -153,7 +163,7 @@ export function BestSpotWeb({ canteen }: { canteen: CanteenSummary }) {
         </Link>
       </div>
       <div className="h-[230px] flex-[1_1_300px]">
-        <CanteenArt wall="#CFE9D7" label={canteenInitial(canteen.name)} className="rounded-[20px]" />
+        <CanteenArt wall="#CFE9D7" photo={canteenPhotoFor(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-[20px]" />
       </div>
     </section>
   );
@@ -175,12 +185,17 @@ function BestBadge({ className, large }: { className?: string; large?: boolean }
 }
 
 export function NoBestSpot({ anyLive }: { anyLive: boolean }) {
+  const offlineArt = anyLive ? undefined : emptyArtFor("sensor-offline");
   return (
     <section
       aria-label="Best spot now"
       className="flex items-start gap-3 rounded-[22px] border-[1.5px] border-dashed border-dash bg-surface-soft p-4"
     >
-      <Icon name="question" size={22} className="mt-0.5 shrink-0 text-neutral-ink" />
+      {offlineArt ? (
+        <img src={offlineArt} alt="" loading="lazy" decoding="async" className="h-16 w-16 shrink-0 object-contain" />
+      ) : (
+        <Icon name="question" size={22} className="mt-0.5 shrink-0 text-neutral-ink" />
+      )}
       <span className="flex flex-col gap-0.5">
         <span className="text-[15px] font-extrabold">{anyLive ? "No reliable alternative right now" : "No seat info right now"}</span>
         <span className="text-[13px] text-muted">

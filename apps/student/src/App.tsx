@@ -11,7 +11,7 @@ import { WelcomeScreen } from "./screens/Welcome";
 function NotFound() {
   return (
     <main id="main" className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 p-6">
-      <MessageCard icon="question" title="Page not found" />
+      <MessageCard icon="question" art="page-not-found" title="Page not found" />
       <Link to="/" className="font-bold text-brand">
         Back to home
       </Link>

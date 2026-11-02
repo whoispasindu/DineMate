@@ -416,9 +416,23 @@ interface FoodArtProps {
   className?: string;
   muted?: boolean;
   fit?: "cover" | "contain";
+  photo?: string;
 }
 
-export function FoodArt({ kind, name = "", className, muted, fit = "cover" }: FoodArtProps) {
+export function FoodArt({ kind, name = "", className, muted, fit = "cover", photo }: FoodArtProps) {
+  if (photo) {
+    return (
+      <span className={cx("block overflow-hidden bg-[#E6D6C3]", muted && "opacity-50 grayscale", className)}>
+        <img
+          src={photo}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className={cx("block h-full w-full", fit === "cover" ? "object-cover" : "object-contain")}
+        />
+      </span>
+    );
+  }
   const Art = kind === "drink" ? null : ART[kind];
   return (
     <span className={cx("block overflow-hidden", muted && "opacity-50 grayscale", className)} style={{ background: BACKDROP[kind] }}>

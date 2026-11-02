@@ -167,7 +167,7 @@ export function AlertsScreen() {
                 <Skeleton className="h-[320px] rounded-[22px]" />
               </Loading>
             ) : null}
-            {empty ? <MessageCard icon="checkCircle" title="No alerts today" /> : null}
+            {empty ? <MessageCard icon="checkCircle" art="no-alerts" title="No alerts today" /> : null}
             {notices.length > 0 ? (
               <section aria-labelledby="today-title" className="flex flex-col rounded-[22px] border border-line bg-card px-5 py-2">
                 <h2 id="today-title" className="mb-1 mt-3 text-[13px] font-extrabold tracking-[0.06em] text-muted">
@@ -225,7 +225,7 @@ export function AlertsScreen() {
             <Skeleton className="h-[300px] rounded-[20px]" />
           </Loading>
         ) : null}
-        {empty ? <MessageCard icon="checkCircle" title="No alerts today" /> : null}
+        {empty ? <MessageCard icon="checkCircle" art="no-alerts" title="No alerts today" /> : null}
         {notices.length > 0 ? (
           <>
             <h2 className="m-0 mt-1 text-xs font-extrabold tracking-[0.06em] text-muted">TODAY</h2>

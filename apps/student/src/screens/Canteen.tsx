@@ -10,6 +10,7 @@ import {
 } from "@dinemate/api-client";
 import {
   CanteenArt,
+  canteenPhotoFor,
   cx,
   FoodArt,
   formatClock,
@@ -20,6 +21,7 @@ import {
   levelFor,
   LiveLine,
   shopArtFor,
+  shopPhotoFor,
   StatusPill,
   type IconName,
 } from "@dinemate/ui";
@@ -55,7 +57,11 @@ export function CanteensIndex() {
     );
   }
   const target = summary.data.best?.canteen_id ?? summary.data.canteens[0]?.id;
-  return target ? <Navigate to={`/canteens/${target}`} replace /> : <MessageCard icon="question" title="No canteens yet" className="m-4" />;
+  return target ? (
+    <Navigate to={`/canteens/${target}`} replace />
+  ) : (
+    <MessageCard icon="question" art="no-canteens" title="No canteens yet" className="m-4" />
+  );
 }
 
 export function CanteenScreen() {
@@ -67,7 +73,7 @@ export function CanteenScreen() {
   if (detail.error instanceof ApiError && detail.error.status === 404) {
     return (
       <main id="main" className="mx-auto flex w-full max-w-[1200px] flex-col gap-4 p-6">
-        <MessageCard icon="question" title="Canteen not found" body="It may have been renamed or removed." />
+        <MessageCard icon="question" art="page-not-found" title="Canteen not found" body="It may have been renamed or removed." />
         <Link to="/" className="font-bold text-brand">
           Back to home
         </Link>
@@ -188,7 +194,7 @@ function CanteenMobile({ data, now, online }: ViewProps) {
   return (
     <main id="main" className="flex flex-1 flex-col">
       <div className="relative h-[250px] shrink-0">
-        <CanteenArt wall={canteenWall(canteen.id)} />
+        <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} />
         <BackButton className="absolute left-4 top-[18px] h-11 w-11 rounded-[14px]" />
         <FavouriteButton canteen={canteen} className="absolute right-4 top-[18px] h-11 w-11 rounded-[14px]" />
       </div>
@@ -313,7 +319,12 @@ function CanteenWeb({ data, now, online }: ViewProps) {
       </Link>
       <div className="flex flex-wrap gap-[22px]">
         <div className="relative h-[340px] flex-[1_1_460px]">
-          <CanteenArt wall={canteenWall(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-[26px]" />
+          <CanteenArt
+            wall={canteenWall(canteen.id)}
+            photo={canteenPhotoFor(canteen.id)}
+            label={canteenInitial(canteen.name)}
+            className="rounded-[26px]"
+          />
           <FavouriteButton canteen={canteen} className="absolute right-4 top-4 h-11 w-11 rounded-[14px]" />
         </div>
         <section
@@ -387,7 +398,11 @@ function CanteenWeb({ data, now, online }: ViewProps) {
                   className="flex min-h-[52px] items-center justify-between gap-2 text-ink no-underline hover:text-brand-dark"
                 >
                   <span className="flex items-center gap-2.5">
-                    <FoodArt kind={shopArtFor(shop.kind)} className="h-9 w-9 shrink-0 rounded-[10px]" />
+                    <FoodArt
+                      kind={shopArtFor(shop.kind)}
+                      photo={shopPhotoFor(shop.id, shop.kind)}
+                      className="h-9 w-9 shrink-0 rounded-[10px]"
+                    />
                     <span className="text-sm font-bold">{shop.name}</span>
                   </span>
                   <ShopStatusText status={shop.status} />
@@ -399,7 +414,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
       </div>
       <Footnote className="text-[13px]">
         {canteen.is_sample
-          ? "Sample data · seat counts are estimates · shop names, hours and prices are placeholders"
+          ? "Sample data · seat counts are estimates · shop names, hours, prices and pictures are placeholders"
           : "Seat counts are estimates from privacy-preserving sensors."}
       </Footnote>
     </main>

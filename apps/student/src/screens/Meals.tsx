@@ -127,7 +127,7 @@ export function MealsScreen() {
       <main id="main" className="flex flex-1 flex-col gap-3.5 px-4 pb-4 pt-1 md:px-6 md:pb-10">
         {!data ? (
           meal.isError ? (
-            <MessageCard icon="wifiOff" title="Couldn't load meal times" body="Retrying automatically…" />
+            <MessageCard icon="wifiOff" art="offline" title="Couldn't load meal times" body="Retrying automatically…" />
           ) : (
             <Loading label="Loading meal times">
               <Skeleton className="h-[300px] rounded-3xl" />

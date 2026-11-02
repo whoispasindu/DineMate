@@ -8,7 +8,7 @@ import {
   type MenuTag,
   type Shop,
 } from "@dinemate/api-client";
-import { cx, FoodArt, foodArtFor, formatClock, formatPrice, SampleBadge, shopArtFor } from "@dinemate/ui";
+import { cx, FoodArt, foodArtFor, foodPhotoFor, formatClock, formatPrice, SampleBadge, shopArtFor, shopPhotoFor } from "@dinemate/ui";
 import { useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import {
@@ -39,11 +39,20 @@ const CATEGORIES: { value: Category; label: string }[] = [
 const PERIOD_OPTIONS = PERIODS.map((p) => ({ value: p, label: PERIOD_LABEL[p] }));
 
 function ItemArt({ item, className, fit }: { item: MenuItem; className: string; fit?: "cover" | "contain" }) {
-  return <FoodArt kind={foodArtFor(item.name, item.tags)} name={item.name} muted={!item.is_available} className={className} fit={fit} />;
+  return (
+    <FoodArt
+      kind={foodArtFor(item.name, item.tags)}
+      name={item.name}
+      photo={foodPhotoFor(item.name)}
+      muted={!item.is_available}
+      className={className}
+      fit={fit}
+    />
+  );
 }
 
 function ShopArt({ shop, className }: { shop: Shop; className: string }) {
-  return <FoodArt kind={shopArtFor(shop.kind)} name={shop.name} className={className} />;
+  return <FoodArt kind={shopArtFor(shop.kind)} name={shop.name} photo={shopPhotoFor(shop.id, shop.kind)} className={className} />;
 }
 
 function defaultShop(shops: Shop[]): Shop | undefined {
@@ -129,11 +138,13 @@ interface FoodViewProps {
 }
 
 function MenuEmpty({ menuEmpty, filtering, period }: Pick<FoodViewProps, "menuEmpty" | "filtering" | "period">) {
-  if (menuEmpty) return <MessageCard icon="utensils" dashed title="Menu not added yet" body="This shop hasn't published a menu." />;
-  if (filtering) return <MessageCard icon="search" title="Nothing matches" body="Try another search or category." />;
+  if (menuEmpty)
+    return <MessageCard icon="utensils" art="no-menu" dashed title="Menu not added yet" body="This shop hasn't published a menu." />;
+  if (filtering) return <MessageCard icon="search" art="no-results" title="Nothing matches" body="Try another search or category." />;
   return (
     <MessageCard
       icon="utensils"
+      art="no-menu"
       dashed
       title={`No ${PERIOD_LABEL[period].toLowerCase()} menu`}
       body="This shop doesn't list items for this meal."
@@ -194,7 +205,7 @@ function FoodMobile(props: FoodViewProps) {
             <Skeleton className="h-[78px]" />
           </Loading>
         ) : shops.length === 0 ? (
-          <MessageCard icon="store" dashed title="No shops listed yet" />
+          <MessageCard icon="store" art="no-shops" dashed title="No shops listed yet" />
         ) : (
           <div aria-label="Shops" className="scrollbar-none -mx-4 flex snap-x gap-2.5 overflow-x-auto px-4">
             {shops.map((s) => (
@@ -240,7 +251,7 @@ function FoodMobile(props: FoodViewProps) {
         </div>
         <p className="m-0 text-xs text-muted">
           {props.menuUpdatedAt ? `Menu updated today ${formatClock(props.menuUpdatedAt)} by shop staff` : "Menu not updated yet"}
-          {props.isSample ? " · prices are sample values" : ""}
+          {props.isSample ? " · prices and pictures are samples" : ""}
         </p>
       </main>
     </>
@@ -360,7 +371,8 @@ function FoodWeb(props: FoodViewProps) {
           </div>
           {props.isSample ? (
             <Footnote>
-              Sample data — shop names, items and prices are placeholders until real shops provide them. Pictures are illustrations.
+              Sample data — shop names, items and prices are placeholders until real shops provide them. Pictures are generated samples, not
+              photos of real dishes.
             </Footnote>
           ) : null}
         </section>

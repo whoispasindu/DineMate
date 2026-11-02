@@ -1,5 +1,15 @@
 import type { CanteenSummary, SafetyEvent, ShopStatus } from "@dinemate/api-client";
-import { cx, formatClock, formatLocalHM, HazardFrame, Icon, SimulationLabel, type IconName } from "@dinemate/ui";
+import {
+  cx,
+  emptyArtFor,
+  formatClock,
+  formatLocalHM,
+  HazardFrame,
+  Icon,
+  SimulationLabel,
+  type EmptyArt,
+  type IconName,
+} from "@dinemate/ui";
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
 
 export function Skeleton({ className }: { className?: string }) {
@@ -20,20 +30,27 @@ interface MessageCardProps {
   body?: string;
   dashed?: boolean;
   className?: string;
+  art?: EmptyArt;
 }
 
-export function MessageCard({ icon, title, body, dashed, className }: MessageCardProps) {
+export function MessageCard({ icon, title, body, dashed, className, art }: MessageCardProps) {
+  const picture = emptyArtFor(art);
   return (
     <div
       className={cx(
-        "flex items-start gap-3 rounded-[18px] bg-card p-4",
+        "flex gap-3 rounded-[18px] bg-card p-4",
+        picture ? "items-center" : "items-start",
         dashed ? "border-[1.5px] border-dashed border-dash bg-surface-soft" : "border border-line",
         className,
       )}
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral text-neutral-ink">
-        <Icon name={icon} size={20} strokeWidth={2.2} />
-      </span>
+      {picture ? (
+        <img src={picture} alt="" loading="lazy" decoding="async" className="h-16 w-16 shrink-0 object-contain" />
+      ) : (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-neutral text-neutral-ink">
+          <Icon name={icon} size={20} strokeWidth={2.2} />
+        </span>
+      )}
       <span className="flex flex-col gap-0.5">
         <span className="text-[15px] font-extrabold">{title}</span>
         {body ? <span className="text-[13px] leading-snug text-muted">{body}</span> : null}
@@ -46,6 +63,7 @@ export function OfflineCard() {
   return (
     <MessageCard
       icon="wifiOff"
+      art="offline"
       dashed
       title="You're offline"
       body="Showing nothing until we reconnect — seat numbers are never shown from memory."
