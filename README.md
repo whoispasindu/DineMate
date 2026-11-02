@@ -9,7 +9,7 @@
   &nbsp;
   <img src="docs/screenshots/student-canteen-phone.png" width="230" alt="Canteen page for a crowded canteen with a Less crowded nearby suggestion" />
   &nbsp;
-  <img src="docs/screenshots/student-food-phone.png" width="230" alt="Food tab with illustrated menu items, prices and sold-out state" />
+  <img src="docs/screenshots/student-food-phone.png" width="230" alt="Food tab with sample menu pictures, prices and sold-out state" />
 </p>
 
 ## What it does
@@ -30,11 +30,11 @@ Seats are counted by a small vision worker (YOLO11n + ByteTrack). It runs on a l
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/student-home-laptop.png" alt="Student Home on a laptop" /></td>
-    <td width="50%"><img src="docs/screenshots/student-food-laptop.png" alt="Food and shops on a laptop with illustrated drinks" /></td>
+    <td width="50%"><img src="docs/screenshots/student-food-laptop.png" alt="Food and shops on a laptop with sample menu pictures" /></td>
   </tr>
   <tr>
     <td align="center">Student Home: best spot, canteens, busy times</td>
-    <td align="center">Food & shops: menus with sample illustrations</td>
+    <td align="center">Food & shops: menus with sample pictures</td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/console-overview.png" alt="Staff console overview" /></td>
@@ -78,7 +78,7 @@ More: [canteen page with the forecast](docs/screenshots/student-canteen-laptop.p
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `apps/student`        | React 18 + Vite + Tailwind v4 PWA for students                                                                                 |
 | `apps/console`        | Staff console (sign-in, roles, editing pages)                                                                                  |
-| `packages/ui`         | Shared tokens and components (status pill, canteen and food illustrations, icons)                                              |
+| `packages/ui`         | Shared tokens and components (status pill, sample canteen and food pictures, icons)                                            |
 | `packages/api-client` | Typed API client and TanStack Query hooks; types are checked against the OpenAPI spec                                          |
 | `services/api`        | FastAPI, SQLAlchemy 2, Alembic, PostgreSQL 16 (managed with uv, Python 3.12)                                                   |
 | `services/vision`     | Seat-counting worker and zone tools ([README](services/vision/README.md))                                                      |
@@ -136,7 +136,7 @@ CI runs everything except `pnpm screenshots` on every pull request.
 - **Estimates, not counts.** Every seat number has a range, goes grey after 2 minutes, and disappears after 10.
 - **Privacy first.** Counts only, frames never stored, no faces or identities.
 - **Safety stays separate.** Its own tables, router and permissions. Only signed messages from registered sources are accepted, and a simulator can never send a real alarm.
-- **Honest sample data.** Shop names, prices and pictures are placeholders until real shops supply them. The food pictures are original illustrations, not photos.
+- **Honest sample data.** Shop names, prices and pictures are placeholders until real shops supply them. The canteen, shop and food pictures are generated samples, not photos of real places or dishes.
 - **Server time.** Countdowns and freshness use the server clock (Asia/Colombo), never the phone's.
 
 ## Status
