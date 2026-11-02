@@ -99,7 +99,7 @@ test("labelled safety simulation", async ({ browser }) => {
   const officer = await context.newPage();
   await signIn(officer, "safety@dinemate.test");
   await officer.getByLabel("Location").selectOption({ label: "Canteen A" });
-  await officer.getByLabel("Note for the log").fill("README screenshot");
+  await officer.getByLabel("Note for the log").fill("Judging demo");
   await officer.getByRole("button", { name: "Trigger simulation" }).click();
   await expect(officer.getByText("Fire alarm (simulated)", { exact: true })).toBeVisible();
   await shot(officer, "console-safety");
@@ -109,7 +109,7 @@ test("labelled safety simulation", async ({ browser }) => {
   await expect(student.getByText("SIMULATION — NOT A REAL EMERGENCY").first()).toBeVisible();
   await shot(student, "student-safety-phone");
 
-  await officer.getByLabel("Resolution note (required)").fill("README screenshot done");
+  await officer.getByLabel("Resolution note (required)").fill("Drill finished");
   await officer.getByRole("button", { name: "Resolve" }).click();
   await expect(officer.getByText("No open safety events.")).toBeVisible();
   await student.context().close();
