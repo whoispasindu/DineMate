@@ -120,62 +120,15 @@ interface CanteenArtProps {
   wall: string;
   label?: string;
   className?: string;
+  photo?: string;
 }
 
-export function CanteenArt({ wall, label, className }: CanteenArtProps) {
+export function CanteenArt({ wall, label, className, photo }: CanteenArtProps) {
   return (
     <div className={cx("relative h-full min-h-[60px] w-full overflow-hidden", className)} style={{ background: wall }}>
-      <svg
-        aria-hidden="true"
-        width="100%"
-        height="100%"
-        viewBox="0 0 320 200"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 block"
-      >
-        <rect x="0" y="0" width="320" height="200" fill={wall} />
-        <rect x="0" y="0" width="320" height="14" fill="#FFFFFF" opacity="0.45" />
-        {[18, 118, 218].map((x, i) => (
-          <g key={x}>
-            <rect x={x} y="28" width="84" height="92" rx="4" fill="#EAF7FB" stroke="#FFFFFF" strokeWidth="5" />
-            <circle cx={x + 20} cy="102" r="14" fill={i === 1 ? "#7CC48F" : "#9ED4AE"} />
-            <circle cx={x + 52} cy="98" r="18" fill={i === 1 ? "#9ED4AE" : "#7CC48F"} />
-            <circle cx={x + 74} cy="106" r="10" fill={i === 1 ? "#7CC48F" : "#9ED4AE"} />
-            <line x1={x + 42} y1="28" x2={x + 42} y2="120" stroke="#FFFFFF" strokeWidth="4" />
-          </g>
-        ))}
-        <rect x="0" y="120" width="320" height="6" fill="#FFFFFF" opacity="0.7" />
-        {[70, 160, 250].map((x) => (
-          <g key={x}>
-            <line x1={x} y1="0" x2={x} y2="40" stroke="#56645B" strokeWidth="1.5" />
-            <path d={`M${x - 12} 52 Q${x} 34 ${x + 12} 52 Z`} fill="#F2C14E" />
-          </g>
-        ))}
-        <rect x="0" y="150" width="320" height="50" fill="#EADFCB" />
-        <line x1="0" y1="150" x2="320" y2="150" stroke="#D8C8AC" strokeWidth="2" />
-        {[
-          [34, 34, 52],
-          [160, 142, 144],
-          [174, 174, 192],
-          [300, 282, 284],
-        ].map(([back, seat, leg]) => (
-          <g key={back} fill="#2F6B4A">
-            <rect x={back} y="122" width="6" height="48" rx="2" />
-            <rect x={seat} y="148" width="24" height="5" rx="2" />
-            <rect x={leg} y="153" width="4" height="20" />
-          </g>
-        ))}
-        {[50, 190].map((x) => (
-          <g key={x}>
-            <rect x={x} y="138" width="100" height="7" rx="2" fill="#B07A45" />
-            <rect x={x + 8} y="145" width="5" height="30" fill="#8C5D33" />
-            <rect x={x + 87} y="145" width="5" height="30" fill="#8C5D33" />
-          </g>
-        ))}
-        <ellipse cx="10" cy="158" rx="6" ry="12" fill="#4E9F68" transform="rotate(-20 10 158)" />
-        <ellipse cx="19" cy="156" rx="6" ry="13" fill="#3E8A57" transform="rotate(18 19 156)" />
-        <path d="M3 168h22l-3 22H6z" fill="#C96F4A" />
-      </svg>
+      {photo ? (
+        <img src={photo} alt="" loading="lazy" decoding="async" className="absolute inset-0 block h-full w-full object-cover" />
+      ) : null}
       {label ? (
         <span
           aria-hidden="true"

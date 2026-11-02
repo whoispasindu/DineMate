@@ -35,6 +35,11 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
         runtimeCaching: [
           {
+            urlPattern: ({ request, sameOrigin }) => sameOrigin && request.destination === "image",
+            handler: "CacheFirst",
+            options: { cacheName: "sample-art", expiration: { maxEntries: 80 } },
+          },
+          {
             urlPattern: ({ url }) => MENUS_AND_HOURS.test(url.pathname),
             handler: "StaleWhileRevalidate",
             options: { cacheName: "menus-and-hours" },
