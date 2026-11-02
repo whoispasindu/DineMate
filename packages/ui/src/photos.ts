@@ -46,9 +46,9 @@ import shopRice from "./art/shops/shop-rice.webp";
 import shopShortEats from "./art/shops/shop-short-eats.webp";
 import shopTea from "./art/shops/shop-tea.webp";
 import welcomeHero from "./art/welcome/welcome-hero.webp";
-import type { ShopArtKind } from "./food";
+import { foodArtFor, type FoodArtKind, type ShopArtKind } from "./food";
 
-export const PHOTO_ART = true;
+export const welcomePhoto = welcomeHero;
 
 export type EmptyArt =
   "no-alerts" | "no-canteens" | "no-menu" | "no-results" | "no-shops" | "offline" | "page-not-found" | "sensor-offline";
@@ -83,6 +83,20 @@ const FOOD: Record<string, string> = {
   "vegetable rice & curry": vegetableRiceCurry,
   "vegetable roti": vegetableRoti,
   "wood apple juice": woodAppleJuice,
+};
+
+const BY_CATEGORY: Record<FoodArtKind, string> = {
+  rice_curry: chickenRiceCurry,
+  fried_rice: chickenFriedRice,
+  milk_rice: milkRiceLunuMiris,
+  string_hoppers: stringHoppersCurry,
+  dhal: dhalPapadam,
+  kottu: shopKottu,
+  short_eats: shopShortEats,
+  bakery: shopBakery,
+  noodles: shopNoodles,
+  tea: plainTea,
+  drink: shopDrinks,
 };
 
 const SHOP_BY_ID: Record<string, string> = {
@@ -120,26 +134,18 @@ const EMPTY: Record<EmptyArt, string> = {
   "sensor-offline": sensorOffline,
 };
 
-function enabled(src: string | undefined): string | undefined {
-  return PHOTO_ART ? src : undefined;
+export function foodPhotoFor(name: string, tags: readonly string[] = []): string {
+  return FOOD[name.trim().toLowerCase()] ?? BY_CATEGORY[foodArtFor(name, tags)];
 }
 
-export function foodPhotoFor(name: string): string | undefined {
-  return enabled(FOOD[name.trim().toLowerCase()]);
-}
-
-export function shopPhotoFor(id: string, kind: ShopArtKind): string | undefined {
-  return enabled(SHOP_BY_ID[id] ?? SHOP_BY_KIND[kind]);
+export function shopPhotoFor(id: string, kind: ShopArtKind): string {
+  return SHOP_BY_ID[id] ?? SHOP_BY_KIND[kind];
 }
 
 export function canteenPhotoFor(id: string): string | undefined {
-  return enabled(CANTEENS[id]);
-}
-
-export function welcomePhoto(): string | undefined {
-  return enabled(welcomeHero);
+  return CANTEENS[id];
 }
 
 export function emptyArtFor(art: EmptyArt | undefined): string | undefined {
-  return art ? enabled(EMPTY[art]) : undefined;
+  return art ? EMPTY[art] : undefined;
 }

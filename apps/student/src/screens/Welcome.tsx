@@ -1,4 +1,4 @@
-import { APP_NAME, CanteenArt, cx, Icon, welcomePhoto, type IconName } from "@dinemate/ui";
+import { APP_NAME, Icon, welcomePhoto, type IconName } from "@dinemate/ui";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { isStandalone, useInstall } from "../lib/device";
@@ -15,7 +15,6 @@ export function WelcomeScreen() {
   const seen = welcomeSeen.use();
   const { canPrompt, showIosHint, promptInstall } = useInstall();
   const [hintOpen, setHintOpen] = useState(false);
-  const hero = welcomePhoto();
 
   if (seen || isStandalone()) return <Navigate to="/" replace />;
 
@@ -37,12 +36,8 @@ export function WelcomeScreen() {
     <main id="main" className="flex min-h-dvh bg-mint-soft">
       <div className="mx-auto flex w-full max-w-[420px] flex-col px-7 pb-9 pt-14">
         <div className="flex flex-1 flex-col items-center justify-center gap-[22px] text-center">
-          <div className={cx("relative w-60", hero ? "h-60" : "h-[168px]")}>
-            {hero ? (
-              <img src={hero} alt="" decoding="async" className="block h-full w-full rounded-[28px] object-cover" />
-            ) : (
-              <CanteenArt wall="#DCEFE2" className="rounded-[28px]" />
-            )}
+          <div className="relative h-60 w-60">
+            <img src={welcomePhoto} alt="" decoding="async" className="block h-full w-full rounded-[28px] object-cover" />
             <span className="absolute -bottom-[18px] -right-3.5 flex h-[72px] w-[72px] items-center justify-center rounded-[22px] border-[5px] border-mint-soft bg-brand text-white">
               <Icon name="leaf" size={36} />
             </span>

@@ -1,17 +1,5 @@
 import { useAlertFeed, useServerNow, useStudentSummary, type StudentSummary } from "@dinemate/api-client";
-import {
-  APP_NAME,
-  BrandMark,
-  FoodArt,
-  formatAgo,
-  formatClock,
-  greeting,
-  Icon,
-  LiveLine,
-  SampleBadge,
-  shopArtFor,
-  shopPhotoFor,
-} from "@dinemate/ui";
+import { APP_NAME, BrandMark, FoodArt, formatAgo, formatClock, greeting, Icon, LiveLine, SampleBadge, shopPhotoFor } from "@dinemate/ui";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { BestSpotMobile, BestSpotWeb, BusyTimesChart, CanteenCard, CanteenRow, NoBestSpot } from "../components/canteen";
@@ -198,11 +186,7 @@ function ShopsNow({ shops }: { shops: StudentSummary["shops_now"] }) {
               className="flex items-center justify-between gap-2 py-[9px] text-ink no-underline hover:text-brand-dark"
             >
               <span className="flex min-w-0 items-center gap-2.5">
-                <FoodArt
-                  kind={shopArtFor(shop.kind)}
-                  photo={shopPhotoFor(shop.id, shop.kind)}
-                  className="h-9 w-9 shrink-0 rounded-[10px]"
-                />
+                <FoodArt photo={shopPhotoFor(shop.id, shop.kind)} className="h-9 w-9 shrink-0 rounded-[10px]" />
                 <span className="flex flex-col">
                   <span className="text-sm font-bold">{shop.name}</span>
                   <span className="text-xs text-muted">{shop.canteen_name}</span>

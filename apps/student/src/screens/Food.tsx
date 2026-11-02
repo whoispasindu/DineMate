@@ -8,7 +8,7 @@ import {
   type MenuTag,
   type Shop,
 } from "@dinemate/api-client";
-import { cx, FoodArt, foodArtFor, foodPhotoFor, formatClock, formatPrice, SampleBadge, shopArtFor, shopPhotoFor } from "@dinemate/ui";
+import { cx, FoodArt, foodPhotoFor, formatClock, formatPrice, SampleBadge, shopPhotoFor } from "@dinemate/ui";
 import { useId, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import {
@@ -39,20 +39,11 @@ const CATEGORIES: { value: Category; label: string }[] = [
 const PERIOD_OPTIONS = PERIODS.map((p) => ({ value: p, label: PERIOD_LABEL[p] }));
 
 function ItemArt({ item, className, fit }: { item: MenuItem; className: string; fit?: "cover" | "contain" }) {
-  return (
-    <FoodArt
-      kind={foodArtFor(item.name, item.tags)}
-      name={item.name}
-      photo={foodPhotoFor(item.name)}
-      muted={!item.is_available}
-      className={className}
-      fit={fit}
-    />
-  );
+  return <FoodArt photo={foodPhotoFor(item.name, item.tags)} muted={!item.is_available} className={className} fit={fit} />;
 }
 
 function ShopArt({ shop, className }: { shop: Shop; className: string }) {
-  return <FoodArt kind={shopArtFor(shop.kind)} name={shop.name} photo={shopPhotoFor(shop.id, shop.kind)} className={className} />;
+  return <FoodArt photo={shopPhotoFor(shop.id, shop.kind)} className={className} />;
 }
 
 function defaultShop(shops: Shop[]): Shop | undefined {

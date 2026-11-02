@@ -20,7 +20,6 @@ import {
   Icon,
   levelFor,
   LiveLine,
-  shopArtFor,
   shopPhotoFor,
   StatusPill,
   type IconName,
@@ -398,11 +397,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
                   className="flex min-h-[52px] items-center justify-between gap-2 text-ink no-underline hover:text-brand-dark"
                 >
                   <span className="flex items-center gap-2.5">
-                    <FoodArt
-                      kind={shopArtFor(shop.kind)}
-                      photo={shopPhotoFor(shop.id, shop.kind)}
-                      className="h-9 w-9 shrink-0 rounded-[10px]"
-                    />
+                    <FoodArt photo={shopPhotoFor(shop.id, shop.kind)} className="h-9 w-9 shrink-0 rounded-[10px]" />
                     <span className="text-sm font-bold">{shop.name}</span>
                   </span>
                   <ShopStatusText status={shop.status} />
