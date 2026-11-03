@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DineMate image pack</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        color: #16231b;
+        background: #f3f7f2;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1440px;
+        margin: auto;
+        padding: 32px 28px;
+      }
+      header {
+        padding-bottom: 12px;
+      }
+      header p {
+        max-width: 850px;
+        line-height: 1.6;
+        color: #56645b;
+      }
+      h1 {
+        font-size: clamp(30px, 4vw, 48px);
+        letter-spacing: -0.04em;
+        margin: 12px 0;
+      }
+      a {
+        color: #1f7a45;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 24px 0 8px;
+      }
+      nav a {
+        padding: 10px 16px;
+        border: 1px solid #cfe3d4;
+        border-radius: 999px;
+        text-decoration: none;
+        background: white;
+        font-weight: 600;
+      }
+      section {
+        scroll-margin-top: 20px;
+        margin-bottom: 52px;
+      }
+      h2 {
+        font-size: 26px;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      h2 span {
+        font-size: 14px;
+        background: #e3f2e7;
+        color: #1f7a45;
+        border-radius: 99px;
+        padding: 5px 10px;
+        vertical-align: middle;
+        margin-left: 12px;
+      }
+      section > p {
+        color: #56645b;
+        margin: 0 0 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      figure {
+        margin: 0;
+        overflow: hidden;
+        border: 1px solid #e1e8e1;
+        border-radius: 18px;
+        background: white;
+      }
+      .preview {
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        background: #f7f7f3;
+      }
+      .preview img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .alpha {
+        background-color: #f3f7f2;
+        background-image:
+          linear-gradient(45deg, #e1e8e1 25%, transparent 25%), linear-gradient(-45deg, #e1e8e1 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #e1e8e1 75%), linear-gradient(-45deg, transparent 75%, #e1e8e1 75%);
+        background-size: 24px 24px;
+        background-position:
+          0 0,
+          0 12px,
+          12px -12px,
+          -12px 0;
+      }
+      figcaption {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      strong {
+        font-size: 16px;
+      }
+      code {
+        font-size: 12px;
+        overflow-wrap: anywhere;
+        color: #1f7a45;
+      }
+      small {
+        font-size: 12px;
+        color: #56645b;
+      }
+      footer {
+        border-top: 1px solid #e1e8e1;
+        color: #56645b;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .eyebrow {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        color: #1f7a45;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">DineMate · manual replacement pack</div>
+      <h1>48 images, ready to choose.</h1>
+      <p>
+        Generated sample artwork for your canteens, menus, shop categories, welcome screen and empty states. Click any image to open its PNG
+        master. Nothing here is connected to the running app.
+      </p>
+      <p>
+        <a href="README.md">Replacement guide</a> · <a href="manifest.json">File inventory</a> ·
+        <a href="prompts.json">Exact generation prompts</a>
+      </p>
+      <nav aria-label="Image categories">
+        <a href="#canteens">Canteens</a><a href="#food">Menu items</a><a href="#shops">Shop categories</a><a href="#welcome">Welcome</a
+        ><a href="#empty-states">Empty states</a>
+      </nav>
+    </header>
+    <main>
+      <section id="canteens">
+        <h2>Canteens<span>3</span></h2>
+        <p>Fictional sample locations for covers, cards and thumbnails.</p>
+        <div class="grid">
+          <figure>
+            <a href="canteens/canteen-a.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="canteens/canteen-a.png" alt="Canteen A" loading="lazy" width="1536" height="1024" /></div
+            ></a>
+            <figcaption><strong>Canteen A</strong><code>canteens/canteen-a.png</code><small>1536 × 1024 · 2.5 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="canteens/canteen-b.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="canteens/canteen-b.png" alt="Canteen B" loading="lazy" width="1536" height="1024" /></div
+            ></a>
+            <figcaption><strong>Canteen B</strong><code>canteens/canteen-b.png</code><small>1536 × 1024 · 3.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="canteens/canteen-c.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="canteens/canteen-c.png" alt="Canteen C" loading="lazy" width="1536" height="1024" /></div
+            ></a>
+            <figcaption><strong>Canteen C</strong><code>canteens/canteen-c.png</code><small>1536 × 1024 · 2.5 MB</small></figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="food">
+        <h2>Menu items<span>29</span></h2>
+        <p>One image per distinct sample menu item.</p>
+        <div class="grid">
+          <figure>
+            <a href="food/string-hoppers-curry.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/string-hoppers-curry.png" alt="String hoppers &amp; curry" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>String hoppers &amp; curry</strong><code>food/string-hoppers-curry.png</code><small>1254 × 1254 · 2.3 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/milk-rice-lunu-miris.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/milk-rice-lunu-miris.png" alt="Milk rice &amp; lunu miris" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Milk rice &amp; lunu miris</strong><code>food/milk-rice-lunu-miris.png</code><small>1254 × 1254 · 2.2 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/vegetable-rice-curry.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/vegetable-rice-curry.png" alt="Vegetable rice &amp; curry" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Vegetable rice &amp; curry</strong><code>food/vegetable-rice-curry.png</code><small>1254 × 1254 · 2.4 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/chicken-rice-curry.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/chicken-rice-curry.png" alt="Chicken rice &amp; curry" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Chicken rice &amp; curry</strong><code>food/chicken-rice-curry.png</code><small>1254 × 1254 · 2.6 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/fish-rice-curry.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/fish-rice-curry.png" alt="Fish rice &amp; curry" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Fish rice &amp; curry</strong><code>food/fish-rice-curry.png</code><small>1254 × 1254 · 2.6 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/egg-fried-rice.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/egg-fried-rice.png" alt="Egg fried rice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Egg fried rice</strong><code>food/egg-fried-rice.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/dhal-papadam.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/dhal-papadam.png" alt="Dhal &amp; papadam (add-on)" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Dhal &amp; papadam (add-on)</strong><code>food/dhal-papadam.png</code><small>1254 × 1254 · 2.4 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/vegetable-fried-rice.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/vegetable-fried-rice.png" alt="Vegetable fried rice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Vegetable fried rice</strong><code>food/vegetable-fried-rice.png</code><small>1254 × 1254 · 2.4 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/chicken-kottu.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/chicken-kottu.png" alt="Chicken kottu" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Chicken kottu</strong><code>food/chicken-kottu.png</code><small>1254 × 1254 · 2.5 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/vegetable-kottu.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/vegetable-kottu.png" alt="Vegetable kottu" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Vegetable kottu</strong><code>food/vegetable-kottu.png</code><small>1254 × 1254 · 2.6 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/egg-kottu.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/egg-kottu.png" alt="Egg kottu" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Egg kottu</strong><code>food/egg-kottu.png</code><small>1254 × 1254 · 2.7 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/cheese-kottu.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/cheese-kottu.png" alt="Cheese kottu" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Cheese kottu</strong><code>food/cheese-kottu.png</code><small>1254 × 1254 · 2.5 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/fish-bun.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/fish-bun.png" alt="Fish bun" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Fish bun</strong><code>food/fish-bun.png</code><small>1254 × 1254 · 2.3 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/vegetable-roti.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/vegetable-roti.png" alt="Vegetable roti" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Vegetable roti</strong><code>food/vegetable-roti.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/chicken-roll.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/chicken-roll.png" alt="Chicken roll" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Chicken roll</strong><code>food/chicken-roll.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/samosa.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/samosa.png" alt="Samosa" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Samosa</strong><code>food/samosa.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/plain-tea.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/plain-tea.png" alt="Plain tea" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Plain tea</strong><code>food/plain-tea.png</code><small>1254 × 1254 · 2.1 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/chicken-noodles.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/chicken-noodles.png" alt="Chicken noodles" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Chicken noodles</strong><code>food/chicken-noodles.png</code><small>1254 × 1254 · 2.4 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/vegetable-noodles.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/vegetable-noodles.png" alt="Vegetable noodles" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Vegetable noodles</strong><code>food/vegetable-noodles.png</code><small>1254 × 1254 · 2.5 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/devilled-chicken-noodles.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img
+                  src="food/devilled-chicken-noodles.png"
+                  alt="Devilled chicken noodles"
+                  loading="lazy"
+                  width="1254"
+                  height="1254"
+                /></div
+            ></a>
+            <figcaption>
+              <strong>Devilled chicken noodles</strong><code>food/devilled-chicken-noodles.png</code><small>1254 × 1254 · 2.5 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/egg-sandwich.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/egg-sandwich.png" alt="Egg sandwich" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Egg sandwich</strong><code>food/egg-sandwich.png</code><small>1254 × 1254 · 2.1 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/butter-cake.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/butter-cake.png" alt="Butter cake slice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Butter cake slice</strong><code>food/butter-cake.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/iced-coffee.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/iced-coffee.png" alt="Iced coffee" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Iced coffee</strong><code>food/iced-coffee.png</code><small>1254 × 1254 · 2.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/mango-smoothie.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/mango-smoothie.png" alt="Mango smoothie" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Mango smoothie</strong><code>food/mango-smoothie.png</code><small>1254 × 1254 · 2.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/papaya-juice.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/papaya-juice.png" alt="Papaya juice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Papaya juice</strong><code>food/papaya-juice.png</code><small>1254 × 1254 · 2.1 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/chicken-fried-rice.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/chicken-fried-rice.png" alt="Chicken fried rice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Chicken fried rice</strong><code>food/chicken-fried-rice.png</code><small>1254 × 1254 · 2.6 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="food/nasi-goreng.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/nasi-goreng.png" alt="Nasi goreng" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Nasi goreng</strong><code>food/nasi-goreng.png</code><small>1254 × 1254 · 2.5 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/lime-juice.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="food/lime-juice.png" alt="Lime juice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Lime juice</strong><code>food/lime-juice.png</code><small>1254 × 1254 · 2.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="food/wood-apple-juice.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="food/wood-apple-juice.png" alt="Wood apple juice" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Wood apple juice</strong><code>food/wood-apple-juice.png</code><small>1254 × 1254 · 2.3 MB</small>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="shops">
+        <h2>Shop categories<span>7</span></h2>
+        <p>Seven category images covering the nine sample shops.</p>
+        <div class="grid">
+          <figure>
+            <a href="shops/shop-rice.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="shops/shop-rice.png" alt="Rice stalls" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Rice stalls</strong><code>shops/shop-rice.png</code><small>1254 × 1254 · 2.3 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-kottu.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="shops/shop-kottu.png" alt="Kottu Corner" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Kottu Corner</strong><code>shops/shop-kottu.png</code><small>1254 × 1254 · 2.4 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-short-eats.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img src="shops/shop-short-eats.png" alt="Short Eats Counter" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Short Eats Counter</strong><code>shops/shop-short-eats.png</code><small>1254 × 1254 · 2.3 MB</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-tea.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="shops/shop-tea.png" alt="Tea Kiosk" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Tea Kiosk</strong><code>shops/shop-tea.png</code><small>1254 × 1254 · 2.0 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-noodles.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="shops/shop-noodles.png" alt="Noodle Bar" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Noodle Bar</strong><code>shops/shop-noodles.png</code><small>1254 × 1254 · 2.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-bakery.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="shops/shop-bakery.png" alt="Bakery Corner" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Bakery Corner</strong><code>shops/shop-bakery.png</code><small>1254 × 1254 · 2.2 MB</small></figcaption>
+          </figure>
+          <figure>
+            <a href="shops/shop-drinks.png" target="_blank" rel="noopener"
+              ><div class="preview">
+                <img
+                  src="shops/shop-drinks.png"
+                  alt="Smoothie Stand and Juice &amp; Snacks"
+                  loading="lazy"
+                  width="1254"
+                  height="1254"
+                /></div
+            ></a>
+            <figcaption>
+              <strong>Smoothie Stand and Juice &amp; Snacks</strong><code>shops/shop-drinks.png</code><small>1254 × 1254 · 2.0 MB</small>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="welcome">
+        <h2>Welcome<span>1</span></h2>
+        <p>Onboarding artwork.</p>
+        <div class="grid">
+          <figure>
+            <a href="welcome/welcome-hero.png" target="_blank" rel="noopener"
+              ><div class="preview"><img src="welcome/welcome-hero.png" alt="Welcome hero" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption><strong>Welcome hero</strong><code>welcome/welcome-hero.png</code><small>1254 × 1254 · 2.1 MB</small></figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="empty-states">
+        <h2>Empty states<span>8</span></h2>
+        <p>Optional illustrations with transparent backgrounds.</p>
+        <div class="grid">
+          <figure>
+            <a href="empty-states/no-menu.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/no-menu.png" alt="No menu yet" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>No menu yet</strong><code>empty-states/no-menu.png</code><small>1254 × 1254 · 1.1 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/no-results.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/no-results.png" alt="No results" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>No results</strong><code>empty-states/no-results.png</code><small>1254 × 1254 · 0.8 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/sensor-offline.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/sensor-offline.png" alt="Sensor offline" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Sensor offline</strong><code>empty-states/sensor-offline.png</code><small>1254 × 1254 · 0.6 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/no-shops.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/no-shops.png" alt="No shops listed yet" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>No shops listed yet</strong><code>empty-states/no-shops.png</code><small>1254 × 1254 · 1.0 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/no-canteens.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/no-canteens.png" alt="No canteens yet" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>No canteens yet</strong><code>empty-states/no-canteens.png</code><small>1254 × 1254 · 0.8 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/no-alerts.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/no-alerts.png" alt="No alerts today" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>No alerts today</strong><code>empty-states/no-alerts.png</code><small>1254 × 1254 · 0.9 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/page-not-found.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/page-not-found.png" alt="Page or canteen not found" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Page or canteen not found</strong><code>empty-states/page-not-found.png</code
+              ><small>1254 × 1254 · 0.9 MB · transparent</small>
+            </figcaption>
+          </figure>
+          <figure>
+            <a href="empty-states/offline.png" target="_blank" rel="noopener"
+              ><div class="preview alpha">
+                <img src="empty-states/offline.png" alt="Connection unavailable" loading="lazy" width="1254" height="1254" /></div
+            ></a>
+            <figcaption>
+              <strong>Connection unavailable</strong><code>empty-states/offline.png</code><small>1254 × 1254 · 0.8 MB · transparent</small>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+    <footer>
+      Generated using the built-in image_gen tool. Canteens and dishes are sample representations, not photos of actual campus facilities or
+      meals. PNG masters total approximately 101 MB; resize and compress selected files when integrating. Transparent backgrounds are shown
+      on a checker pattern in this gallery only.
+    </footer>
+  </body>
+</html>

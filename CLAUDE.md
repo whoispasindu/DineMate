@@ -7,7 +7,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 
 - apps/student — installable PWA for students. Keep it simple.
 - apps/console — staff console (admin, canteen manager, shop manager, safety officer).
-- packages/ui — shared tokens and components (StatusPill, Ring, CanteenArt, FoodArt, HazardFrame, icons). Sample pictures are WebP files in `src/art`, mapped in `src/photos.ts` (food by item name with a dish-category fallback, shops by ID then kind, canteens by ID). PNG masters are not committed.
+- packages/ui — shared tokens and components (StatusPill, Ring, CanteenArt, FoodArt, HazardFrame, icons). Sample pictures are WebP files in `src/art`, mapped in `src/photos.ts` (food by item name with a dish-category fallback, shops by ID then kind, canteens by ID). PNG masters, prompts and the manifest live in `docs/newImages` (not loaded by the apps).
 - packages/api-client — hand-written API types, TanStack Query hooks, and a client that calls the real API when `configureApi({ baseUrl })` is set, else a labelled sample "server". `src/contract.ts` makes typecheck fail if the types drift from the generated OpenAPI types in `src/generated/`.
 - services/api — FastAPI + PostgreSQL, managed with uv (Python 3.12). Layout: `app/models` (SQLAlchemy), `app/services` (pure rules: occupancy, shop_status, meal_status; `views.py` loads DB → schemas), `app/routers`, `app/schemas.py`, `app/seed.py`, `app/sim.py`. Alembic migrations in `alembic/versions`.
 - infra/docker-compose.yml — Postgres 16 + API (migrates and seeds an empty DB on start) + occupancy simulator. Copy infra/.env.example to infra/.env to override defaults.

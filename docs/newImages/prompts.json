@@ -1,0 +1,342 @@
+{
+  "generator": "Built-in image_gen",
+  "purpose": "Standalone generated sample assets for manual integration; app code unchanged",
+  "assets": [
+    {
+      "id": "food/string-hoppers-curry",
+      "label": "String hoppers & curry",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: A neat stack of fine white Sri Lankan string hoppers with two small bowls of dhal curry and coconut sambol; fine steamed rice-flour strands, not spaghetti. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/milk-rice-lunu-miris",
+      "label": "Milk rice & lunu miris",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Four authentic Sri Lankan kiribath diamond pieces of compact coconut milk rice, visibly cut diamond shapes, with a small serving of red lunu miris. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/vegetable-rice-curry",
+      "label": "Vegetable rice & curry",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: White rice with dhal, pumpkin curry, green mallung, beetroot curry and papadam, each in distinct portions. Vegetarian, no meat, fish or egg. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/chicken-rice-curry",
+      "label": "Chicken rice & curry",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: White rice with two modest pieces of Sri Lankan chicken curry, dhal, green mallung and papadam, distinct appetizing portions. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/fish-rice-curry",
+      "label": "Fish rice & curry",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: White rice with a clearly visible fish steak in Sri Lankan red curry, dhal, green vegetables and papadam. No chicken. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/egg-fried-rice",
+      "label": "Egg fried rice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Sri Lankan canteen-style fried rice with distinct rice grains, generous visible scrambled egg pieces, carrot and spring onion. No meat or fish. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/dhal-papadam",
+      "label": "Dhal & papadam (add-on)",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: A small ivory bowl of golden creamy Sri Lankan red-lentil dhal tempered with curry leaves, beside two crisp round papadams on a small plate. No rice mound. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/vegetable-fried-rice",
+      "label": "Vegetable fried rice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: A modest mound of Sri Lankan vegetable fried rice with distinct grains, carrot, peas, cabbage and spring onion. Vegetarian with no egg, meat or fish. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/chicken-kottu",
+      "label": "Chicken kottu",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Authentic Sri Lankan chicken kottu: chopped flat roti strips, chicken pieces, cabbage, carrot and curry leaves. Roti texture clearly distinguishable from rice or noodles. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/vegetable-kottu",
+      "label": "Vegetable kottu",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Authentic Sri Lankan vegetable kottu: chopped flat roti strips with generous cabbage, carrot, leek and green vegetables. No meat, fish or egg. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/egg-kottu",
+      "label": "Egg kottu",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Authentic Sri Lankan egg kottu: chopped roti strips, generous clearly visible scrambled egg, leek, cabbage and carrot. No meat or fish. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/cheese-kottu",
+      "label": "Cheese kottu",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Authentic Sri Lankan cheese kottu: chopped roti strips, vegetables and creamy melted cheese coating, with a little visible shredded cheese melting on top. No theatrical cheese pull. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/fish-bun",
+      "label": "Fish bun",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One modest Sri Lankan triangular fish bun with glossy golden baked bread crust, one half cut open revealing spiced flaked fish and potato filling. Not a hamburger. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/vegetable-roti",
+      "label": "Vegetable roti",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Two authentic Sri Lankan triangular folded vegetable roti parcels with griddle-browned surfaces, one cut to show curried potato, leek and carrot filling. No meat. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/chicken-roll",
+      "label": "Chicken roll",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Two Sri Lankan breaded cylindrical chicken rolls, one cut diagonally showing spiced chicken and potato filling, golden crisp crumb coating. Not spring rolls or sausage rolls. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/samosa",
+      "label": "Samosa",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Three crisp golden triangular Sri Lankan vegetable samosas, one opened slightly showing potato and pea filling. No meat. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/plain-tea",
+      "label": "Plain tea",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One small clear glass of Sri Lankan plain black tea, translucent amber-brown tea without milk, simple saucer, faint steam. No pastries or other drinks. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/chicken-noodles",
+      "label": "Chicken noodles",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Sri Lankan canteen stir-fried thin wheat noodles with clearly visible modest chicken pieces, carrot, cabbage and spring onion. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/vegetable-noodles",
+      "label": "Vegetable noodles",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Sri Lankan canteen stir-fried thin wheat noodles with cabbage, carrot, leek and green vegetables. No egg, meat or fish. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/devilled-chicken-noodles",
+      "label": "Devilled chicken noodles",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Sri Lankan noodles topped with glossy red devilled chicken pieces, red and green capsicum and onion wedges; recognizable spicy sweet red sauce. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/egg-sandwich",
+      "label": "Egg sandwich",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Two simple triangular Sri Lankan canteen egg sandwiches made with soft white sandwich bread, sliced boiled egg filling and a little lettuce, cut faces visible. No meat. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/butter-cake",
+      "label": "Butter cake slice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Two modest rectangular slices of authentic Sri Lankan butter cake, fine pale golden yellow crumb and thin golden brown crust, no frosting, no cream. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/iced-coffee",
+      "label": "Iced coffee",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One clear straight-sided glass of Sri Lankan milky iced coffee, light coffee-brown liquid, a few ice cubes and subtle condensation. No whipped cream, branding or second drink. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/mango-smoothie",
+      "label": "Mango smoothie",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One clear glass of thick golden mango smoothie, visibly smooth and creamy orange-yellow texture, subtle condensation, no overflowing garnish or other drinks. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/papaya-juice",
+      "label": "Papaya juice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One clear glass of fresh ripe papaya juice, natural coral-orange color distinct from golden mango, lightly pulpy texture, no extra fruit display or other drinks. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/chicken-fried-rice",
+      "label": "Chicken fried rice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: A modest mound of Sri Lankan chicken fried rice with distinct grains, clear chicken pieces, carrot, peas and spring onion; no curry side dishes. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/nasi-goreng",
+      "label": "Nasi goreng",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: Sri Lankan canteen-style nasi goreng: dark savory fried rice, vegetable pieces, a sunny-side-up fried egg on top and two cucumber slices. Distinct from pale fried rice. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/lime-juice",
+      "label": "Lime juice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One clear glass of fresh Sri Lankan lime juice, translucent very pale yellow-green liquid with a few ice cubes and a small lime slice on rim. No mint cocktail styling. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "food/wood-apple-juice",
+      "label": "Wood apple juice",
+      "group": "food",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: one standalone reusable menu image for DineMate, Sri Lankan campus dining app. Photorealistic natural food photography. Subject: One clear glass of authentic Sri Lankan wood apple juice, opaque earthy taupe-brown slightly pulpy drink with subtle condensation, plain glass. Not orange juice or chocolate milk. Composition: square canvas, one serving centered within central 75 percent, complete plate/glass fully visible with comfortable 12 percent safe margin for square and landscape crops. Camera 45-degree view, consistent soft warm window light from upper left, realistic edible textures, affordable student portion, simple ivory ceramic plate/bowl where applicable, light warm beige matte stone tabletop filling the whole background. Dark green #1F7A45 may appear only as a tiny subtle background accent, no decorative props. Glasses for drinks. No text, captions, price, labels, branding, watermark, borders, collage, hands, cutlery clutter or people. One final image only. Generated sample meal, not a real shop photograph."
+    },
+    {
+      "id": "canteens/canteen-a",
+      "label": "Canteen A",
+      "group": "canteens",
+      "transparent": false,
+      "prompt": "Use case: photorealistic-natural. Asset: a single landscape 3:2 cover photograph for Canteen A in DineMate. A bright modest indoor campus dining hall with large open windows, ivory columns, long light-wood communal tables and deep green chairs. A side terrace and tropical trees visible beyond windows. Natural warm tropical daylight, editorial architectural photography, realistic slightly worn affordable university furniture, balanced forest green #1F7A45, cream and natural wood palette. Inviting calm composition with recognizable architecture concentrated centrally, important details inside middle 65 percent so this same image works in a square thumbnail and a wide hero crop. No people, no brands, no text, no letters, no labels, no collage or border, no watermark. Fictional Sri Lankan sample campus, not NSBM or any named real university. Show a believable canteen, not luxury resort or restaurant. One photograph only."
+    },
+    {
+      "id": "canteens/canteen-b",
+      "label": "Canteen B",
+      "group": "canteens",
+      "transparent": false,
+      "prompt": "Use case: photorealistic-natural. Asset: a single landscape 3:2 cover photograph for Canteen B in DineMate. A shaded tropical garden courtyard canteen, low terracotta paving, simple wooden benches, leafy tree canopy and an open-sided serving counter. Distinct courtyard architecture, not an indoor dining hall. Natural warm tropical daylight, editorial architectural photography, realistic slightly worn affordable university furniture, balanced forest green #1F7A45, cream and natural wood palette. Inviting calm composition with recognizable architecture concentrated centrally, important details inside middle 65 percent so this same image works in a square thumbnail and a wide hero crop. No people, no brands, no text, no letters, no labels, no collage or border, no watermark. Fictional Sri Lankan sample campus, not NSBM or any named real university. Show a believable canteen, not luxury resort or restaurant. One photograph only."
+    },
+    {
+      "id": "canteens/canteen-c",
+      "label": "Canteen C",
+      "group": "canteens",
+      "transparent": false,
+      "prompt": "Use case: photorealistic-natural. Asset: a single landscape 3:2 cover photograph for Canteen C in DineMate. A contemporary two-level modest campus canteen, clean broad windows, pale concrete, steel-framed communal tables and green seating, visible upper mezzanine or deck railing. Distinct from a courtyard or classic columned hall. Natural warm tropical daylight, editorial architectural photography, realistic slightly worn affordable university furniture, balanced forest green #1F7A45, cream and natural wood palette. Inviting calm composition with recognizable architecture concentrated centrally, important details inside middle 65 percent so this same image works in a square thumbnail and a wide hero crop. No people, no brands, no text, no letters, no labels, no collage or border, no watermark. Fictional Sri Lankan sample campus, not NSBM or any named real university. Show a believable canteen, not luxury resort or restaurant. One photograph only."
+    },
+    {
+      "id": "welcome/welcome-hero",
+      "label": "Welcome hero",
+      "group": "welcome",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: standalone onboarding hero illustration for DineMate. Square composition that will crop to a 240 by 168 pixel welcome card. A friendly Sri Lankan university student with a backpack holding a phone and a simple tray of rice and curry, noticing an inviting empty forest green chair beside a communal canteen table. Phone has only a simple green chair/check symbol, no writing. Entire student upper body, tray, phone and empty chair comfortably inside central 75 percent, no cut-off face or fingers. Warm airy tropical campus canteen suggested with simple windows and foliage, minimal background and ample breathing room. Sophisticated gently textured painted editorial illustration, rounded soft geometric forms, natural anatomy and hands, friendly young adult character rather than childish cartoon. Palette forest green #1F7A45, mint #CFE9D7, cream #F3F7F2, restrained ochre and terracotta. No text, captions, logos, watermark, UI chrome, borders or collage. One finished illustration only."
+    },
+    {
+      "id": "shops/shop-rice",
+      "label": "Rice stalls",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: A simple ivory plate of Sri Lankan rice and curry with dhal, vegetables and a modest chicken curry portion. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-kottu",
+      "label": "Kottu Corner",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: A simple ivory plate of recognizable chopped-roti kottu with vegetables. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-short-eats",
+      "label": "Short Eats Counter",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: A compact assortment of a triangular fish bun, one breaded roll and one samosa on an ivory plate. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-tea",
+      "label": "Tea Kiosk",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: One small glass of amber black tea beside one small ivory cup of milk tea, compact simple arrangement. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-noodles",
+      "label": "Noodle Bar",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: One ivory bowl of stir-fried noodles with cabbage, carrot and spring onion. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-bakery",
+      "label": "Bakery Corner",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: A compact arrangement of a triangular egg sandwich and one rectangular butter cake slice on an ivory plate. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "shops/shop-drinks",
+      "label": "Smoothie Stand and Juice & Snacks",
+      "group": "shops",
+      "transparent": false,
+      "prompt": "Use case: product-mockup. Asset: standalone square photographic category thumbnail for DineMate shop selector, legible at 36 to 52 pixels. Subject: Two plain clear glasses, one golden mango smoothie and one pale lime juice, compact balanced arrangement. Very simple centered silhouette, subjects occupy central 75 percent, comfortably fully visible. Photorealistic food photograph with soft warm upper-left natural window light, ivory ceramic tableware, light warm beige matte stone background, natural appetizing textures, affordable Sri Lankan campus food. Match a consistent photography series. No shop signage or logos, no text, watermark, borders, captions or collage, no hands or people, no busy props. One image only."
+    },
+    {
+      "id": "empty-states/no-menu",
+      "label": "No menu yet",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: An empty cream menu clipboard with a small empty plate and fork, a tiny leaf sprig. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/no-results",
+      "label": "No results",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A green-handled magnifying glass looking over an empty cream plate, one small leaf beside it. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/sensor-offline",
+      "label": "Sensor offline",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A simple small neutral seat-counting sensor on a stand beside an empty green chair, with a small grey disconnected signal symbol above the sensor. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/no-shops",
+      "label": "No shops listed yet",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A tiny simple unbranded green awning shop counter with an empty display shelf and a small potted plant; no closed sign. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/no-canteens",
+      "label": "No canteens yet",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A simple empty communal dining table with two green chairs and a small leaf sprig, compact composition. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/no-alerts",
+      "label": "No alerts today",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A calm small forest green notification bell with a tiny cream circular check badge, resting above a soft mint leaf sprig; no emergency imagery. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/page-not-found",
+      "label": "Page or canteen not found",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A small folded cream campus map with a dashed green path ending at a simple question mark and a tiny leaf; no map text or place names. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    },
+    {
+      "id": "empty-states/offline",
+      "label": "Connection unavailable",
+      "group": "empty-states",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: one standalone small empty-state spot illustration for DineMate campus dining app. Subject: A small simple cream phone beside a green chair and a grey disconnected signal symbol, phone screen blank; no text. Sophisticated hand-painted editorial illustration, soft geometric rounded forms, faint paperlike painted texture on objects, simple clear silhouette readable small, warm gentle mood. Forest green #1F7A45, mint #CFE9D7, ivory cream and restrained ochre, grey for disconnected status. Square canvas, all objects completely visible within central 75 percent, generous transparent margin all around. Genuinely transparent background with alpha; no colored backdrop, no checkerboard drawn into image, no scene rectangle. No text except the simple question-mark symbol when requested, no titles, labels, numerals, logos, watermark, border, multi-panel sheet, UI or buttons. One illustration only."
+    }
+  ]
+}
