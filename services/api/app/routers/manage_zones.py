@@ -1,3 +1,5 @@
+import uuid
+from collections.abc import Sequence
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -87,16 +89,48 @@ def validate_polygons(session: SessionDep, device: models.Device, polygons: list
         )
     }
     seen: set[str] = set()
+    seat_ids: set[str] = set()
     for polygon in polygons:
         if polygon.type != "seating":
             if polygon.zone_id is not None:
                 raise invalid("Only seating polygons can be linked to a zone.")
+            if polygon.seats:
+                raise invalid("Seats can only be placed in seating polygons.")
             continue
         if polygon.zone_id not in canteen_zones:
             raise invalid("Seating polygons must use a zone from this canteen.", zone_id=polygon.zone_id or "")
         if polygon.zone_id in seen:
             raise invalid("Each zone can be drawn once per layout.", zone_id=polygon.zone_id)
         seen.add(polygon.zone_id)
+        for seat in polygon.seats:
+            if seat.seat_id in seat_ids:
+                raise invalid("Each seat needs its own id.", seat_id=seat.seat_id)
+            seat_ids.add(seat.seat_id)
+            if not inside(polygon.points, seat.x, seat.y):
+                raise invalid("Seats must be inside their seating polygon.", seat_id=seat.seat_id)
+
+
+def inside(polygon: Sequence[Sequence[float]], x: float, y: float) -> bool:
+    result = False
+    for i in range(len(polygon)):
+        x1, y1 = polygon[i][0], polygon[i][1]
+        x2, y2 = polygon[(i + 1) % len(polygon)][0], polygon[(i + 1) % len(polygon)][1]
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            result = not result
+    return result
+
+
+def sync_seat_capacity(session: SessionDep, polygons: list[dict[str, Any]]) -> dict[str, int]:
+    changed: dict[str, int] = {}
+    for polygon in polygons:
+        seats = polygon.get("seats") or []
+        if polygon.get("type") != "seating" or not seats or not polygon.get("zone_id"):
+            continue
+        zone = session.get(models.SeatingZone, uuid.UUID(str(polygon["zone_id"])))
+        if zone is not None and zone.capacity != len(seats):
+            zone.capacity = len(seats)
+            changed[str(zone.id)] = len(seats)
+    return changed
 
 
 def save_version(session: SessionDep, device: models.Device, polygons: list[dict[str, Any]]) -> int:
@@ -158,6 +192,7 @@ def put_layout(
     validate_polygons(session, device, payload.polygons)
     polygons = [p.model_dump(mode="json", exclude_none=True) for p in payload.polygons]
     version = save_version(session, device, polygons)
+    capacities = sync_seat_capacity(session, polygons)
     record(
         session,
         real_now,
@@ -166,7 +201,12 @@ def put_layout(
         device_id,
         user=user,
         before={"version": current},
-        after={"version": version, "polygons": len(polygons)},
+        after={
+            "version": version,
+            "polygons": len(polygons),
+            "seats": sum(len(p.get("seats") or []) for p in polygons),
+            "capacity_from_seats": capacities,
+        },
         request=request,
     )
     session.commit()
@@ -190,6 +230,7 @@ def rollback_layout(
         raise not_found("Layout version", str(payload.version))
     current = current_layout(session, device_id)
     version = save_version(session, device, list(source.polygons))
+    capacities = sync_seat_capacity(session, list(source.polygons))
     record(
         session,
         real_now,
@@ -198,7 +239,7 @@ def rollback_layout(
         device_id,
         user=user,
         before={"version": current.version if current else None},
-        after={"version": version, "copied_from": payload.version},
+        after={"version": version, "copied_from": payload.version, "capacity_from_seats": capacities},
         request=request,
     )
     session.commit()

@@ -4,6 +4,7 @@ from app.models.base import Base
 from app.models.canteen import Canteen, CanteenHours, SeatingZone, WalkingTime
 from app.models.device import Device, DeviceHeartbeat, OccupancyReading, ZoneLayout
 from app.models.schedule import MealSchedule, ScheduleOverride
+from app.models.seats import SeatSession, SeatState, ZoneSeatStatus
 from app.models.shop import MenuItem, MenuItemPeriod, Shop, ShopHourException, ShopHours
 from app.models.users import AuditLog, RefreshToken, User, UserCanteenScope, UserShopScope
 
@@ -22,6 +23,8 @@ __all__ = [
     "OccupancyReading",
     "RefreshToken",
     "ScheduleOverride",
+    "SeatSession",
+    "SeatState",
     "SeatingZone",
     "Shop",
     "ShopHourException",
@@ -33,4 +36,5 @@ __all__ = [
     "WalkingTime",
     "ZoneCrowdState",
     "ZoneLayout",
+    "ZoneSeatStatus",
 ]
