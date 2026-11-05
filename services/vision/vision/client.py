@@ -8,7 +8,9 @@ MAX_QUEUED_POSTS = 20
 
 
 class ApiError(Exception):
-    pass
+    def __init__(self, message: str, status: int | None = None) -> None:
+        super().__init__(message)
+        self.status = status
 
 
 class DeviceClient:
@@ -29,7 +31,10 @@ class DeviceClient:
                 message = response.json()["error"]["message"]
             except (ValueError, KeyError, TypeError):
                 message = response.text[:200]
-            raise ApiError(f"{response.request.method} {response.request.url.path} → {response.status_code}: {message}")
+            raise ApiError(
+                f"{response.request.method} {response.request.url.path} → {response.status_code}: {message}",
+                response.status_code,
+            )
 
     def config(self) -> dict[str, Any] | None:
         headers = {"If-None-Match": self.etag} if self.etag else {}
@@ -52,6 +57,10 @@ class DeviceClient:
                 self.queue.popleft()
             sent += 1
         return sent
+
+    def post_seats(self, snapshot: dict[str, Any]) -> None:
+        payload = {"captured_at": datetime.now(UTC).isoformat(), **snapshot}
+        self._check(self.http.post(f"/devices/{self.device_id}/seats", json=payload))
 
     def heartbeat(
         self, status: str, fps: float | None, latency_ms: int | None, stream_ok: bool, message: str | None

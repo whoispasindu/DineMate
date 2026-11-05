@@ -10,15 +10,24 @@ from typing import Any
 import httpx
 
 from vision.client import ApiError, DeviceClient
-from vision.counting import Assignment, ZoneCounter, zones_from_config
+from vision.counting import Assignment
+from vision.pipeline import Models, Pipeline
 from vision.source import FrameSource
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
 DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11n.pt"
+DEFAULT_POSE_MODEL = PROJECT_DIR / "models" / "yolo11n-pose.pt"
 CONFIG_REFRESH_S = 30.0
 HEARTBEAT_S = 30.0
-DEFAULT_SETTINGS = {"post_every_s": 15.0, "smoothing_s": 60.0, "dwell_s": 20.0, "fps": 4.0, "min_confidence": 0.25}
+DEFAULT_SETTINGS = {
+    "post_every_s": 15.0,
+    "smoothing_s": 60.0,
+    "dwell_s": 20.0,
+    "fps": 4.0,
+    "min_confidence": 0.25,
+    "objects_every_s": 5.0,
+}
 
 log = logging.getLogger("dinemate.vision")
 
@@ -78,6 +87,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--layout", help="layout JSON for --dry-run instead of fetching config from the API")
     parser.add_argument("--model", default=os.environ.get("DINEMATE_MODEL", str(DEFAULT_MODEL)))
     parser.add_argument(
+        "--pose-model",
+        default=os.environ.get("DINEMATE_POSE_MODEL", str(DEFAULT_POSE_MODEL)),
+        help="pose model used when the layout has seats",
+    )
+    parser.add_argument(
         "--imgsz",
         type=int,
         help="YOLO input size; default picks 1280 for sources 1920 px wide or more, else 640",
@@ -116,14 +130,24 @@ class Preview:
     def show(
         self,
         image: Any,
-        counter: ZoneCounter,
+        pipeline: Pipeline,
         assignments: list[Assignment],
         readings: dict[str, dict[str, Any]],
         status: str,
     ) -> bool:
         from vision.overlay import draw
 
-        canvas = draw(image, counter.zones, counter.ignore, assignments, readings, status, self.limits)
+        canvas = draw(
+            image,
+            pipeline.zones,
+            pipeline.ignore,
+            assignments,
+            readings,
+            status,
+            self.limits,
+            pipeline.seat_states(),
+            pipeline.labels(),
+        )
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
 
@@ -132,27 +156,27 @@ class Preview:
 
 
 def run(args: argparse.Namespace) -> int:
-    from vision.detector import YoloDetector
-
     client = DeviceClient(args.api, args.device, args.token) if args.device and args.token else None
     config = layout_config(args.layout) if args.layout else client.config() if client else None
     if not config or not config.get("zones"):
         log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
         return 1
     config = apply_overrides(config, args)
-    counter = ZoneCounter(*zones_from_config(config))
+    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz))
     settings = config["settings"]
-    log.info("Counting %d zone(s): %s", len(counter.zones), ", ".join(z.name for z in counter.zones))
+    log.info("Counting %d zone(s): %s", len(pipeline.zones), ", ".join(z.name for z in pipeline.zones))
+    if pipeline.seat_mode:
+        log.info("Tracking %d seat(s) with pose keypoints and belongings", len(pipeline.tracker.seats))
     log.info(
         "Dwell %ss, smoothing %ss, a reading every %ss",
         settings["dwell_s"],
         settings["smoothing_s"],
         settings["post_every_s"],
     )
-    detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(settings["min_confidence"]))
     source = FrameSource(args.source, fps=float(settings["fps"]), loop=args.loop, realtime=not args.fast)
     preview = Preview() if args.preview else None
     posting = client is not None and not args.dry_run
+    seats_endpoint = True
     last_config = last_beat = time.monotonic()
     last_post: float | None = None
     fps = 0.0
@@ -161,22 +185,22 @@ def run(args: argparse.Namespace) -> int:
     try:
         for frame in source.frames():
             started = time.perf_counter()
-            detections = detector.detect(frame.image)
+            assignments = pipeline.process(frame.image, frame.at)
             latency_ms = round((time.perf_counter() - started) * 1000)
             fps = 0.9 * fps + 0.1 * (1000 / max(latency_ms, 1)) if fps else 1000 / max(latency_ms, 1)
             height, width = frame.image.shape[:2]
-            assignments = counter.update(detections, width, height, frame.at)
             if last_post is None:
                 last_post = frame.at
                 chosen = "set by --imgsz" if args.imgsz else f"auto for a {width}px-wide source"
-                log.info("Source is %dx%d; detecting at %d px (%s)", width, height, detector.imgsz, chosen)
+                log.info("Source is %dx%d; detecting at %s px (%s)", width, height, pipeline.imgsz, chosen)
             if frame.at - last_post >= float(settings["post_every_s"]):
-                readings = counter.readings()
+                readings = pipeline.readings()
+                snapshot = pipeline.snapshot(frame.at)
                 shown = {r["zone_id"]: r for r in readings}
                 last_post = frame.at
                 summary = ", ".join(
                     f"{z.name} ~{shown[z.zone_id]['estimated_occupied'] if z.zone_id in shown else 0}"
-                    for z in counter.zones
+                    for z in pipeline.zones
                 )
                 if posting and client:
                     try:
@@ -184,8 +208,21 @@ def run(args: argparse.Namespace) -> int:
                         log.info("posted %s (detect %d ms)", summary, latency_ms)
                     except (ApiError, httpx.HTTPError) as exc:
                         log.warning("post failed, will retry: %s", exc)
+                    if snapshot and seats_endpoint:
+                        try:
+                            client.post_seats(snapshot)
+                        except ApiError as exc:
+                            if exc.status == 404:
+                                seats_endpoint = False
+                                log.warning("this API has no seat endpoint yet; posting zone counts only")
+                            else:
+                                log.warning("seat post failed: %s", exc)
+                        except httpx.HTTPError as exc:
+                            log.warning("seat post failed: %s", exc)
                 else:
                     log.info("dry run: %s", json.dumps(readings))
+                    if snapshot:
+                        log.info("dry run seats: %s", json.dumps(snapshot["zones"]))
             now = time.monotonic()
             if client and now - last_config >= CONFIG_REFRESH_S:
                 last_config = now
@@ -193,7 +230,7 @@ def run(args: argparse.Namespace) -> int:
                     fresh = client.config()
                     if fresh is not None:
                         fresh = apply_overrides(fresh, args)
-                        counter.reconfigure(*zones_from_config(fresh))
+                        pipeline.configure(fresh)
                         settings = fresh["settings"]
                         log.info("layout updated to version %s", fresh.get("layout_version"))
                 except (ApiError, httpx.HTTPError) as exc:
@@ -207,7 +244,7 @@ def run(args: argparse.Namespace) -> int:
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("heartbeat failed: %s", exc)
             if preview and not preview.show(
-                frame.image, counter, assignments, shown, "Live preview - Q to quit (nothing is saved)"
+                frame.image, pipeline, assignments, shown, "Live preview - Q to quit (nothing is saved)"
             ):
                 break
     except KeyboardInterrupt:
