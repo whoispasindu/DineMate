@@ -29,3 +29,4 @@ e2e/playwright-report/
 
 docs/PITCH_SCRIPT.md
 services/vision/layouts/test*.json
+docs/competitionPresentation/

@@ -8,3 +8,4 @@ apps/student/public
 packages/api-client/openapi.json
 packages/api-client/src/generated
 docs/newImages
+docs/PITCH_SCRIPT.md
