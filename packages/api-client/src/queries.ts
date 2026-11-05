@@ -26,6 +26,9 @@ export const queryKeys = {
   safetySources: ["safety", "sources"] as const,
   recommendation: (fromCanteen: string | null) => ["recommendation", fromCanteen ?? "any"] as const,
   zoneHistory: (zoneId: string, hours: number, bucket: string) => ["zone-history", zoneId, hours, bucket] as const,
+  canteenSeats: (canteenId: string) => ["seats", canteenId] as const,
+  seatOverview: ["seats", "overview"] as const,
+  zoneSeatMap: (zoneId: string) => ["seats", "zone", zoneId] as const,
 };
 
 export function useStudentSummary() {
@@ -211,6 +214,35 @@ export function useZoneHistory(zoneId: string | undefined, hours: number, bucket
     queryFn: () => api.zoneHistory(zoneId ?? "", new Date(serverNow() - hours * 3_600_000).toISOString(), bucket),
     enabled: zoneId !== undefined,
     refetchInterval: 60_000,
+    retry: false,
+  });
+}
+
+export function useCanteenSeats(canteenId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.canteenSeats(canteenId ?? ""),
+    queryFn: () => api.canteenSeats(canteenId ?? ""),
+    enabled: canteenId !== undefined,
+    refetchInterval: LIVE_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useSeatOverview() {
+  return useQuery({
+    queryKey: queryKeys.seatOverview,
+    queryFn: api.seatOverview,
+    refetchInterval: LIVE_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useZoneSeatMap(zoneId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.zoneSeatMap(zoneId ?? ""),
+    queryFn: () => api.zoneSeatMap(zoneId ?? ""),
+    enabled: zoneId !== undefined,
+    refetchInterval: LIVE_POLL_MS,
     retry: false,
   });
 }
