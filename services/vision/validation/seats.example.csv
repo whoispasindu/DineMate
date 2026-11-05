@@ -1,0 +1,4 @@
+video,layout,t_seconds,seat,state
+../../../data/videos/staged-standing.mp4,,40,seat-1,free
+../../../data/videos/staged-standing.mp4,,40,seat-2,occupied
+../../../data/videos/staged-bags.mp4,,90,seat-3,held
