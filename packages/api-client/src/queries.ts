@@ -29,6 +29,7 @@ export const queryKeys = {
   canteenSeats: (canteenId: string) => ["seats", canteenId] as const,
   seatOverview: ["seats", "overview"] as const,
   zoneSeatMap: (zoneId: string) => ["seats", "zone", zoneId] as const,
+  stayTimes: (canteenId: string) => ["seats", "stays", canteenId] as const,
 };
 
 export function useStudentSummary() {
@@ -243,6 +244,16 @@ export function useZoneSeatMap(zoneId: string | undefined) {
     queryFn: () => api.zoneSeatMap(zoneId ?? ""),
     enabled: zoneId !== undefined,
     refetchInterval: LIVE_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useStayTimes(canteenId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.stayTimes(canteenId ?? ""),
+    queryFn: () => api.stayTimes(canteenId ?? ""),
+    enabled: canteenId !== undefined,
+    refetchInterval: INFO_POLL_MS,
     retry: false,
   });
 }

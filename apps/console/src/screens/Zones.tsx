@@ -26,6 +26,12 @@ const TYPE_COLOR: Record<PolygonType, string> = { seating: "#1f7a4d", queue: "#1
 type Point = [number, number];
 
 const clamp = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 1000) / 1000;
+const nextSeatId = (polygons: LayoutPolygon[]): string => {
+  const used = new Set(polygons.flatMap((p) => (p.seats ?? []).map((seat) => seat.seat_id)));
+  let n = used.size + 1;
+  while (used.has(`seat-${n}`)) n += 1;
+  return `seat-${n}`;
+};
 const centroid = (points: Point[]): Point => [
   points.reduce((s, p) => s + p[0], 0) / points.length,
   points.reduce((s, p) => s + p[1], 0) / points.length,
@@ -38,6 +44,9 @@ function Canvas({
   onSelect,
   onMove,
   backdrop,
+  seatMode,
+  onAddSeat,
+  onRemoveSeat,
 }: {
   polygons: LayoutPolygon[];
   zones: Map<string, EditableZone>;
@@ -45,6 +54,9 @@ function Canvas({
   onSelect: (index: number | null) => void;
   onMove: (polygon: number, vertex: number, point: Point) => void;
   backdrop: string | null;
+  seatMode: boolean;
+  onAddSeat: (polygon: number, point: Point) => void;
+  onRemoveSeat: (polygon: number, seat: number) => void;
 }) {
   const svg = useRef<SVGSVGElement>(null);
   const [drag, setDrag] = useState<{ polygon: number; vertex: number } | null>(null);
@@ -100,16 +112,37 @@ function Canvas({
               fillOpacity={active ? 0.35 : 0.2}
               stroke={color}
               strokeWidth={active ? 6 : 4}
-              className="cursor-pointer"
+              className={seatMode && active ? "cursor-crosshair" : "cursor-pointer"}
               onPointerDown={(e) => {
                 e.stopPropagation();
-                onSelect(index);
+                const point = seatMode && active ? toPoint(e) : null;
+                if (point) onAddSeat(index, point);
+                else onSelect(index);
               }}
             />
             <text x={cx_ * W} y={cy_ * H} textAnchor="middle" fill="#ffffff" fontSize={34} fontWeight={700} pointerEvents="none">
               {polygon.type === "seating" ? (zone ? `${zone.name} · ${zone.capacity}` : "Unlinked seating") : TYPE_LABEL[polygon.type]}
             </text>
-            {active
+            {(polygon.seats ?? []).map((seat, k) => (
+              <circle
+                key={seat.seat_id}
+                cx={seat.x * W}
+                cy={seat.y * H}
+                r={12}
+                fill="#ffffff"
+                fillOpacity={0.9}
+                stroke={color}
+                strokeWidth={4}
+                aria-label={`Seat ${seat.seat_id}`}
+                className={seatMode && active ? "cursor-pointer" : undefined}
+                pointerEvents={seatMode && active ? "all" : "none"}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  onRemoveSeat(index, k);
+                }}
+              />
+            ))}
+            {active && !seatMode
               ? polygon.points.map(([x, y], vertex) => (
                   <circle
                     key={vertex}
@@ -144,11 +177,15 @@ function ShapeTools({
   zones,
   onChange,
   onDelete,
+  seatMode,
+  onSeatMode,
 }: {
   polygon: LayoutPolygon;
   zones: EditableZone[];
   onChange: (next: LayoutPolygon) => void;
   onDelete: () => void;
+  seatMode: boolean;
+  onSeatMode: (on: boolean) => void;
 }) {
   const points = polygon.points;
   return (
@@ -179,6 +216,19 @@ function ShapeTools({
             ))}
           </Select>
         </Field>
+      ) : null}
+      {polygon.type === "seating" ? (
+        <>
+          <Button tone={seatMode ? "primary" : "secondary"} aria-pressed={seatMode} onClick={() => onSeatMode(!seatMode)}>
+            {seatMode ? "Done placing seats" : "Place seats"}
+          </Button>
+          <span className="self-center text-xs text-muted">
+            {(polygon.seats ?? []).length} seat(s){seatMode ? " · click a chair to add, click a seat to remove" : ""}
+          </span>
+          {(polygon.seats ?? []).length > 0 && !seatMode ? (
+            <Button onClick={() => onChange({ ...polygon, seats: [] })}>Clear seats</Button>
+          ) : null}
+        </>
       ) : null}
       <Button
         disabled={points.length >= 32}
@@ -289,6 +339,7 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
   const [polygons, setPolygons] = useState<LayoutPolygon[]>(saved);
   const [selected, setSelected] = useState<number | null>(null);
   const [backdrop, setBackdrop] = useState<string | null>(null);
+  const [seatMode, setSeatMode] = useState(false);
   const now = useServerNow(30_000);
   const client = useQueryClient();
   const save = useLayoutMutation(layout.device_id, (body: { base_version: number | null; polygons: LayoutPolygon[] }) =>
@@ -302,6 +353,7 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
     setPolygons(saved);
     setSelected(null);
   }, [saved]);
+  useEffect(() => setSeatMode(false), [selected]);
   useEffect(() => () => (backdrop ? URL.revokeObjectURL(backdrop) : undefined), [backdrop]);
 
   const conflict = save.error instanceof ApiError && save.error.status === 409;
@@ -398,6 +450,15 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
               all.map((p, i) => (i === polygon ? { ...p, points: p.points.map((pt, j) => (j === vertex ? point : pt)) } : p)),
             )
           }
+          seatMode={seatMode}
+          onAddSeat={(polygon, [x, y]) =>
+            setPolygons((all) =>
+              all.map((p, i) => (i === polygon ? { ...p, seats: [...(p.seats ?? []), { seat_id: nextSeatId(all), x, y }] } : p)),
+            )
+          }
+          onRemoveSeat={(polygon, seat) =>
+            setPolygons((all) => all.map((p, i) => (i === polygon ? { ...p, seats: (p.seats ?? []).filter((_, k) => k !== seat) } : p)))
+          }
         />
         {current && selected !== null ? (
           <ShapeTools
@@ -408,9 +469,11 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
               setPolygons(polygons.filter((_, i) => i !== selected));
               setSelected(null);
             }}
+            seatMode={seatMode}
+            onSeatMode={setSeatMode}
           />
         ) : (
-          <span className="text-xs text-muted">Select a shape to move its corners, change its type or link it to a zone.</span>
+          <span className="text-xs text-muted">Select a shape to move its corners, change its type, link it to a zone or place seats.</span>
         )}
       </Panel>
       <div className="flex flex-wrap gap-5">

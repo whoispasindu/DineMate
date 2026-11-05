@@ -3388,6 +3388,86 @@
         }
       }
     },
+    "/api/v1/canteens/{canteen_id}/stay-times": {
+      "get": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Get Stay Times",
+        "operationId": "get_stay_times_api_v1_canteens__canteen_id__stay_times_get",
+        "parameters": [
+          {
+            "name": "canteen_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Canteen Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 28,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StayTimes"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/safety/events": {
       "post": {
         "tags": [
@@ -8469,6 +8549,100 @@
           "event"
         ],
         "title": "StaffSafetyEventResult"
+      },
+      "StayHour": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "median_minutes": {
+            "type": "number",
+            "title": "Median Minutes"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hour",
+          "median_minutes",
+          "sessions"
+        ],
+        "title": "StayHour"
+      },
+      "StayTimes": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "median_minutes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Minutes"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/StayHour"
+            },
+            "type": "array",
+            "title": "Hours"
+          },
+          "occupied_now": {
+            "type": "integer",
+            "title": "Occupied Now"
+          },
+          "likely_free_10min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likely Free 10Min"
+          },
+          "is_experimental": {
+            "type": "boolean",
+            "title": "Is Experimental"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "canteen_id",
+          "days",
+          "sessions",
+          "median_minutes",
+          "hours",
+          "occupied_now",
+          "likely_free_10min",
+          "is_experimental"
+        ],
+        "title": "StayTimes"
       },
       "StudentSummary": {
         "properties": {

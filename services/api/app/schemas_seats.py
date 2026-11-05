@@ -89,3 +89,20 @@ class ZoneSeatMap(Timestamped):
     name: str
     freshness: Freshness
     seats: list[SeatDetail]
+
+
+class StayHour(Schema):
+    hour: int
+    median_minutes: float
+    sessions: int
+
+
+class StayTimes(Timestamped):
+    canteen_id: str
+    days: int
+    sessions: int
+    median_minutes: float | None
+    hours: list[StayHour]
+    occupied_now: int
+    likely_free_10min: int | None
+    is_experimental: bool

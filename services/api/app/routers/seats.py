@@ -1,9 +1,10 @@
 import uuid
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any
+from statistics import median
+from typing import Annotated, Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from sqlalchemy import func, select, update
 
 from app import models
@@ -20,10 +21,13 @@ from app.schemas_seats import (
     SeatOverview,
     SeatsAccepted,
     SeatSnapshotIn,
+    StayHour,
+    StayTimes,
     ZoneSeatMap,
     ZoneSeats,
 )
 from app.services.occupancy import freshness_for
+from app.services.stays import likely_to_free, median_by_hour, stay_minutes
 
 router = APIRouter(tags=["seats"])
 
@@ -224,3 +228,47 @@ def get_zone_seat_map(zone_id: str, user: StaffUser, session: SessionDep, now: N
             )
         )
     return ZoneSeatMap(server_time=now, zone_id=zone_id, name=zone.name, freshness=freshness, seats=seats)
+
+
+@router.get("/canteens/{canteen_id}/stay-times", response_model=StayTimes, responses=NOT_FOUND)
+def get_stay_times(
+    canteen_id: str,
+    user: StaffUser,
+    session: SessionDep,
+    now: NowDep,
+    days: Annotated[int, Query(ge=1, le=28)] = 7,
+) -> StayTimes:
+    if session.get(models.Canteen, canteen_id) is None:
+        raise not_found("Canteen", canteen_id)
+    if not can_manage_canteen(user, canteen_id):
+        raise forbidden_scope("You can only see stay times for your own canteens.", canteen_id=canteen_id)
+    ss = models.SeatSession
+    zone_ids = select(models.SeatingZone.id).where(models.SeatingZone.canteen_id == canteen_id)
+    closed = session.execute(
+        select(ss.started_at, ss.ended_at).where(
+            ss.zone_id.in_(zone_ids),
+            ss.state == "occupied",
+            ss.ended_at.is_not(None),
+            ss.started_at >= now - timedelta(days=days),
+        )
+    ).all()
+    pairs = [(started, ended) for started, ended in closed if ended is not None]
+    durations = [m for started, ended in pairs if (m := stay_minutes(started, ended)) is not None]
+    open_now = session.scalars(
+        select(ss.started_at).where(ss.zone_id.in_(zone_ids), ss.state == "occupied", ss.ended_at.is_(None))
+    ).all()
+    elapsed = [max(0.0, (now - started).total_seconds() / 60) for started in open_now]
+    return StayTimes(
+        server_time=now,
+        canteen_id=canteen_id,
+        days=days,
+        sessions=len(durations),
+        median_minutes=round(median(durations), 1) if durations else None,
+        hours=[
+            StayHour(hour=hour, median_minutes=value, sessions=count)
+            for hour, (value, count) in median_by_hour(pairs).items()
+        ],
+        occupied_now=len(elapsed),
+        likely_free_10min=likely_to_free(elapsed, durations),
+        is_experimental=True,
+    )

@@ -737,6 +737,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/canteens/{canteen_id}/stay-times": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Stay Times */
+        get: operations["get_stay_times_api_v1_canteens__canteen_id__stay_times_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/safety/events": {
         parameters: {
             query?: never;
@@ -2363,6 +2380,39 @@ export interface components {
              */
             server_time: string;
             event: components["schemas"]["StaffSafetyEvent"];
+        };
+        /** StayHour */
+        StayHour: {
+            /** Hour */
+            hour: number;
+            /** Median Minutes */
+            median_minutes: number;
+            /** Sessions */
+            sessions: number;
+        };
+        /** StayTimes */
+        StayTimes: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Days */
+            days: number;
+            /** Sessions */
+            sessions: number;
+            /** Median Minutes */
+            median_minutes: number | null;
+            /** Hours */
+            hours: components["schemas"]["StayHour"][];
+            /** Occupied Now */
+            occupied_now: number;
+            /** Likely Free 10Min */
+            likely_free_10min: number | null;
+            /** Is Experimental */
+            is_experimental: boolean;
         };
         /** StudentSummary */
         StudentSummary: {
@@ -4994,6 +5044,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ZoneSeatMap"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_stay_times_api_v1_canteens__canteen_id__stay_times_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                canteen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StayTimes"];
                 };
             };
             /** @description Not Found */

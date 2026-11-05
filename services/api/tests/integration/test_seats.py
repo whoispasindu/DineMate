@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -165,3 +166,34 @@ def test_old_seat_data_shows_no_numbers(client: TestClient, seeded: Engine) -> N
         assert zone["held"] is None and zone["free"] is None
         seat_map = later.get(f"/api/v1/zones/{zone_id}/seats", headers=login(later, ADMIN)).json()
         assert {s["state"] for s in seat_map["seats"]} == {"unknown"}
+
+
+def test_stay_times_learn_from_finished_seat_sessions(client: TestClient, seeded: Engine) -> None:
+    admin = login(client, ADMIN)
+    zone_id, _ = seated_layout(client, admin)
+    with Session(seeded) as session:
+        zone = uuid.UUID(zone_id)
+        for minutes in (15, 20, 25, 40):
+            started = LUNCH_NOW - timedelta(hours=2)
+            session.add(
+                models.SeatSession(
+                    zone_id=zone,
+                    seat_id="g0",
+                    state="occupied",
+                    started_at=started,
+                    ended_at=started + timedelta(minutes=minutes),
+                )
+            )
+        for seat in ("g1", "g2"):
+            session.add(
+                models.SeatSession(
+                    zone_id=zone, seat_id=seat, state="occupied", started_at=LUNCH_NOW - timedelta(minutes=18)
+                )
+            )
+        session.commit()
+    stays = client.get("/api/v1/canteens/b/stay-times", headers=admin).json()
+    assert (stays["sessions"], stays["median_minutes"], stays["occupied_now"]) == (4, 22.5, 2)
+    assert stays["likely_free_10min"] == 1
+    assert stays["is_experimental"] is True
+    assert stays["hours"][0]["sessions"] == 4
+    assert client.get("/api/v1/canteens/b/stay-times", headers=login(client, MANAGER_A)).status_code == 403

@@ -11,6 +11,7 @@ import type {
   AlertFeed,
   CanteenSeats,
   SeatOverview,
+  StayTimes,
   ZoneSeatMap,
   HistoryBucket,
   RecommendationResult,
@@ -294,4 +295,5 @@ export const api = {
     either(`/canteens/${enc(canteenId)}/seats`, (now) => sampleCanteenSeats(canteenId, now), "Canteen not found"),
   seatOverview: (): Promise<SeatOverview> => either("/seats/overview", sampleSeatOverview, "Seat overview unavailable"),
   zoneSeatMap: (zoneId: string): Promise<ZoneSeatMap> => staffOnly(`/zones/${enc(zoneId)}/seats`),
+  stayTimes: (canteenId: string): Promise<StayTimes> => staffOnly(`/canteens/${enc(canteenId)}/stay-times`),
 };

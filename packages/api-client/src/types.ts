@@ -588,3 +588,20 @@ export interface ZoneSeatMap extends Timestamped {
   freshness: Freshness;
   seats: SeatDetail[];
 }
+
+export interface StayHour {
+  hour: number;
+  median_minutes: number;
+  sessions: number;
+}
+
+export interface StayTimes extends Timestamped {
+  canteen_id: string;
+  days: number;
+  sessions: number;
+  median_minutes: number | null;
+  hours: StayHour[];
+  occupied_now: number;
+  likely_free_10min: number | null;
+  is_experimental: boolean;
+}
