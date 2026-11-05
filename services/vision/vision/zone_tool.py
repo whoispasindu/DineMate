@@ -8,11 +8,13 @@ import cv2
 import numpy as np
 
 from vision.overlay import fit, screen_limits, status_bar
+from vision.seats import SeatSettings
 from vision.source import grab_still
 from vision.zone_editor import ZoneEditor
 
 WINDOW = "DineMate zones (frame is not saved)"
 COLORS = {"seating": (69, 160, 31), "queue": (30, 140, 230), "walkway": (170, 170, 170), "ignore": (60, 60, 220)}
+SEAT_COLOR = (255, 255, 255)
 
 
 def render(base: np.ndarray, editor: ZoneEditor) -> np.ndarray:
@@ -29,8 +31,18 @@ def render(base: np.ndarray, editor: ZoneEditor) -> np.ndarray:
         cv2.fillPoly(overlay, [pts], color)
         canvas = cv2.addWeighted(overlay, 0.18, canvas, 0.82, 0)
         cv2.polylines(canvas, [pts], True, color, 2)
-        label = f"{shape['name']} ({shape['capacity']})" if shape["type"] == "seating" else shape["type"]
+        seats = shape.get("seats", [])
+        capacity = len(seats) or shape.get("capacity")
+        label = f"{shape['name']} ({capacity})" if shape["type"] == "seating" else shape["type"]
         cv2.putText(canvas, label, (int(pts[0][0]) + 6, int(pts[0][1]) + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+        radius = max(round(SeatSettings().seat_radius * w), 4)
+        for number, seat in enumerate(seats, start=1):
+            centre = (round(seat["x"] * w), round(seat["y"] * h))
+            cv2.circle(canvas, centre, radius, SEAT_COLOR, 1, cv2.LINE_AA)
+            cv2.circle(canvas, centre, 4, SEAT_COLOR, -1)
+            cv2.putText(
+                canvas, str(number), (centre[0] + 6, centre[1] - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, SEAT_COLOR, 1
+            )
     if editor.current:
         pts = pixels(editor.current)
         cv2.polylines(canvas, [pts], editor.mode != "points", (255, 255, 255), 2)
@@ -86,7 +98,11 @@ def main(argv: list[str] | None = None) -> int:
         print("Closed without saving.")
         return 0
     save_layout(layout, out)
-    print(f"Saved {len(layout['zones'])} seating zone(s) and {len(layout['ignore'])} ignored area(s) to {out}.")
+    seats = sum(len(z.get("seats", [])) for z in layout["zones"])
+    print(
+        f"Saved {len(layout['zones'])} seating zone(s), {seats} seat(s) and "
+        f"{len(layout['ignore'])} ignored area(s) to {out}."
+    )
     print("The frame itself was not saved.")
     return 0
 

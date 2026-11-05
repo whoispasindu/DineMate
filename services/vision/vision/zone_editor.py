@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from vision.geometry import contains
+
 ENTER_KEYS = {10, 13}
 BACKSPACE_KEYS = {8, 127}
 ESCAPE = 27
@@ -8,7 +10,7 @@ AREA_KEYS = {"s": "seating", "q": "queue", "w": "walkway", "i": "ignore"}
 DEFAULT_CAPACITY = 4
 MAX_NAME = 40
 
-Mode = Literal["points", "type", "name", "capacity"]
+Mode = Literal["points", "type", "name", "capacity", "seats"]
 Action = Literal["save", "quit"] | None
 
 
@@ -22,14 +24,32 @@ class ZoneEditor:
     text: str = ""
     message: str = ""
     pending: dict[str, Any] = field(default_factory=dict)
+    placed: list[dict[str, Any]] = field(default_factory=list)
 
     def click(self, x: int, y: int) -> None:
-        if self.mode != "points":
+        nx = round(min(max(x / self.width, 0.0), 1.0), 4)
+        ny = round(min(max(y / self.height, 0.0), 1.0), 4)
+        if self.mode == "seats":
+            self._add_seat(nx, ny)
+        elif self.mode == "points":
+            self.current.append((nx, ny))
+            self.message = ""
+
+    def _add_seat(self, x: float, y: float) -> None:
+        zone = next((s for s in self.shapes if s["type"] == "seating" and contains(s["points"], x, y)), None)
+        if zone is None:
+            self.message = "Click on a chair inside a seating zone."
             return
-        nx = min(max(x / self.width, 0.0), 1.0)
-        ny = min(max(y / self.height, 0.0), 1.0)
-        self.current.append((round(nx, 4), round(ny, 4)))
-        self.message = ""
+        zone.setdefault("seats", []).append({"seat_id": self._new_seat_id(), "x": x, "y": y})
+        self.placed.append(zone)
+        self.message = f"{zone['name']}: {len(zone['seats'])} seat(s). Click the next chair."
+
+    def _new_seat_id(self) -> str:
+        used = {seat["seat_id"] for s in self.shapes for seat in s.get("seats", [])}
+        number = len(used) + 1
+        while f"seat-{number}" in used:
+            number += 1
+        return f"seat-{number}"
 
     def prompt(self) -> str:
         if self.mode == "type":
@@ -38,9 +58,12 @@ class ZoneEditor:
             return f"Zone name: {self.text}_   (Enter to continue)"
         if self.mode == "capacity":
             return f"Seats in this zone: {self.text}_   (Enter, blank = {DEFAULT_CAPACITY})"
+        if self.mode == "seats":
+            prefix = f"{self.message} | " if self.message else ""
+            return prefix + "Seats: click each chair where a seated person's hips go | U undo, T done, S save"
         if self.message:
             return self.message
-        return "Click corners, Enter closes an area | U undo point, D delete last area, Esc clear | S save, Q quit"
+        return "Click corners, Enter closes an area | U undo, D delete area, T place seats | S save, Q quit"
 
     def key(self, code: int) -> Action:
         if code < 0 or code == 255:
@@ -48,6 +71,8 @@ class ZoneEditor:
         char = chr(code).lower() if 32 <= code < 127 else ""
         if self.mode == "points":
             return self._points_key(code, char)
+        if self.mode == "seats":
+            return self._seats_key(code, char)
         if code == ESCAPE:
             self._reset_pending("Cancelled.")
             return None
@@ -67,6 +92,11 @@ class ZoneEditor:
                 self.mode = "type"
         elif char == "u" and self.current:
             self.current.pop()
+        elif char == "t" and not self.current:
+            if not any(s["type"] == "seating" for s in self.shapes):
+                self.message = "Add a seating zone before placing seats."
+            else:
+                self.mode, self.message = "seats", ""
         elif char == "d" and not self.current and self.shapes:
             removed = self.shapes.pop()
             self.message = f"Deleted {removed.get('name', removed['type'])}."
@@ -78,6 +108,26 @@ class ZoneEditor:
         elif code == ESCAPE:
             self.current = []
             self.message = "Cleared the shape in progress."
+        elif char == "q":
+            return "quit"
+        return None
+
+    def _seats_key(self, code: int, char: str) -> Action:
+        if char == "u":
+            while self.placed and (self.placed[-1] not in self.shapes or not self.placed[-1].get("seats")):
+                self.placed.pop()
+            if self.placed:
+                zone = self.placed.pop()
+                zone["seats"].pop()
+                self.message = f"Removed a seat from {zone['name']}."
+            else:
+                self.message = "No seats placed yet in this session."
+        elif char in ("t", " ") or code in ENTER_KEYS or code == ESCAPE:
+            self.mode = "points"
+            seats = sum(len(s.get("seats", [])) for s in self.shapes)
+            self.message = f"{seats} seat(s) placed. Draw more areas, T for seats, or S to save."
+        elif char == "s":
+            return "save"
         elif char == "q":
             return "quit"
         return None
@@ -130,7 +180,16 @@ class ZoneEditor:
             return [(float(x), float(y)) for x, y in raw]
 
         seating = [
-            {"type": "seating", "name": z["name"], "capacity": int(z["capacity"]), "points": points(z["points"])}
+            {
+                "type": "seating",
+                "name": z["name"],
+                "capacity": int(z["capacity"]),
+                "points": points(z["points"]),
+                "seats": [
+                    {"seat_id": str(seat["seat_id"]), "x": float(seat["x"]), "y": float(seat["y"])}
+                    for seat in z.get("seats", [])
+                ],
+            }
             for z in layout.get("zones", [])
         ]
         others = [{"type": a["type"], "points": points(a["points"])} for a in layout.get("ignore", [])]
@@ -140,7 +199,12 @@ class ZoneEditor:
     def layout(self) -> dict[str, Any]:
         return {
             "zones": [
-                {"name": s["name"], "capacity": s["capacity"], "points": [list(p) for p in s["points"]]}
+                {
+                    "name": s["name"],
+                    "capacity": len(s["seats"]) if s.get("seats") else s["capacity"],
+                    "points": [list(p) for p in s["points"]],
+                    **({"seats": [dict(seat) for seat in s["seats"]]} if s.get("seats") else {}),
+                }
                 for s in self.shapes
                 if s["type"] == "seating"
             ],

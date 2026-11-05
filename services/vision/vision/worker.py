@@ -35,7 +35,13 @@ def load_env_file(path: Path) -> None:
 def layout_config(path: str) -> dict[str, Any]:
     layout = json.loads(Path(path).read_text(encoding="utf-8"))
     zones = [
-        {"zone_id": z.get("zone_id", z["name"]), "name": z["name"], "capacity": z["capacity"], "points": z["points"]}
+        {
+            "zone_id": z.get("zone_id", z["name"]),
+            "name": z["name"],
+            "capacity": z["capacity"],
+            "points": z["points"],
+            "seats": z.get("seats", []),
+        }
         for z in layout["zones"]
     ]
     return {
