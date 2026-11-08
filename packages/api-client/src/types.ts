@@ -607,3 +607,174 @@ export interface StayTimes extends Timestamped {
   likely_free_10min: number | null;
   is_experimental: boolean;
 }
+
+export type TableStateName = "free" | "occupied" | "held" | "needs_clearing" | "unknown";
+export type TableShape = "round" | "rect";
+
+export interface VenueZone {
+  id: string;
+  name: string;
+}
+
+export interface VenueSummary {
+  id: string;
+  name: string;
+  organization_name: string;
+  is_sample: boolean;
+  zones: VenueZone[];
+  tables: number;
+}
+
+export interface VenueList extends Timestamped {
+  items: VenueSummary[];
+}
+
+export interface LeaveEstimate {
+  low_min: number;
+  high_min: number;
+}
+
+export interface FloorTable {
+  id: string;
+  name: string;
+  zone_id: string;
+  zone_name: string;
+  shape: TableShape;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  seats: number;
+  state: TableStateName;
+  party_size: number;
+  since: string | null;
+  seated_min: number | null;
+  plates_left: boolean;
+  estimate: LeaveEstimate | null;
+}
+
+export interface FloorTotals {
+  tables: number;
+  free: number;
+  guests_seated: number;
+  visits_today: number;
+  avg_stay_today_min: number | null;
+  turns_today: number;
+}
+
+export interface VenueFloor extends Timestamped {
+  venue_id: string;
+  venue_name: string;
+  is_sample: boolean;
+  updated_at: string | null;
+  totals: FloorTotals;
+  tables: FloorTable[];
+}
+
+export interface HourCount {
+  hour: number;
+  visits: number;
+}
+
+export interface TableStay {
+  table_id: string;
+  name: string;
+  seats: number;
+  avg_stay_min: number | null;
+  turns: number;
+}
+
+export interface CustomerDay extends Timestamped {
+  venue_id: string;
+  day: string;
+  is_sample: boolean;
+  visits: number;
+  visits_last_week: number;
+  guests: number;
+  avg_stay_min: number | null;
+  median_stay_min: number | null;
+  turns_per_table: number;
+  by_hour: HourCount[];
+  by_table: TableStay[];
+}
+
+export interface DayTotal {
+  day: string;
+  visits: number;
+  guests: number;
+  avg_stay_min: number | null;
+}
+
+export interface HeatCell {
+  weekday: number;
+  hour: number;
+  visits: number;
+}
+
+export type ReportRange = "day" | "week";
+
+export interface VenueReport extends Timestamped {
+  venue_id: string;
+  range: ReportRange;
+  is_sample: boolean;
+  days: DayTotal[];
+  heat: HeatCell[];
+  heat_days: number;
+}
+
+export interface CameraHealth {
+  id: string;
+  kind: "camera" | "simulator";
+  zones: string[];
+  status: "ok" | "not_reporting" | "offline";
+  fps: number | null;
+  last_seen_at: string | null;
+}
+
+export interface VenueCameras extends Timestamped {
+  venue_id: string;
+  items: CameraHealth[];
+}
+
+export interface SeatPoint {
+  seat_id: string;
+  x: number;
+  y: number;
+}
+
+export interface LayoutZoneSeats {
+  zone_id: string;
+  name: string;
+  seats: SeatPoint[];
+}
+
+export interface TableFields {
+  name: string;
+  zone_id: string;
+  shape: TableShape;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  seat_ids: string[];
+}
+
+export interface TableOut extends TableFields {
+  id: string;
+}
+
+export interface TableIn extends TableFields {
+  id?: string | null;
+}
+
+export interface TableLayout extends Timestamped {
+  venue_id: string;
+  zones: LayoutZoneSeats[];
+  tables: TableOut[];
+}
+
+export interface BusinessSettings extends Timestamped {
+  organization_id: string;
+  organization_name: string;
+  retention_days: number;
+}

@@ -1,7 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
 import { serverNow } from "./clock";
-import type { HistoryBucket, DeviceLayout, ShopEditor, StaffSafetyEventResult, ThresholdList, ThresholdValues } from "./types";
+import type {
+  HistoryBucket,
+  DeviceLayout,
+  ReportRange,
+  ShopEditor,
+  StaffSafetyEventResult,
+  TableIn,
+  ThresholdList,
+  ThresholdValues,
+} from "./types";
 
 const LIVE_POLL_MS = 15_000;
 const INFO_POLL_MS = 60_000;
@@ -30,6 +39,13 @@ export const queryKeys = {
   seatOverview: ["seats", "overview"] as const,
   zoneSeatMap: (zoneId: string) => ["seats", "zone", zoneId] as const,
   stayTimes: (canteenId: string) => ["seats", "stays", canteenId] as const,
+  venues: ["business", "venues"] as const,
+  floor: (venueId: string) => ["business", "floor", venueId] as const,
+  customers: (venueId: string, day: string) => ["business", "customers", venueId, day] as const,
+  report: (venueId: string, range: string) => ["business", "report", venueId, range] as const,
+  cameras: (venueId: string) => ["business", "cameras", venueId] as const,
+  tables: (venueId: string) => ["business", "tables", venueId] as const,
+  businessSettings: ["business", "settings"] as const,
 };
 
 export function useStudentSummary() {
@@ -255,5 +271,92 @@ export function useStayTimes(canteenId: string | undefined) {
     enabled: canteenId !== undefined,
     refetchInterval: INFO_POLL_MS,
     retry: false,
+  });
+}
+
+const FLOOR_POLL_MS = 10_000;
+
+export function useVenues(enabled = true) {
+  return useQuery({ queryKey: queryKeys.venues, queryFn: api.businessVenues, enabled, retry: false });
+}
+
+export function useFloor(venueId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.floor(venueId ?? ""),
+    queryFn: () => api.businessFloor(venueId ?? ""),
+    enabled: venueId !== undefined,
+    refetchInterval: FLOOR_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useCustomers(venueId: string | undefined, day?: string) {
+  return useQuery({
+    queryKey: queryKeys.customers(venueId ?? "", day ?? "today"),
+    queryFn: () => api.businessCustomers(venueId ?? "", day),
+    enabled: venueId !== undefined,
+    refetchInterval: INFO_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useReport(venueId: string | undefined, range: ReportRange) {
+  return useQuery({
+    queryKey: queryKeys.report(venueId ?? "", range),
+    queryFn: () => api.businessReport(venueId ?? "", range),
+    enabled: venueId !== undefined,
+    refetchInterval: INFO_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useCameras(venueId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.cameras(venueId ?? ""),
+    queryFn: () => api.businessCameras(venueId ?? ""),
+    enabled: venueId !== undefined,
+    refetchInterval: LIVE_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useTableLayout(venueId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.tables(venueId ?? ""),
+    queryFn: () => api.businessTables(venueId ?? ""),
+    enabled: venueId !== undefined,
+    retry: false,
+  });
+}
+
+export function useSaveTables(venueId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (tables: TableIn[]) => api.saveBusinessTables(venueId, tables),
+    onSuccess: (layout) => {
+      client.setQueryData(queryKeys.tables(venueId), layout);
+      void client.invalidateQueries({ queryKey: queryKeys.floor(venueId) });
+      void client.invalidateQueries({ queryKey: queryKeys.venues });
+    },
+  });
+}
+
+export function useMarkCleared(venueId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (tableId: string) => api.markTableCleared(tableId),
+    onSuccess: (floor) => client.setQueryData(queryKeys.floor(venueId), floor),
+  });
+}
+
+export function useBusinessSettings() {
+  return useQuery({ queryKey: queryKeys.businessSettings, queryFn: api.businessSettings, retry: false });
+}
+
+export function useSaveBusinessSettings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (retentionDays: number) => api.saveBusinessSettings(retentionDays),
+    onSuccess: (settings) => client.setQueryData(queryKeys.businessSettings, settings),
   });
 }

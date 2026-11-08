@@ -26,6 +26,22 @@ export const SAMPLE_USERS: StaffUser[] = [
     shop_ids: ["s-rice"],
   },
   {
+    id: "sample-owner",
+    email: "owner@dinemate.test",
+    display_name: "Sample Café owner",
+    role: "owner",
+    canteen_ids: [],
+    shop_ids: [],
+  },
+  {
+    id: "sample-venue-manager",
+    email: "manager@dinemate.test",
+    display_name: "Sample Café manager",
+    role: "venue_manager",
+    canteen_ids: ["v-sample-cafe"],
+    shop_ids: [],
+  },
+  {
     id: "sample-safety",
     email: "safety@dinemate.test",
     display_name: "Safety officer",

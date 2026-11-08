@@ -137,7 +137,7 @@ def test_seat_snapshots_drive_table_states_and_visits(client: TestClient, seeded
         )
     cleared = client.post(f"{BASE}/tables/{t4['id']}/cleared", headers=headers)
     assert cleared.status_code == 200, cleared.text
-    assert cleared.json()["state"] == "free"
+    assert table_named(cleared.json(), "T4")["state"] == "free"
 
 
 def test_tables_editor_validates_and_saves(client: TestClient) -> None:

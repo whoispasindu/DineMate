@@ -4873,7 +4873,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FloorTable"
+                  "$ref": "#/components/schemas/VenueFloor"
                 }
               }
             }

@@ -97,8 +97,8 @@ def put_tables(
     return service.table_layout(session, venue, now)
 
 
-@router.post("/tables/{table_id}/cleared", response_model=s.FloorTable, responses=RESPONSES)
-def mark_cleared(table_id: str, user: BusinessUser, session: SessionDep, now: NowDep, request: Request) -> s.FloorTable:
+@router.post("/tables/{table_id}/cleared", response_model=s.VenueFloor, responses=RESPONSES)
+def mark_cleared(table_id: str, user: BusinessUser, session: SessionDep, now: NowDep, request: Request) -> s.VenueFloor:
     table = service.load_venue_table(session, table_id)
     if table is None:
         raise not_found("Table", table_id)
@@ -106,7 +106,7 @@ def mark_cleared(table_id: str, user: BusinessUser, session: SessionDep, now: No
     table.cleared_at = now
     record(session, now, "business.table.cleared", "venue_table", table_id, user=user, request=request)
     session.commit()
-    return service.single_floor_table(session, venue, table, now)
+    return service.floor(session, venue, now)
 
 
 def _settings(session: SessionDep, user: models.User, now: NowDep) -> s.BusinessSettings:

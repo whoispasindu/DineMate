@@ -401,13 +401,6 @@ def load_venue_table(session: Session, table_id: str) -> VenueTable | None:
         return None
 
 
-def single_floor_table(session: Session, venue: models.Canteen, table: VenueTable, now: datetime) -> s.FloorTable:
-    view = views_for([table], seat_views(session, {table.zone_id}), now)[table.id]
-    return floor_table(
-        table, zone_names(venue).get(table.zone_id, ""), view, past_visits(session, venue, now), now, tz_of(venue)
-    )
-
-
 def org_venues(session: Session, organization_id: str) -> list[models.Canteen]:
     return list(
         session.scalars(

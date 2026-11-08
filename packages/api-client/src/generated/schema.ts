@@ -6499,7 +6499,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FloorTable"];
+                    "application/json": components["schemas"]["VenueFloor"];
                 };
             };
             /** @description Unauthorized */

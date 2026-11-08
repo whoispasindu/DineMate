@@ -5,9 +5,28 @@ import { mealStatus } from "./sample/schedule";
 import { menuItems, shopById, shopsFor } from "./sample/shops";
 import { alertFeed, canteenDetail, canteenIds, safetyStatus, sampleRecommendation, studentSummary } from "./sample/student";
 import { sampleCanteenSeats, sampleSeatOverview } from "./sample/seats";
+import {
+  sampleBusinessSettings,
+  sampleCameras,
+  sampleCustomers,
+  sampleFloor,
+  sampleMarkCleared,
+  sampleReport,
+  sampleTableLayout,
+  sampleVenues,
+} from "./sample/business";
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
+  BusinessSettings,
+  CustomerDay,
+  ReportRange,
+  TableIn,
+  TableLayout,
+  VenueCameras,
+  VenueFloor,
+  VenueList,
+  VenueReport,
   AlertFeed,
   CanteenSeats,
   SeatOverview,
@@ -204,6 +223,15 @@ function either<T extends Timestamped>(path: string, build: (now: number) => T |
   return baseUrl === null ? fromSample(build, notFound) : fromApi<T>(path);
 }
 
+function staffEither<T extends Timestamped>(
+  path: string,
+  build: (now: number) => T | undefined,
+  notFound: string,
+  options: RequestOptions = {},
+): Promise<T> {
+  return baseUrl === null ? fromSample(build, notFound) : fromApi<T>(path, { ...options, staff: true });
+}
+
 const enc = encodeURIComponent;
 
 export const api = {
@@ -296,4 +324,28 @@ export const api = {
   seatOverview: (): Promise<SeatOverview> => either("/seats/overview", sampleSeatOverview, "Seat overview unavailable"),
   zoneSeatMap: (zoneId: string): Promise<ZoneSeatMap> => staffOnly(`/zones/${enc(zoneId)}/seats`),
   stayTimes: (canteenId: string): Promise<StayTimes> => staffOnly(`/canteens/${enc(canteenId)}/stay-times`),
+  businessVenues: (): Promise<VenueList> => staffEither("/business/venues", sampleVenues, "No venues"),
+  businessFloor: (venueId: string): Promise<VenueFloor> =>
+    staffEither(`/business/venues/${enc(venueId)}/floor`, (now) => sampleFloor(venueId, now), "Venue not found"),
+  businessCustomers: (venueId: string, day?: string): Promise<CustomerDay> =>
+    staffEither(
+      `/business/venues/${enc(venueId)}/customers${day ? `?day=${enc(day)}` : ""}`,
+      (now) => sampleCustomers(venueId, now),
+      "Venue not found",
+    ),
+  businessReport: (venueId: string, range: ReportRange): Promise<VenueReport> =>
+    staffEither(`/business/venues/${enc(venueId)}/reports?range=${range}`, (now) => sampleReport(venueId, range, now), "Venue not found"),
+  businessCameras: (venueId: string): Promise<VenueCameras> =>
+    staffEither(`/business/venues/${enc(venueId)}/cameras`, (now) => sampleCameras(venueId, now), "Venue not found"),
+  businessTables: (venueId: string): Promise<TableLayout> =>
+    staffEither(`/business/venues/${enc(venueId)}/tables`, (now) => sampleTableLayout(venueId, now), "Venue not found"),
+  saveBusinessTables: (venueId: string, tables: TableIn[]): Promise<TableLayout> =>
+    staffOnly(`/business/venues/${enc(venueId)}/tables`, { method: "PUT", body: { tables } }),
+  markTableCleared: (tableId: string): Promise<VenueFloor> =>
+    staffEither(`/business/tables/${enc(tableId)}/cleared`, (now) => sampleMarkCleared(tableId, now), "Table not found", {
+      method: "POST",
+    }),
+  businessSettings: (): Promise<BusinessSettings> => staffEither("/business/settings", sampleBusinessSettings, "No settings"),
+  saveBusinessSettings: (retentionDays: number): Promise<BusinessSettings> =>
+    staffOnly("/business/settings", { method: "PATCH", body: { retention_days: retentionDays } }),
 };
