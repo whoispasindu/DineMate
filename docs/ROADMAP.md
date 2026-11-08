@@ -201,6 +201,7 @@ A second product for cafés, restaurants and food courts, rented monthly. It liv
 Ground rules for the whole product:
 
 - No video or images are ever stored, on the shop's server or ours. Only events and numbers are kept.
+- Live view: the dashboard can show a camera's live video with tracking drawn on it (boxes, stay times, staff role and items served, paths, table states). It is streamed from the camera computer on the shop's network only, never recorded, never sent to our cloud, and customer faces are blurred by default.
 - Customers are anonymous: tracked within one visit (temporary ids), never recognised again, never enrolled.
 - Staff recognition is opt-in per worker, with written consent. Face templates (not photos) are stored encrypted on the shop's local server only, never in our cloud, and deleted when the worker leaves. Workers who decline use a badge instead. Workers can see their own data.
 - Per-worker reports are visible to the owner only. Data is deleted automatically after a retention period the shop sets.
@@ -214,7 +215,7 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 - [ ] Tables: group seats into tables in the zone tool and the dashboard; a table is free, occupied, held or needs clearing; party size from its seats
 - [ ] Customer visits: start and end per table (no identities), time at table, turns per table per day, busiest hours, stay after paying (matched to till orders by time, Phase 9)
 - [ ] Leave-time estimate per table ("likely free in about X–Y min") from time seated, party size, time of day and what is on the table, fitted on the venue's own history
-- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras, Settings, and a manager phone view; simple left navigation, every page one click away (Staff, Sales and Privacy & consent land in Phase 9)
+- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras (live view with tracking, camera health), Settings, and a manager phone view; simple left navigation, every page one click away (Staff, Sales and Privacy & consent land in Phase 9)
 - [ ] Business design: same design language as the campus apps in graphite `#1B1F27` and cobalt `#2F5BEA` on a cool grey page (green free, amber held, red needs attention); v2 is in Figma for review, then built (docs/BUSINESS_DESIGN.md)
 - [ ] Sample café with simulated tables and visits, always labelled
 
@@ -224,6 +225,7 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 
 - [ ] Staff enrolment: opt-in face enrolment on the local server (consent record, face template only, encrypted), badge fallback (printed code on apron or lanyard), remove a worker and their data in one step
 - [ ] Recognition in the worker: match staff faces or badges to tracks; customers are never matched; no images leave memory
+- [ ] Live view stream: the worker serves annotated frames (MJPEG or WebRTC) to the dashboard on the local network only, with customer faces blurred before encoding; owner and manager roles only; nothing written to disk
 - [ ] Work areas: mark counter, kitchen and floor areas; time per worker per area, counter coverage ("unstaffed for 6 min at 12:40"), queue length alerts
 - [ ] Till data: CSV import first, then one real till system; items sold per cashier ("coffees served per worker"), orders per hour, average order
 - [ ] Staff page: per-worker hours in each area, items served, busiest shifts; workers can see their own page

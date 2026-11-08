@@ -1,6 +1,6 @@
 # DineMate Business — design
 
-Design for the business app (`apps/business`, Phases 8–10). Designed in Figma first; build only after the owner approves it. Figma file: page "DineMate Business v2 — for review" (campus redesign is on "Redesign v4 — final for review").
+Design for the business app (`apps/business`, Phases 8–10). Designed in Figma first; build only after the owner approves it. Figma file: page "DineMate Business v2 — for review" (seven screens including Cameras) (campus redesign is on "Redesign v4 — final for review").
 
 ## Look
 
@@ -40,6 +40,7 @@ Left navigation on laptop and tablet: Live floor, Customers, Staff, Sales, Repor
 - **Customers:** anonymous visits, average stay, table turns, stay after paying (matched to till orders), visits by hour, stay by table.
 - **Staff (owner only):** counter coverage and gaps, items served from the till, serve time, time per work area per worker, how each worker is recognised.
 - **Privacy & consent:** staff consent list (face or badge, enrol, view data, remove), what is kept and for how long, cloud backup off by default.
+- **Cameras:** live video from one camera at a time with tracking drawn on it: green boxes on customers with time seated, cobalt boxes on staff with role and items served, staff paths, table outlines with their state, the counter area, and the queue. Switches turn each layer on or off; customer faces are blurred by default. Beside it: what the camera sees now, camera health, and a note that video is live only and never saved. Live floor has a Watch live button. Staff are labelled by role (Barista 1), never by real name in sample screens.
 - **Manager phone:** tables free, a "Needs you" list ordered by urgency, bottom tab bar.
 
 All sample screens use "Sample Café" and labelled sample data. Estimates read "~N" or "about", as in the campus apps.
