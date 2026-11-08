@@ -3,15 +3,16 @@ import type { ReactNode } from "react";
 import { cx } from "./cx";
 import { Icon } from "./icons";
 import { levelFor } from "./levels";
+import tableScene from "./art/scene/table.svg";
 
 export const APP_NAME = "DineMate";
 
 type PillSize = "sm" | "md" | "lg";
 
 const PILL_SIZES: Record<PillSize, { box: string; icon: number }> = {
-  sm: { box: "gap-1 px-2 py-[3px] text-[11px]", icon: 12 },
-  md: { box: "gap-[5px] px-2.5 py-[5px] text-xs", icon: 13 },
-  lg: { box: "gap-1.5 px-3 py-1.5 text-[13px]", icon: 14 },
+  sm: { box: "h-6 px-2.5 text-xs", icon: 12 },
+  md: { box: "h-7 px-3 text-xs", icon: 13 },
+  lg: { box: "h-8 px-3.5 text-[13px]", icon: 14 },
 };
 
 interface StatusPillProps {
@@ -36,7 +37,6 @@ export function StatusPill({ level, freshness = "live", size = "md", onWhite, la
         className,
       )}
     >
-      <Icon name={style.icon} size={dims.icon} strokeWidth={2.4} />
       {label ?? style.label}
     </span>
   );
@@ -132,7 +132,7 @@ export function CanteenArt({ wall, label, className, photo }: CanteenArtProps) {
       {label ? (
         <span
           aria-hidden="true"
-          className="absolute left-2.5 top-2.5 flex h-[30px] min-w-[30px] items-center justify-center rounded-[9px] bg-brand-dark px-2 text-[15px] font-extrabold text-white"
+          className="absolute left-2.5 top-2.5 flex h-[26px] min-w-[26px] items-center justify-center rounded-[9px] bg-brand px-1.5 font-display text-[13px] font-extrabold text-sand"
         >
           {label}
         </span>
@@ -164,28 +164,85 @@ export function SimulationLabel({ children = "SIMULATION — NOT A REAL EMERGENC
   );
 }
 
-export function SampleBadge({ children = "SAMPLE DATA", className }: { children?: ReactNode; className?: string }) {
+export function SampleBadge({ children = "Sample data", className }: { children?: ReactNode; className?: string }) {
   return (
-    <span className={cx("shrink-0 rounded-md bg-chip px-2 py-1 text-[11px] font-extrabold text-neutral-ink", className)}>{children}</span>
+    <span className={cx("inline-flex h-7 shrink-0 items-center rounded-full bg-chip px-3 text-xs font-bold text-neutral-ink", className)}>
+      {children}
+    </span>
   );
 }
 
-export function BrandMark({ size = 38, className }: { size?: number; className?: string }) {
+export function BrandMark({ size = 38, tone = "forest", className }: { size?: number; tone?: "forest" | "sand"; className?: string }) {
+  const bg = tone === "forest" ? "var(--color-brand)" : "var(--color-sand)";
+  const fg = tone === "forest" ? "var(--color-sand)" : "var(--color-brand)";
   return (
-    <span
-      className={cx("flex shrink-0 items-center justify-center rounded-xl bg-mint text-brand", className)}
-      style={{ width: size, height: size }}
-    >
-      <Icon name="leaf" size={Math.round(size * 0.58)} />
-    </span>
+    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden="true" className={cx("shrink-0", className)}>
+      <rect width="34" height="34" rx="10" fill={bg} />
+      <path d="M11 8.5v10.5h12" fill="none" stroke={fg} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11 19v6.5M21.5 19v6.5" stroke={fg} strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M15 14.5h9" stroke="var(--color-purple)" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
   );
+}
+
+interface SeatStripProps {
+  total: number;
+  taken: number;
+  held?: number;
+  hidden?: number;
+  dark?: boolean;
+  height?: number;
+  className?: string;
+  stale?: boolean;
+}
+
+export function SeatStrip({ total, taken, held = 0, hidden = 0, dark, height = 8, className, stale }: SeatStripProps) {
+  const free = Math.max(total - taken - held - hidden, 0);
+  const parts: { n: number; className: string }[] = [
+    { n: taken, className: dark ? "bg-sand" : "bg-brand" },
+    { n: held, className: "bg-held" },
+    { n: hidden, className: dark ? "bg-sand/35" : "bg-hidden" },
+    { n: free, className: dark ? "bg-sand/15" : "bg-track" },
+  ];
+  return (
+    <div
+      aria-hidden="true"
+      className={cx("flex w-full gap-0.5 overflow-hidden", stale && "opacity-50", className)}
+      style={{ height, borderRadius: height }}
+    >
+      {parts
+        .filter((p) => p.n > 0)
+        .map((p, i) => (
+          <div key={i} className={p.className} style={{ flex: p.n }} />
+        ))}
+    </div>
+  );
+}
+
+export function EmptyStrip({ height = 8, className }: { height?: number; className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cx("w-full border-[1.5px] border-dashed border-dash-soft", className)}
+      style={{ height, borderRadius: height }}
+    />
+  );
+}
+
+export function TableScene({ width = 120, className }: { width?: number; className?: string }) {
+  return <img src={tableScene} alt="" width={width} height={Math.round(width * 1.09)} className={cx("block shrink-0", className)} />;
 }
 
 export function LiveLine({ text, freshness = "live" }: { text: string; freshness?: Freshness }) {
   const live = freshness === "live";
   return (
-    <span className={cx("inline-flex items-center gap-1.5 text-[13px] font-bold", live ? "text-ok" : "text-neutral-ink")}>
-      <span className={cx("h-2 w-2 rounded-full", live ? "bg-ok-mark" : "bg-dash")} />
+    <span
+      className={cx(
+        "inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-xs font-bold",
+        live ? "bg-purple-bg text-purple-ink" : "bg-chip text-neutral-ink",
+      )}
+    >
+      <span className={cx("h-1.5 w-1.5 rounded-full", live ? "bg-purple" : "bg-dash")} />
       {text}
     </span>
   );

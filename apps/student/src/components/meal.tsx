@@ -24,41 +24,53 @@ export function useMealCountdown() {
 export function MealPill() {
   const { meal, now, remaining } = useMealCountdown();
   const data = meal.data;
-  if (!data) return <Skeleton className="h-[66px] rounded-[18px]" />;
+  if (!data) return <Skeleton className="h-[70px] rounded-[18px]" />;
   const { current, next } = data;
   let label = "Meal times";
-  let value = "No meals scheduled";
+  let value: string | null = null;
+  let note = "No meals scheduled";
   if (current && remaining !== null) {
-    label = `${PERIOD_LABEL[current.period]} is being served`;
-    value = `Ends in ${formatCountdown(remaining)}`;
+    label = `${PERIOD_LABEL[current.period]} ends in`;
+    value = formatCountdown(remaining);
   } else if (next && remaining !== null) {
-    label = `${PERIOD_LABEL[next.period]} is next`;
-    value = remaining > FAR_AWAY_MS ? `Starts at ${startsLabel(next, now)}` : `Starts in ${formatCountdown(remaining)}`;
+    label = `${PERIOD_LABEL[next.period]} starts`;
+    if (remaining > FAR_AWAY_MS) note = startsLabel(next, now);
+    else value = formatCountdown(remaining);
   }
   return (
-    <Link to="/meals" className="flex items-center gap-3 rounded-[18px] bg-brand-dark px-3.5 py-3 text-white no-underline hover:text-white">
-      <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-xl bg-brand-mid text-live-ink">
-        <Icon name="utensils" size={20} />
+    <Link
+      to="/meals"
+      className="edge-ticket flex items-center justify-between gap-4 rounded-[18px] bg-sand px-4 py-3 text-ink no-underline"
+    >
+      <span className="flex flex-col">
+        <span className="text-[13px] font-semibold text-muted">{label}</span>
+        {value ? (
+          <span className="tabular mt-0.5 font-mono text-[22px] font-bold tracking-[-0.02em]">{value}</span>
+        ) : (
+          <span className="mt-0.5 text-lg font-bold">{note}</span>
+        )}
       </span>
-      <span className="flex flex-1 flex-col">
-        <span className="text-xs font-semibold text-on-dark">{label}</span>
-        <span className="tabular text-xl font-extrabold tracking-[-0.01em]">{value}</span>
-      </span>
-      {current && next ? (
-        <span className="text-right text-xs text-on-dark">
-          {PERIOD_LABEL[next.period]}
-          <br />
-          {startsLabel(next, now)}
+      {current ? (
+        <span aria-hidden="true" className="flex w-[132px] flex-col gap-1.5">
+          <span className="h-1.5 overflow-hidden rounded-full bg-sand-deep">
+            <span className="block h-full rounded-full bg-brand" style={{ width: `${windowProgress(current, now)}%` }} />
+          </span>
+          <span className="flex justify-between text-xs text-muted">
+            <span>{formatRange(current.starts, current.ends, false).split("–")[0]}</span>
+            <span>{formatRange(current.starts, current.ends, false).split("–")[1]}</span>
+          </span>
         </span>
-      ) : null}
+      ) : (
+        <Icon name="arrowRight" size={18} className="text-muted" />
+      )}
     </Link>
   );
 }
 
 export function MealBadge({ text }: { text: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-brand-mid px-3 py-[5px] text-xs font-extrabold text-live-ink">
-      <span className="h-2 w-2 rounded-full bg-live" />
+    <span className="inline-flex h-7 items-center gap-1.5 self-start rounded-full bg-purple/25 px-3 text-xs font-bold text-purple-soft">
+      <span className="h-1.5 w-1.5 rounded-full bg-purple" />
       {text}
     </span>
   );
@@ -68,9 +80,9 @@ export function mealBadgeText(
   current: { period: keyof typeof PERIOD_LABEL } | null,
   next: { period: keyof typeof PERIOD_LABEL } | null,
 ): string {
-  if (current) return `${PERIOD_LABEL[current.period].toUpperCase()} · NOW SERVING`;
-  if (next) return `NEXT · ${PERIOD_LABEL[next.period].toUpperCase()}`;
-  return "NO MEALS SCHEDULED";
+  if (current) return `${PERIOD_LABEL[current.period]} is being served`;
+  if (next) return `Next · ${PERIOD_LABEL[next.period]}`;
+  return "No meals scheduled";
 }
 
 export function MealCountdownCard({ className }: { className?: string }) {
@@ -80,19 +92,19 @@ export function MealCountdownCard({ className }: { className?: string }) {
   const { current, next } = data;
   const focus = current ?? next;
   return (
-    <section aria-label="Meal countdown" className={cx("flex flex-col gap-4 rounded-[26px] bg-brand-dark p-6 text-white", className)}>
+    <section aria-label="Meal countdown" className={cx("slab flex flex-col gap-4 rounded-[26px] bg-brand p-6 text-sand", className)}>
       <MealBadge text={mealBadgeText(current, next)} />
       {focus && remaining !== null ? (
         <div className="flex flex-col gap-0.5">
           <span className="text-sm text-on-dark">{current ? "Ends in" : "Starts in"}</span>
-          <span className="tabular text-[44px] font-extrabold leading-tight tracking-[-0.03em]">{formatCountdown(remaining)}</span>
+          <span className="tabular font-mono text-[44px] font-bold leading-tight tracking-[-0.05em]">{formatCountdown(remaining)}</span>
         </div>
       ) : (
         <span className="text-lg font-bold">No meals in the next week</span>
       )}
       {current ? (
         <div aria-hidden="true" className="h-2 overflow-hidden rounded bg-track-dark">
-          <div className="h-full rounded bg-live" style={{ width: `${windowProgress(current, now)}%` }} />
+          <div className="h-full rounded bg-purple" style={{ width: `${windowProgress(current, now)}%` }} />
         </div>
       ) : null}
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-sm">

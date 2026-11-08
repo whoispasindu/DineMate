@@ -250,9 +250,9 @@ function CanteenMobile({ data, now, online }: ViewProps) {
         </div>
         <h2 className="m-0 mt-1 text-[17px] font-extrabold">Seats by zone</h2>
         {online ? (
-          <ul className="m-0 flex list-none flex-col rounded-[18px] border border-line bg-card px-3.5 py-1">
+          <ul className="m-0 flex list-none flex-col gap-3 p-0">
             {zones.map((z, i) => (
-              <ZoneBarRow key={z.zone_id} zone={z} last={i === zones.length - 1} seats={seats.get(z.zone_id)} />
+              <ZoneBarRow key={z.zone_id} zone={z} last={i === zones.length - 1} seats={seats.get(z.zone_id)} now={now} />
             ))}
           </ul>
         ) : null}

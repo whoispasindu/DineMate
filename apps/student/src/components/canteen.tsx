@@ -8,16 +8,16 @@ import {
   type ZoneOccupancy,
   type ZoneSeats,
 } from "@dinemate/api-client";
-import { CanteenArt, canteenPhotoFor, cx, emptyArtFor, formatAgo, formatClock, Icon, levelFor, Ring, StatusPill } from "@dinemate/ui";
+import { CanteenArt, canteenPhotoFor, cx, EmptyStrip, emptyArtFor, formatAgo, formatClock, Icon, levelFor, SeatStrip } from "@dinemate/ui";
 import { Link } from "react-router";
 import { useMemo } from "react";
-import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText, seatNote } from "../lib/present";
+import { canteenInitial, canteenStrip, canteenWall, hasNumbers, seatNote, zoneStrip, type StripCounts } from "../lib/present";
 
 export function freshnessText(freshness: Freshness, updatedAt: string | null, now: number): string {
   if (updatedAt === null) return "No live data yet";
   const ago = formatAgo(updatedAt, now);
-  if (freshness === "live") return `Live · updated ${ago}`;
-  if (freshness === "stale") return `Last updated ${ago} — may be out of date`;
+  if (freshness === "live") return `Live · ${ago}`;
+  if (freshness === "stale") return `Updated ${ago} — may be out of date`;
   return `No live data · last reading ${ago}`;
 }
 
@@ -31,54 +31,93 @@ export function useZoneSeats(canteenId: string): Map<string, ZoneSeats> {
   return useMemo(() => new Map((seats.data?.zones ?? []).map((z) => [z.zone_id, z])), [seats.data]);
 }
 
-function heldText(held: number): string {
-  return held > 0 ? ` · ${held} held` : "";
+function heldNote(held: number): string | null {
+  return held > 0 ? `${held} held by bags` : null;
 }
 
-function metaLine(c: CanteenSummary, now: number, held: number): string {
-  if (!hasNumbers(c)) return "No info right now";
-  const base = `${freeShort(c)} ${rangeText(c)}${heldText(held)} · ${formatAgo(c.updated_at, now)}`;
-  return c.freshness === "stale" ? `${base} — may be out of date` : base;
+function rowNote(c: CanteenSummary, held: number, now: number): string {
+  if (!hasNumbers(c)) return c.updated_at ? `Last reading ${formatAgo(c.updated_at, now)}` : "No live data yet";
+  if (c.freshness === "stale") return `Updated ${formatAgo(c.updated_at, now)}`;
+  if (c.level === "crowded" || c.level === "near_capacity") return "Few or no seats";
+  return heldNote(held) ?? `${c.zones_live} of ${c.zones_total} zones live`;
+}
+
+export function Strip({
+  counts,
+  dark,
+  height = 8,
+  stale,
+}: {
+  counts: StripCounts | null;
+  dark?: boolean;
+  height?: number;
+  stale?: boolean;
+}) {
+  return counts ? <SeatStrip {...counts} dark={dark} height={height} stale={stale} /> : <EmptyStrip height={height} />;
+}
+
+function BigNumber({ value, className }: { value: string; className?: string }) {
+  return <span className={cx("font-display font-extrabold leading-none tracking-[-0.04em]", className)}>{value}</span>;
+}
+
+function freeAbout(c: Pick<CanteenSummary, "free_about" | "free_range" | "freshness">): string {
+  return hasNumbers(c) ? `~${c.free_about}` : "—";
+}
+
+function rangeLine(c: Pick<CanteenSummary, "free_about" | "free_range" | "freshness">): string {
+  return hasNumbers(c) ? `${c.free_range[0]}–${c.free_range[1]} free` : "No number";
+}
+
+function seatsLabel(c: Pick<CanteenSummary, "name" | "free_about" | "free_range" | "freshness">): string {
+  return hasNumbers(c)
+    ? `${c.name}: about ${c.free_about} seats free, between ${c.free_range[0]} and ${c.free_range[1]}`
+    : `${c.name}: no live seat number right now`;
 }
 
 export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: number }) {
   const held = useHeldSeats(canteen.id);
+  const style = levelFor(canteen.level, canteen.freshness);
+  const stale = canteen.freshness === "stale";
   return (
     <Link
       to={`/canteens/${canteen.id}`}
-      className="flex items-center gap-3 rounded-[18px] border border-line bg-card p-2.5 text-ink no-underline hover:border-mint-line"
+      aria-label={seatsLabel(canteen)}
+      className="flex items-center gap-3.5 py-3.5 text-ink no-underline hover:opacity-90"
     >
-      <div className="h-16 w-16 shrink-0">
-        <CanteenArt
-          wall={canteenWall(canteen.id)}
-          photo={canteenPhotoFor(canteen.id)}
-          label={canteenInitial(canteen.name)}
-          className="rounded-[14px]"
-        />
+      <div className="relative h-[58px] w-[58px] shrink-0">
+        <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} className="rounded-2xl" />
+        <span
+          aria-hidden="true"
+          className="absolute -left-1.5 -top-1.5 flex h-[22px] min-w-[22px] items-center justify-center rounded-lg bg-brand px-1 font-display text-xs font-extrabold text-sand"
+        >
+          {canteenInitial(canteen.name)}
+        </span>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="text-[15px] font-extrabold">{canteen.name}</span>
-        <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" className="self-start" />
-        <span className={cx("text-xs text-muted", canteen.freshness === "stale" && "opacity-70")}>{metaLine(canteen, now, held)}</span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <span className="text-base font-bold">{canteen.name}</span>
+        <Strip counts={canteenStrip(canteen, held)} height={5} stale={stale} />
+        <span className="truncate text-[13px] font-semibold">
+          <span className={style.word}>{style.label}</span>
+          <span className="font-medium text-faint"> · {rowNote(canteen, held, now)}</span>
+        </span>
       </div>
-      <Ring
-        percent={canteen.percent}
-        level={canteen.level}
-        freshness={canteen.freshness}
-        size={54}
-        thickness={6}
-        textClassName="text-[13px]"
-      />
+      <div aria-hidden="true" className={cx("w-[78px] shrink-0 whitespace-nowrap text-right", stale && "opacity-60")}>
+        <BigNumber value={freeAbout(canteen)} className="text-[30px]" />
+        <div className="mt-1 text-xs text-muted">{rangeLine(canteen)}</div>
+      </div>
     </Link>
   );
 }
 
 export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: number }) {
   const held = useHeldSeats(canteen.id);
+  const style = levelFor(canteen.level, canteen.freshness);
+  const stale = canteen.freshness === "stale";
   return (
     <Link
       to={`/canteens/${canteen.id}`}
-      className="flex flex-[1_1_300px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-3 text-ink no-underline hover:border-mint-line"
+      aria-label={seatsLabel(canteen)}
+      className="raised flex flex-[1_1_300px] flex-col gap-4 rounded-[22px] border border-line bg-card p-3 text-ink no-underline hover:border-mint-line"
     >
       <div className="h-[150px]">
         <CanteenArt
@@ -88,126 +127,107 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
           className="rounded-2xl"
         />
       </div>
-      <div className="flex items-center gap-3.5 px-1.5 pb-1.5">
-        <Ring
-          percent={canteen.percent}
-          level={canteen.level}
-          freshness={canteen.freshness}
-          size={72}
-          thickness={8}
-          textClassName="text-base"
-        />
-        <div className="flex flex-1 flex-col gap-[5px]">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-lg font-extrabold">{canteen.name}</span>
-            <StatusPill level={canteen.level} freshness={canteen.freshness} />
+      <div className="flex flex-col gap-3 px-1.5 pb-1.5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <span className="text-lg font-bold">{canteen.name}</span>
+            <span className={cx("text-[13px] font-semibold", style.word)}>{style.label}</span>
           </div>
-          <span className={cx("text-sm text-ink-2", canteen.freshness === "stale" && "opacity-70")}>
-            {hasNumbers(canteen) ? (
-              <>
-                <strong>{freeShort(canteen)}</strong> <span className="text-muted">{rangeText(canteen)}</span>
-                {held > 0 ? <span className="text-muted"> · {held} held by bags</span> : null}
-              </>
-            ) : (
-              "No info right now"
-            )}
-          </span>
-          <span className="text-xs text-muted">
-            {canteen.zones_live} of {canteen.zones_total} zones live · {formatAgo(canteen.updated_at, now)}
-          </span>
+          <div aria-hidden="true" className={cx("whitespace-nowrap text-right", stale && "opacity-60")}>
+            <BigNumber value={freeAbout(canteen)} className="text-[34px]" />
+            <div className="mt-1 text-xs text-muted">{rangeLine(canteen)}</div>
+          </div>
         </div>
+        <Strip counts={canteenStrip(canteen, held)} stale={stale} />
+        <span className="text-xs text-muted">{rowNote(canteen, held, now)}</span>
       </div>
     </Link>
   );
 }
 
-export function BestSpotMobile({ canteen }: { canteen: CanteenSummary }) {
+function BestBadge() {
   return (
-    <section aria-label="Best spot now" className="flex flex-col overflow-hidden rounded-[22px] border border-line bg-card">
-      <div className="relative h-32">
-        <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} />
-        <BestBadge className="absolute left-3 top-3" />
-      </div>
-      <div className="flex flex-col gap-2.5 px-4 pb-4 pt-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="m-0 text-xl font-extrabold">{canteen.name}</h2>
-          <StatusPill level={canteen.level} freshness={canteen.freshness} />
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-2">
-          <span className="inline-flex items-center gap-1.5">
-            <Icon name="seat" size={17} />
-            <strong>{freeShort(canteen)}</strong>
-            <span className="text-muted">{rangeText(canteen)}</span>
+    <span className="inline-flex h-7 items-center gap-1.5 self-start whitespace-nowrap rounded-full bg-purple/25 px-3 text-xs font-bold text-purple-soft">
+      <span className="h-1.5 w-1.5 rounded-full bg-purple" />
+      Best spot now
+    </span>
+  );
+}
+
+function BestSpotBody({ canteen, big }: { canteen: CanteenSummary; big?: boolean }) {
+  const held = useHeldSeats(canteen.id);
+  const counts = canteenStrip(canteen, held);
+  return (
+    <>
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h2 className={cx("m-0 font-sans font-semibold tracking-normal", big ? "text-[28px]" : "text-[17px]")}>{canteen.name}</h2>
+          <span className="text-xs text-on-dark-faint">
+            {canteen.walk
+              ? `${canteen.walk.minutes} min walk from ${canteen.walk.from_name}`
+              : `${canteen.shops_open} of ${canteen.shops_total} shops open`}
           </span>
-          {canteen.walk ? (
-            <span className="inline-flex items-center gap-1.5 text-muted">
-              <Icon name="walk" size={17} />
-              {canteen.walk.minutes} min walk
-            </span>
-          ) : null}
+        </div>
+        <div className="text-right">
+          <BigNumber value={freeAbout(canteen)} className={big ? "text-[96px] leading-[0.82]" : "text-[72px] leading-[0.82]"} />
+          <div className="mt-1.5 text-xs text-on-dark-faint">
+            {hasNumbers(canteen) ? `seats free · ${canteen.free_range[0]}–${canteen.free_range[1]}` : "no live number"}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-1 flex-col gap-2">
+          <Strip counts={counts} dark />
+          <span className="text-xs text-on-dark-faint">
+            {canteen.percent !== null ? `${canteen.percent}% in use` : "Usage unknown"}
+            {held > 0 ? ` · ${held} held by bags` : ""}
+          </span>
         </div>
         <Link
           to={`/canteens/${canteen.id}`}
-          className="flex min-h-12 items-center justify-center gap-1.5 rounded-[14px] bg-brand text-[15px] font-bold text-white no-underline hover:bg-brand-dark hover:text-white"
+          className="edge-sand inline-flex h-[42px] shrink-0 items-center gap-2 rounded-[14px] bg-sand px-3.5 text-sm font-bold text-brand no-underline hover:text-brand"
         >
-          View {canteen.name}
-          <Icon name="arrowRight" size={16} strokeWidth={2.4} />
+          {canteen.walk ? (
+            <>
+              <Icon name="walk" size={18} strokeWidth={2} />
+              {canteen.walk.minutes} min
+            </>
+          ) : (
+            <>
+              View
+              <Icon name="arrowRight" size={16} strokeWidth={2.2} />
+            </>
+          )}
+          <span className="sr-only">, open {canteen.name}</span>
         </Link>
       </div>
+    </>
+  );
+}
+
+export function BestSpotMobile({ canteen }: { canteen: CanteenSummary }) {
+  return (
+    <section aria-label="Best spot now" className="slab flex flex-col gap-4 rounded-[26px] bg-brand px-5 pb-4 pt-[18px] text-sand">
+      <BestBadge />
+      <BestSpotBody canteen={canteen} />
     </section>
   );
 }
 
 export function BestSpotWeb({ canteen }: { canteen: CanteenSummary }) {
   return (
-    <section aria-label="Best spot now" className="flex min-w-0 flex-[2_1_560px] flex-wrap items-center gap-6 rounded-[26px] bg-mint p-6">
-      <div className="flex flex-[1_1_260px] flex-col gap-3.5">
-        <BestBadge large />
-        <h2 className="m-0 text-4xl font-extrabold tracking-[-0.03em] text-brand-dark">{canteen.name}</h2>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-[15px]">
-          <StatusPill level={canteen.level} freshness={canteen.freshness} size="lg" onWhite />
-          <span className="inline-flex items-center gap-1.5 text-ink-2">
-            <Icon name="seat" size={18} />
-            <strong>{hasNumbers(canteen) ? `~${canteen.free_about} seats free` : "No info right now"}</strong>
-            {hasNumbers(canteen) ? (
-              <span className="text-muted">
-                (est. {canteen.free_range[0]}–{canteen.free_range[1]})
-              </span>
-            ) : null}
-          </span>
-        </div>
-        <span className="inline-flex items-center gap-1.5 text-sm text-muted">
-          <Icon name="walk" size={16} />
-          {canteen.walk ? `${canteen.walk.minutes} min walk from ${canteen.walk.from_name} · ` : ""}
-          {canteen.shops_open} of {canteen.shops_total} shops open
-        </span>
-        <Link
-          to={`/canteens/${canteen.id}`}
-          className="inline-flex min-h-12 items-center gap-2 self-start rounded-[14px] bg-brand px-5 text-[15px] font-extrabold text-white no-underline hover:bg-brand-dark hover:text-white"
-        >
-          View details
-          <Icon name="arrowRight" size={16} strokeWidth={2.4} />
-        </Link>
+    <section
+      aria-label="Best spot now"
+      className="slab flex min-w-0 flex-[2_1_560px] flex-wrap items-stretch gap-6 rounded-[28px] bg-brand p-6 text-sand"
+    >
+      <div className="flex min-w-[280px] flex-[1_1_320px] flex-col justify-between gap-5">
+        <BestBadge />
+        <BestSpotBody canteen={canteen} big />
       </div>
-      <div className="h-[230px] flex-[1_1_300px]">
-        <CanteenArt wall="#CFE9D7" photo={canteenPhotoFor(canteen.id)} label={canteenInitial(canteen.name)} className="rounded-[20px]" />
+      <div className="h-[230px] flex-[1_1_240px]">
+        <CanteenArt wall="#2E5743" photo={canteenPhotoFor(canteen.id)} className="rounded-[20px]" />
       </div>
     </section>
-  );
-}
-
-function BestBadge({ className, large }: { className?: string; large?: boolean }) {
-  return (
-    <span
-      className={cx(
-        "inline-flex items-center gap-1.5 self-start rounded-full bg-card font-extrabold text-brand-dark",
-        large ? "px-3 py-1.5 text-[13px]" : "px-2.5 py-[5px] text-xs",
-        className,
-      )}
-    >
-      <Icon name="star" size={large ? 14 : 13} className="text-brand" />
-      Best spot now
-    </span>
   );
 }
 
@@ -224,7 +244,7 @@ export function NoBestSpot({ anyLive }: { anyLive: boolean }) {
         <Icon name="question" size={22} className="mt-0.5 shrink-0 text-neutral-ink" />
       )}
       <span className="flex flex-col gap-0.5">
-        <span className="text-[15px] font-extrabold">{anyLive ? "No reliable alternative right now" : "No seat info right now"}</span>
+        <span className="text-[15px] font-bold">{anyLive ? "No reliable alternative right now" : "No seat info right now"}</span>
         <span className="text-[13px] text-muted">
           {anyLive ? "Every canteen with live data is crowded." : "We'll show seats again as soon as live readings return."}
         </span>
@@ -235,16 +255,19 @@ export function NoBestSpot({ anyLive }: { anyLive: boolean }) {
 
 export function BusyTimesChart({ title, points }: { title: string; points: BusyPoint[] }) {
   return (
-    <section aria-label={title} className="flex min-w-0 flex-[1.3_1_400px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5">
+    <section
+      aria-label={title}
+      className="raised flex min-w-0 flex-[1.3_1_400px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="m-0 text-[17px] font-extrabold">{title}</h2>
-        <div className="flex gap-3 text-xs text-ink-2">
+        <h2 className="m-0 text-xl font-semibold">{title}</h2>
+        <div className="flex gap-3 text-xs text-muted">
           <span className="inline-flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-[3px] bg-brand" />
             Measured
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="forecast-stripes h-2.5 w-2.5 rounded-[3px]" />
+            <span className="h-2.5 w-2.5 rounded-[3px] border-[1.5px] border-dashed border-purple bg-purple-bg" />
             Forecast (experimental)
           </span>
         </div>
@@ -259,12 +282,12 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
               aria-hidden="true"
               title={`${p.is_forecast ? "Forecast" : "Measured"} ${p.percent}%`}
               className={cx(
-                "w-full max-w-[46px] rounded-t-lg rounded-b",
-                p.is_forecast ? "forecast-stripes" : p.is_now ? "bg-busy-mark" : "bg-brand",
+                "w-full max-w-[46px] rounded-t-md rounded-b-sm",
+                p.is_forecast ? "border-[1.5px] border-dashed border-purple bg-purple-bg" : p.percent >= 80 ? "bg-crowd-mark" : "bg-brand",
               )}
               style={{ height: Math.round(p.percent * 1.2) }}
             />
-            <span aria-hidden="true" className={cx("text-[11px]", p.is_now ? "font-extrabold text-ink" : "text-muted")}>
+            <span aria-hidden="true" className={cx("text-xs", p.is_now ? "font-bold text-ink" : "text-muted")}>
               {p.label}
             </span>
           </li>
@@ -274,63 +297,104 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
   );
 }
 
-export function ZoneBarRow({ zone, last, seats }: { zone: ZoneOccupancy; last: boolean; seats?: ZoneSeats }) {
+function zoneNote(zone: ZoneOccupancy, seats: ZoneSeats | undefined, now: number): string {
+  if (!hasNumbers(zone)) {
+    return zone.updated_at ? `Camera offline since ${formatClock(zone.updated_at)}` : "Not monitored yet";
+  }
+  const note = seatNote(seats);
+  if (note) return note;
+  if (zone.freshness === "stale") return `Updated ${formatAgo(zone.updated_at, now)}`;
+  return zone.level === "normal" ? "Plenty of room" : zone.level === "busy" ? "Filling up" : "Few or no seats right now";
+}
+
+function countsLine(counts: StripCounts | null, capacity: number): string {
+  if (!counts) return `${capacity} seats`;
+  const parts = [`${counts.taken} taken`];
+  if (counts.held) parts.push(`${counts.held} held`);
+  if (counts.hidden) parts.push(`${counts.hidden} hidden`);
+  parts.push(`${counts.total} seats`);
+  return parts.join(" · ");
+}
+
+function ZoneBody({ zone, seats, now, large }: { zone: ZoneOccupancy; seats?: ZoneSeats; now: number; large?: boolean }) {
   const style = levelFor(zone.level, zone.freshness);
-  const numbers = hasNumbers(zone);
-  const note = numbers ? seatNote(seats) : null;
+  const counts = zoneStrip(zone, seats);
+  const stale = zone.freshness === "stale";
   return (
-    <li className={cx("flex items-center gap-3 py-3", !last && "border-b border-line-soft")}>
-      <div className="flex flex-1 flex-col gap-1.5">
-        <div className="flex justify-between gap-2">
-          <span className="text-sm font-bold">{zone.name}</span>
-          <span className={cx("text-[13px] text-muted", zone.freshness === "stale" && "opacity-70")}>
-            {numbers ? `${freeShort(zone)} ${rangeText(zone)}` : "No info right now"}
-          </span>
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className={cx("font-bold", large ? "text-lg" : "text-base")}>{zone.name}</span>
+          <span className="text-[13px] text-muted">{zoneNote(zone, seats, now)}</span>
         </div>
-        <div
-          aria-hidden="true"
-          className={cx(
-            "h-[7px] overflow-hidden rounded bg-track",
-            !numbers && "outline outline-1 -outline-offset-1 outline-dashed outline-dash",
-          )}
-        >
-          {numbers ? (
-            <div
-              className={cx("h-full rounded", style.bar, zone.freshness === "stale" && "opacity-50")}
-              style={{ width: `${zone.percent}%` }}
-            />
-          ) : null}
+        <div className={cx("shrink-0 whitespace-nowrap text-right", stale && "opacity-60")}>
+          <BigNumber value={freeAbout(zone)} className={large ? "text-[34px]" : "text-[28px]"} />
+          <div className="mt-1 text-xs text-muted">
+            {hasNumbers(zone) ? `free · ${zone.free_range[0]}–${zone.free_range[1]}` : "no number"}
+          </div>
         </div>
-        {note ? <span className="text-xs font-semibold text-ink-2">{note}</span> : null}
       </div>
-      <span className="w-10 text-right text-sm font-extrabold">{numbers ? `${zone.percent}%` : "—"}</span>
+      <Strip counts={counts} height={large ? 12 : 8} stale={stale} />
+      <div className="flex justify-between gap-2 text-xs font-semibold">
+        <span className={style.word}>{style.label}</span>
+        <span className="text-faint">{countsLine(counts, zone.capacity)}</span>
+      </div>
+    </>
+  );
+}
+
+export function ZoneBarRow({ zone, seats, now }: { zone: ZoneOccupancy; last?: boolean; seats?: ZoneSeats; now: number }) {
+  return (
+    <li
+      aria-label={seatsLabel(zone)}
+      className={cx(
+        "flex flex-col gap-3 rounded-[22px] px-[18px] py-4",
+        hasNumbers(zone) ? "raised border border-line bg-card" : "border-[1.5px] border-dashed border-dash bg-surface-soft",
+      )}
+    >
+      <ZoneBody zone={zone} seats={seats} now={now} />
     </li>
   );
 }
 
 export function ZoneCard({ zone, now, seats }: { zone: ZoneOccupancy; now: number; seats?: ZoneSeats }) {
-  const numbers = hasNumbers(zone);
-  const note = numbers ? seatNote(seats) : null;
   return (
     <div
+      aria-label={seatsLabel(zone)}
       className={cx(
-        "flex flex-[1_1_300px] items-center gap-4 rounded-[22px] p-5",
-        numbers ? "border border-line bg-card" : "border-[1.5px] border-dashed border-dash bg-surface-soft",
+        "flex flex-[1_1_300px] flex-col gap-3.5 rounded-[22px] p-5",
+        hasNumbers(zone) ? "raised border border-line bg-card" : "border-[1.5px] border-dashed border-dash bg-surface-soft",
       )}
     >
-      <Ring percent={zone.percent} level={zone.level} freshness={zone.freshness} size={80} thickness={9} textClassName="text-[17px]" />
-      <div className="flex flex-1 flex-col gap-[5px]">
-        <span className="text-[17px] font-extrabold">{zone.name}</span>
-        <StatusPill level={zone.level} freshness={zone.freshness} className="self-start" />
-        <span className="text-[13px] text-muted">
-          {numbers
-            ? `${freeShort(zone)} ${rangeText(zone)} of ${zone.capacity} seats${zone.freshness === "stale" ? ` · ${formatAgo(zone.updated_at, now)}` : ""}`
-            : zone.updated_at
-              ? `${zone.capacity} seats · sensor offline since ${formatClock(zone.updated_at)}`
-              : `${zone.capacity} seats · not monitored yet`}
+      <ZoneBody zone={zone} seats={seats} now={now} large />
+    </div>
+  );
+}
+
+export function SeatLegend({ counts, free }: { counts: StripCounts | null; free: string }) {
+  if (!counts) return null;
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+      <span className="inline-flex items-center gap-1.5">
+        <span className="h-1.5 w-3 rounded-full bg-brand" />
+        {counts.taken} taken
+      </span>
+      {counts.held ? (
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-1.5 w-3 rounded-full bg-held" />
+          {counts.held} held by bags
         </span>
-        {note ? <span className="text-[13px] font-semibold text-ink-2">{note}</span> : null}
-      </div>
+      ) : null}
+      {counts.hidden ? (
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-1.5 w-3 rounded-full bg-hidden" />
+          {counts.hidden} hidden
+        </span>
+      ) : null}
+      <span className="inline-flex items-center gap-1.5">
+        <span className="h-1.5 w-3 rounded-full border border-brand bg-card" />
+        {free} free
+      </span>
     </div>
   );
 }
@@ -355,14 +419,14 @@ export function AlternativeCard({ canteen }: { canteen: CanteenSummary }) {
     <Link
       to={`/canteens/${pick.canteen_id}`}
       aria-label={`Less crowded nearby: ${pick.name}, about ${pick.free_about ?? pick.available_range[0]} seats free`}
-      className="flex items-center gap-3 rounded-[22px] border border-line bg-card p-4 text-ink no-underline hover:border-brand"
+      className="edge-ticket flex items-center gap-3 rounded-[20px] bg-sand p-4 text-ink no-underline"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mint-soft text-brand">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-sand">
         <Icon name="walk" size={20} />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-xs font-bold uppercase tracking-[0.04em] text-muted">Less crowded nearby</span>
-        <span className="text-[15px] font-extrabold">
+        <span className="text-xs font-semibold text-muted">Less crowded nearby</span>
+        <span className="text-[15px] font-bold">
           {pick.name} · about {pick.free_about ?? pick.available_range[0]} free
         </span>
         <span className="text-xs text-muted">
