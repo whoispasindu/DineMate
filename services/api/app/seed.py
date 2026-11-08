@@ -8,6 +8,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app import models
+from app.business.models import BUSINESS_TABLES
 from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
@@ -222,6 +223,7 @@ MEALS = [("breakfast", "07:00", "09:30"), ("lunch", "11:30", "14:00"), ("dinner"
 SATURDAY_MEALS = [("lunch", "11:30", "13:30")]
 
 TABLES = [
+    *BUSINESS_TABLES,
     *SAFETY_TABLES,
     "audit_log",
     "refresh_tokens",
