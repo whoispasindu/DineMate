@@ -1,6 +1,6 @@
 # DineMate — Solo Roadmap
 
-One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–8 from the judges' feedback. This replaces the four-person allocation in Section 21 of the [development plan](DineMate_Development_Plan.md); everything else in the plan still applies.
+One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–10 from the judges' feedback. This replaces the four-person allocation in Section 21 of the [development plan](DineMate_Development_Plan.md); everything else in the plan still applies.
 
 **How to work through it**
 
@@ -19,7 +19,9 @@ One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–8 from the 
 | 5. Safety module           | 8     | 21 – 27 Dec     | Labelled safety simulation end to end                   |
 | 6. Forecast, polish & demo | 9–10  | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed            |
 | 7. Seat-level occupancy    | TBD   | after judging   | Every seat is free, occupied, held or unknown           |
-| 8. Business demo           | TBD   | after Phase 7   | Same software shown on a sample restaurant              |
+| 8. Business core           | TBD   | after Phase 7   | DineMate Business: venues, tables, customer stays       |
+| 9. Staff and till          | TBD   | after Phase 8   | Staff recognition, work areas, till data per worker     |
+| 10. Deploy and sell        | TBD   | after Phase 9   | Local server, cloud plan, billing, first pilot shops    |
 
 ---
 
@@ -192,21 +194,49 @@ Notes from Phase 7:
 - The worker still posts zone readings to `/occupancy` (held and hidden seats count as taken) and adds a seat snapshot to `/seats`. An older API without the seat endpoint just gets zone counts.
 - Seat sessions store a seat id, a state and start/end times only. Nothing identifies a person.
 
-## Phase 8 — Business demo (separate from the campus app)
+## DineMate Business (Phases 8–10)
 
-Goal: show that the same software works for restaurants and food courts. This is a demo on labelled sample data, not a product launch: no billing, no real restaurant brands, nothing added to the student app. It builds on Phase 7's seats.
+A second product for cafés, restaurants and food courts, rented monthly. It lives in this repo next to the campus apps and shares the camera worker, the API core, the seat and table logic and the design system. The judges (5 Nov) want the business version to track customers and staff; the campus apps stay counts-only and are not affected.
 
-- [ ] Tables: group seats into tables in the layout; a table is free, occupied, held or needs clearing
-- [ ] Table board (console page behind a demo flag): live tables with party size, time seated and "likely free in about X–Y min"
-- [ ] "Check before you come" page: free tables now and likely free in 15 min for one labelled sample venue
-- [ ] Turn-time report: time at table, table turns per day, busiest hours
-- [ ] Leave-time estimate per table: time seated, party size, time of day and the meal stage seen on the table (food, empty plates, cleared), fitted on the venue's own history (simulated and labelled for the demo)
-- [ ] Counter-service orders: a sample till feed (simulated orders) drives "tables needed in the next 15 min" without linking orders to tables; experiment: a numbered table stand with a printed marker the camera reads, to link an order to a table without tracking people
-- [ ] Venue simulator and a demo script; a one-page "how a restaurant would use it", with pricing left as `[__]` until we talk to venues
+Ground rules for the whole product:
 
-**Done when:** a judge can watch tables change state on the board and see a "likely free" estimate and a turn-time report for the sample venue, with every number labelled sample or estimate.
+- No video or images are ever stored, on the shop's server or ours. Only events and numbers are kept.
+- Customers are anonymous: tracked within one visit (temporary ids), never recognised again, never enrolled.
+- Staff recognition is opt-in per worker, with written consent. Face templates (not photos) are stored encrypted on the shop's local server only, never in our cloud, and deleted when the worker leaves. Workers who decline use a badge instead. Workers can see their own data.
+- Per-worker reports are visible to the owner only. Data is deleted automatically after a retention period the shop sets.
+- Not built: "suspicious activity" detection.
 
-Not in this phase: payments, a real till integration, recognising dishes by camera, following customers from the counter to a table, real brand names.
+Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (public "check before you come" page); `services/api/app/business/` (own routers, schemas and tables, like `app/safety/`); `services/vision/vision/staff.py` and `tables.py`; `infra/docker-compose.business.yml` for a shop's local server.
+
+## Phase 8 — Business core
+
+- [ ] Tenancy: organizations and venues above canteens and zones; every query is scoped to the signed-in user's organization; the campus becomes one organization
+- [ ] Tables: group seats into tables in the zone tool and the dashboard; a table is free, occupied, held or needs clearing; party size from its seats
+- [ ] Customer visits: start and end per table (no identities), time at table, turns per table per day, busiest hours, stay after paying (matched to till orders by time, Phase 9)
+- [ ] Leave-time estimate per table ("likely free in about X–Y min") from time seated, party size, time of day and what is on the table, fitted on the venue's own history
+- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras, Settings; simple left navigation, everything reachable in two clicks
+- [ ] Business design: same design language as the campus apps with its own professional palette; designed in Figma first, reviewed, then built
+- [ ] Sample café with simulated tables and visits, always labelled
+
+**Done when:** a sample café runs end to end: tables change state live, visits and turn times show in the dashboard, and the leave-time estimate is labelled experimental.
+
+## Phase 9 — Staff and till
+
+- [ ] Staff enrolment: opt-in face enrolment on the local server (consent record, face template only, encrypted), badge fallback (printed code on apron or lanyard), remove a worker and their data in one step
+- [ ] Recognition in the worker: match staff faces or badges to tracks; customers are never matched; no images leave memory
+- [ ] Work areas: mark counter, kitchen and floor areas; time per worker per area, counter coverage ("unstaffed for 6 min at 12:40"), queue length alerts
+- [ ] Till data: CSV import first, then one real till system; items sold per cashier ("coffees served per worker"), orders per hour, average order
+- [ ] Staff page: per-worker hours in each area, items served, busiest shifts; workers can see their own page
+- [ ] Privacy kit: staff notice and consent templates, data protection impact assessment template, retention settings, audit of who viewed staff reports
+
+**Done when:** on staged clips, enrolled staff are recognised in their work areas, customers stay anonymous, and per-worker items served match the till file.
+
+## Phase 10 — Deploy and sell
+
+- [ ] Local server: one-command install of the business stack on a small PC (`docker-compose.business.yml`), cameras added from the dashboard
+- [ ] Cloud plan: multi-tenant hosting for shops that pay extra; cameras still run locally and send only counts and events
+- [ ] Plans and billing switches (per venue per month, per camera, cloud add-on); pricing left as `[__]` until pilot shops are interviewed
+- [ ] Pilot with one or two shops, with written agreements and staff consent
 
 ---
 
