@@ -1,6 +1,6 @@
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Browser, type Page } from "@playwright/test";
 import { fileURLToPath } from "node:url";
-import { asStudent, CONSOLE, signIn, STUDENT } from "../tests/support";
+import { API, asStudent, BUSINESS, CONSOLE, PASSWORD, signIn, SIM_TOKEN, STUDENT } from "../tests/support";
 
 const OUT = fileURLToPath(new URL("../../docs/screenshots/", import.meta.url));
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
@@ -26,6 +26,15 @@ async function shot(page: Page, name: string, fullPage = false): Promise<void> {
 }
 
 test.describe.configure({ mode: "serial" });
+
+test("welcome screen on a phone", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto(`${STUDENT}/welcome`);
+  await expect(page.getByRole("button", { name: /Find a seat/ })).toBeVisible();
+  await shot(page, "student-welcome-phone");
+  await context.close();
+});
 
 test("student app on a phone", async ({ browser }) => {
   const page = await studentPage(browser, PHONE);
@@ -63,11 +72,40 @@ test("student app on a laptop", async ({ browser }) => {
   await page.context().close();
 });
 
-test("staff console", async ({ browser }) => {
+async function postSampleSeats(request: APIRequestContext): Promise<void> {
+  const headers = { Authorization: `Device ${SIM_TOKEN}` };
+  const config = (await (await request.get(`${API}/devices/sim-a/config`, { headers })).json()) as {
+    zones: { zone_id: string; capacity: number }[];
+  };
+  const zones = config.zones.map((z, i) => {
+    const held = 4;
+    const unknown = i === 0 ? 2 : 0;
+    const occupied = Math.round(z.capacity * (i === 0 ? 0.75 : 0.62));
+    return {
+      zone_id: z.zone_id,
+      free: z.capacity - occupied - held - unknown,
+      occupied,
+      held,
+      unknown,
+      free_soon: 2,
+      standing: i === 0 ? 5 : 1,
+      crowded: i === 0,
+    };
+  });
+  const response = await request.post(`${API}/devices/sim-a/seats`, {
+    headers,
+    data: { captured_at: new Date(Date.now() - 1000).toISOString(), zones, seats: [] },
+  });
+  expect(response.ok()).toBeTruthy();
+}
+
+test("staff console", async ({ browser, request }) => {
+  await postSampleSeats(request);
   for (const [email, path, name, ready] of [
     ["admin@dinemate.test", "/", "console-overview", "Live occupancy by zone"],
     ["rice.stall@dinemate.test", "/shops", "console-shops", "Rice & Curry Stall"],
     ["canteen.a@dinemate.test", "/occupancy", "console-occupancy", "Estimated seats in use"],
+    ["canteen.a@dinemate.test", "/seats", "console-seats", "By zone"],
   ] as const) {
     const context = await browser.newContext(WIDE);
     const page = await context.newPage();
@@ -114,4 +152,34 @@ test("labelled safety simulation", async ({ browser }) => {
   await expect(officer.getByText("No open safety events.")).toBeVisible();
   await student.context().close();
   await context.close();
+});
+
+async function businessPage(browser: Browser, size: typeof PHONE | typeof WIDE): Promise<Page> {
+  const context = await browser.newContext(size);
+  const page = await context.newPage();
+  await page.goto(BUSINESS);
+  await page.getByLabel("Email").fill("owner@dinemate.test");
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("heading", { name: "Live floor", level: 1 })).toBeVisible();
+  return page;
+}
+
+test("DineMate Business dashboard", async ({ browser }) => {
+  const page = await businessPage(browser, WIDE);
+  await expect(page.getByRole("list", { name: "Floor map" }).getByRole("listitem")).toHaveCount(12);
+  await shot(page, "business-floor");
+  for (const [name, file] of [
+    ["Customers", "business-customers"],
+    ["Reports", "business-reports"],
+  ] as const) {
+    await page.getByRole("navigation", { name: "Business" }).getByRole("link", { name }).click();
+    await expect(page.getByRole("heading", { name, level: 1 })).toBeVisible();
+    await shot(page, file);
+  }
+  await page.context().close();
+
+  const phone = await businessPage(browser, PHONE);
+  await shot(phone, "business-floor-phone");
+  await phone.context().close();
 });

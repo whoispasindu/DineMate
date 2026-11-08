@@ -84,6 +84,7 @@ def test_owner_sees_the_sample_cafe_with_tables_and_history(client: TestClient) 
     customers = client.get(f"{BASE}/venues/{VENUE_ID}/customers", headers=headers).json()
     assert customers["is_sample"]
     assert len(customers["by_hour"]) == 24
+    assert 0 < customers["visits_last_week"] < 2 * max(customers["visits"], 1)
     report = client.get(f"{BASE}/venues/{VENUE_ID}/reports?range=week", headers=headers).json()
     assert len(report["days"]) == 7
     assert sum(cell["visits"] for cell in report["heat"]) > 100

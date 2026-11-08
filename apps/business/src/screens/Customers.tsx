@@ -9,9 +9,9 @@ function hourLabel(hour: number): string {
 }
 
 function change(now: number, before: number): string {
-  if (before === 0) return "No visits on the same day last week";
+  if (before === 0) return "No visits by this time last week";
   const pct = Math.round(((now - before) / before) * 100);
-  return `${pct >= 0 ? "+" : ""}${pct}% vs the same day last week`;
+  return `${pct >= 0 ? "+" : ""}${pct}% vs this time last week`;
 }
 
 function VisitsByHour({ data }: { data: CustomerDay }) {

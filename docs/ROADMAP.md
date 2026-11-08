@@ -146,7 +146,7 @@ Notes from Phase 5:
 - [ ] Accessibility pass. Automated part done: axe (WCAG 2.1 A/AA) finds no serious or critical issues on the six student pages, and a contrast fix landed. **You:** keyboard-only run, screen reader spot check, 200% text. The installable PWA check now runs in E2E, because recent Lighthouse versions dropped the PWA audit. Offline shows no seat numbers (E2E)
 - [x] Playwright E2E for the demo flows (plan 25.1): `pnpm e2e` uses its own `dinemate_e2e` database and API on :8001
 - [ ] Sustainability measurements and accuracy report written up. Scaffold in `docs/RESULTS.md`; `app.utilisation_report` gives seat-hours, empty-zone hours and peak balance. **You:** hand counts, survey, smart-plug reading
-- [ ] Demo script, two rehearsals, recorded backup demo (blur faces in any canteen footage). Script in `docs/DEMO.md`; **you:** rehearse twice, record the backup
+- [ ] Demo script, two rehearsals, recorded backup demo (blur faces in any canteen footage). **You:** rehearse twice, record the backup
 - [ ] Feature freeze Monday of Week 10
 
 **Done when:** the full demo runs twice in a row on a clean laptop.
@@ -182,7 +182,7 @@ Every seat has one state:
 - [x] Stay times: median seat-session length by hour, and "about N seats likely to free up in 10 min" (labelled experimental, like the forecast)
 - [x] Simulator: seat summaries per zone (held seats that rise at peak, hidden seats and standing people when a zone is crowded), so canteens without cameras and the demo keep working
 - [ ] Validation: `vision.validate --seats` compares hand-labelled seat states (CSV: video, t_seconds, seat, state) and reports agreement, the false-free rate and accuracy per state. **You:** record three staged clips with friends who agree to it: a standing chat at a table, bags left while queuing, a crowd around several tables
-- [x] Demo: one scenario per judge question in `docs/DEMO.md`
+- [x] Demo: one scenario per judge question
 
 **Done when:** on the staged clips a standing person is never counted as seated, a bag-only seat shows as held, a seat stays held while its owner queues and turns occupied when they return, a crowd never produces a free seat that isn't free, and seat-state accuracy is measured.
 
