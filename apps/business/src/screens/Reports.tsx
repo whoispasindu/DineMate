@@ -74,7 +74,7 @@ function Heat({ data }: { data: VenueReport }) {
       {hours.length === 0 ? (
         <p className="m-0 text-sm text-muted">No visits recorded yet.</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Visits by weekday and hour">
           <table className="border-collapse text-xs">
             <thead>
               <tr>

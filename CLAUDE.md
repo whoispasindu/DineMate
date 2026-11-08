@@ -18,7 +18,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - Staff auth: `app/core/security.py` (Argon2, JWT, refresh tokens, rate limit) + `app/core/auth.py` (roles, `can_manage_canteen`/`can_manage_shop`, 403 `forbidden_scope`). The console holds the access token in memory and refreshes from the httpOnly cookie on `/api/v1/auth`. Create users with `uv run python -m app.users_cli create`. Every write calls `app.services.audit.record`.
 - Seats: positions live inside each seating polygon of the layout (`seats`); devices post snapshots to `POST /devices/{id}/seats` (`app/routers/seats.py`, `schemas_seats.py`) into `seat_states`, `seat_sessions` (no identities) and `zone_seat_status`; held and hidden seats are never free. Stay times: `app/services/stays.py`.
 - Staff editing routers: `manage_shops.py` (hours, closure, menu drafts, publish, instant sold out), `manage_config.py` (meal schedules, thresholds), `manage_zones.py` (layout versions, rollback, zones).
-- DineMate Business (Phases 8–10, planned): `apps/business` for cafés and restaurants, rented monthly; tables, anonymous customer stays, opt-in staff recognition, till data. Design and palette (graphite and cobalt) in docs/BUSINESS_DESIGN.md; ground rules in docs/ROADMAP.md. Never store video or images; live view with tracking is streamed on the shop's network only; customers are never recognised.
+- DineMate Business (Phase 8 built; 9–10 planned): `apps/business` (port 5177) for cafés and restaurants, rented monthly. API in `app/business/` (own models, schemas, router under `/business`, like `app/safety/`): pure rules `tables.py` (table state), `visits.py` (anonymous visits, 60 s grace), `estimate.py` (leave-time range, experimental); `service.py` (DB, called from seat-snapshot ingest); `seed.py` (labelled Sample Café, 12 tables, 28 days of visits); `sim.py` (`cafe-simulator` compose service). Tenancy: `organizations`; a venue is a `canteens` row with `kind='venue'` and id `v-…`; roles `owner`, `venue_manager`; campus endpoints filter to `kind='canteen'`. Design and palette (graphite and cobalt) in docs/BUSINESS_DESIGN.md; ground rules in docs/ROADMAP.md. Never store video or images; live view with tracking is streamed on the shop's network only; customers are never recognised.
 
 ## Rules
 
@@ -39,7 +39,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 ## Commands
 
 - pnpm install
-- pnpm dev:student / pnpm dev:console (sample data) — add `:api` (dev:student:api, dev:console:api) to use the real API on :8000
+- pnpm dev:student / pnpm dev:console / pnpm dev:business (sample data) — add `:api` (dev:student:api, dev:console:api, dev:business:api) to use the real API on :8000; business sample sign-in: owner@ or manager@dinemate.test
 - pnpm typecheck / pnpm build / pnpm lint / pnpm format
 - pnpm stack:up / pnpm stack:down — Postgres + API + simulator in Docker (API on :8000)
 - pnpm dev:api — API with reload against a local or Docker Postgres

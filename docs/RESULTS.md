@@ -68,6 +68,17 @@ For the energy opportunity:
 
 Behaviour change over a 2–3 week pilot will be small and confounded with other factors. Call it a pilot result with limitations.
 
+## 4b. Table leave-time estimate (DineMate Business, experimental)
+
+The Live floor shows "likely free in about X–Y min" for seated tables: the middle half (25th–75th percentile) of remaining time among the venue's finished visits of the same party size near the same hour, from the last 28 days (`app/business/estimate.py`).
+
+| Measure                                           | Result | Data                                                           |
+| ------------------------------------------------- | ------ | -------------------------------------------------------------- |
+| Leave times inside the quoted range (target ~50%) | 63%    | 1,923 predictions, 28 days of **simulated** Sample Café visits |
+| Mean error of the range midpoint                  | 10 min | same                                                           |
+
+Simulated only. It shows the method runs end to end; it says nothing about real cafés until a pilot venue has a few weeks of history.
+
 ## 5. Automated checks
 
 | Check                                                                                                                                                         | How                                                                | Status                        |
@@ -75,6 +86,7 @@ Behaviour change over a 2–3 week pilot will be small and confounded with other
 | API unit and integration tests                                                                                                                                | `pnpm test:api`                                                    | Passing in CI                 |
 | Demo flows end to end (recommendation, crowding acknowledge, sold out, countdown with a wrong device clock, simulated safety alert, offline, PWA installable) | `pnpm e2e`                                                         | Passing locally; CI job added |
 | Accessibility (axe, WCAG 2.1 A/AA, serious and critical) on the six student pages                                                                             | part of `pnpm e2e`                                                 | No violations                 |
+| DineMate Business flows (live table change, mark cleared) and axe on the five business pages                                                                  | `e2e/tests/07-business.spec.ts`                                    | Passing locally               |
 | Safety rows from plan Section 20                                                                                                                              | `tests/integration/test_safety.py` + docs/ROADMAP.md Phase 5 table | Passing                       |
 
 ## What we don't claim
