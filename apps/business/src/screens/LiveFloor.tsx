@@ -4,6 +4,10 @@ import { Banner, Button, errorText, Kpi, Page, Panel, Skeleton } from "../kit";
 import { estimateText, isSoon, LEGEND, minutesSince, tableLook, tableSummary, urgency } from "../tables";
 import { useIsWide, useVenue } from "../venue";
 
+function guests(n: number): string {
+  return `${n} ${n === 1 ? "guest" : "guests"}`;
+}
+
 function liveText(floor: VenueFloor, now: number): string {
   return floor.updated_at ? `Live · ${formatAgo(floor.updated_at, now)}` : "Waiting for the camera";
 }
@@ -58,7 +62,7 @@ function SoonList({ tables }: { tables: FloorTable[] }) {
                 {t.name} <span className="font-medium text-muted">· {t.zone_name}</span>
               </span>
               <span className="text-[13px] text-muted">
-                {t.party_size} guests · {t.seated_min} min
+                {guests(t.party_size)} · {t.seated_min} min
               </span>
             </span>
             <span className={cx("text-sm font-bold", isSoon(t) ? "text-purple-ink" : "text-ink-2")}>{estimateText(t)}</span>
@@ -155,7 +159,7 @@ function PhoneFloor({ floor, now, venueId }: { floor: VenueFloor; now: number; v
         <span className="text-right text-[13px] leading-normal text-on-dark-faint">
           {soon} more in ~10 min
           <br />
-          {floor.totals.guests_seated} guests seated
+          {guests(floor.totals.guests_seated)} seated
         </span>
       </section>
       {floor.is_sample ? <SampleBadge className="self-start" /> : null}
@@ -183,7 +187,7 @@ function PhoneFloor({ floor, now, venueId }: { floor: VenueFloor; now: number; v
                   {look.word}
                 </span>
                 <span className="text-[13px] text-muted">
-                  {t.state === "occupied" ? `${t.party_size} guests · ${t.seated_min} min` : `${t.seats} seats · ${look.detail}`}
+                  {t.state === "occupied" ? `${guests(t.party_size)} · ${t.seated_min} min` : `${t.seats} seats · ${look.detail}`}
                 </span>
               </span>
               {t.state === "needs_clearing" ? (
