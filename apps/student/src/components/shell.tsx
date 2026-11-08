@@ -139,7 +139,7 @@ function TabBar() {
               <>
                 <Icon name={tab.icon} size={22} strokeWidth={isActive ? 2.2 : 1.8} />
                 {tab.label}
-                {isActive ? <span aria-hidden="true" className="absolute -bottom-1 h-[5px] w-[5px] rounded-full bg-purple" /> : null}
+                {isActive ? <span aria-hidden="true" className="absolute -bottom-1 h-[5px] w-[5px] rounded-full bg-sand" /> : null}
               </>
             )}
           </NavLink>

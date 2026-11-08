@@ -61,7 +61,7 @@
   --color-full-mark: #8e2a18;
   --color-indigo: #5b34c9;
   --color-indigo-bg: #ede7fe;
-  --color-notify: #8b5cf6;
+  --color-notify: #b4432f;
 
   --color-hazard-yellow: #f2c230;
   --color-hazard-black: #1c1c17;
@@ -70,8 +70,8 @@
   --color-danger-body: #3b2a20;
   --color-danger-meta: #5a4535;
 
-  --color-forecast: #b9a5f7;
-  --color-forecast-soft: #ede7fe;
+  --color-forecast: #c9b98f;
+  --color-forecast-soft: #f3ecdd;
 }
 
 @utility hazard-stripes {
@@ -155,7 +155,13 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-purple);
+    outline: 3px solid var(--color-brand);
     outline-offset: 2px;
+  }
+
+  .bg-brand :focus-visible,
+  .bg-side :focus-visible,
+  .bg-brand:focus-visible {
+    outline-color: var(--color-sand);
   }
 }

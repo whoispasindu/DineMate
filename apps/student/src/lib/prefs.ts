@@ -6,6 +6,7 @@ const NEW_WINDOW_MS = 10 * 60_000;
 export const welcomeSeen = storedValue("welcome-seen", false);
 export const favourites = storedValue<string[]>("favourite-canteens", []);
 export const alertsSeenAt = storedValue<string | null>("alerts-seen-at", null);
+export const safetySeen = storedValue<string[]>("safety-seen", []);
 
 export interface NotificationPrefs {
   crowding: boolean;

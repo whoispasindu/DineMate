@@ -16,6 +16,7 @@ import {
   formatClock,
   formatClock24,
   formatLocalRange,
+  ApproxNumber,
   Icon,
   levelFor,
   LiveLine,
@@ -156,7 +157,7 @@ function SeatHeadline({ canteen, large }: { canteen: CanteenSummary; large?: boo
   return (
     <div className={cx("shrink-0 text-right", canteen.freshness === "stale" && "opacity-60")}>
       <div className={cx("font-display font-extrabold leading-[0.85] tracking-[-0.05em]", large ? "text-[72px]" : "text-[52px]")}>
-        {numbers ? `~${canteen.free_about}` : "—"}
+        {numbers ? <ApproxNumber value={`~${canteen.free_about}`} /> : "—"}
       </div>
       <div className="mt-1.5 text-xs text-muted">{numbers ? `of ${canteen.monitored_capacity} seats free` : "no live number"}</div>
     </div>
@@ -180,17 +181,17 @@ function SeatSummary({ canteen }: { canteen: CanteenSummary }) {
 
 function ForecastTip({ point }: { point: ForecastPoint }) {
   return (
-    <div className="flex items-center gap-3.5 rounded-[20px] bg-purple-bg px-4 py-3.5">
+    <div className="flex items-center gap-3.5 rounded-[20px] border-[1.5px] border-dashed border-dash bg-surface-soft px-4 py-3.5">
       <div aria-hidden="true" className="flex h-[34px] items-end gap-1">
         {[30, 24, 17, 10].map((h, i) => (
-          <span key={h} className="block w-2 rounded-[3px] bg-purple" style={{ height: h, opacity: 1 - i * 0.2 }} />
+          <span key={h} className="block w-2 rounded-[3px] bg-ink-2" style={{ height: h, opacity: 1 - i * 0.2 }} />
         ))}
       </div>
       <div className="flex flex-col">
-        <span className="text-sm font-bold text-purple-deep">
+        <span className="text-sm font-bold text-ink">
           Likely {point.low}–{point.high}% at {formatClock(point.at)}
         </span>
-        <span className="text-xs text-purple-ink">Experimental forecast</span>
+        <span className="text-xs text-muted">Experimental forecast</span>
       </div>
     </div>
   );
@@ -278,9 +279,7 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
         <h2 id="fc-title" className="m-0 text-[17px] font-extrabold">
           Next hour
         </h2>
-        <span className="inline-flex h-7 items-center rounded-full bg-purple-bg px-3 text-xs font-bold text-purple-ink">
-          Experimental forecast
-        </span>
+        <span className="inline-flex h-7 items-center rounded-full bg-chip px-3 text-xs font-bold text-ink-2">Experimental forecast</span>
       </div>
       <ul className="m-0 flex h-[140px] list-none items-end gap-3.5 p-0">
         {canteen.percent !== null ? (
@@ -301,7 +300,7 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
             </span>
             <div
               aria-hidden="true"
-              className="w-full max-w-16 rounded-t-[10px] rounded-b border-[1.5px] border-dashed border-purple bg-purple-bg"
+              className="forecast-stripes w-full max-w-16 rounded-t-[10px] rounded-b"
               style={{ height: Math.round(((p.low + p.high) / 2) * 1.2) }}
             />
             <span className="text-xs text-muted">{shortClock(p.at)}</span>

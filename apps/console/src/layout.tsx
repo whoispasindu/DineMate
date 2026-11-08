@@ -82,7 +82,7 @@ function Sidebar({ user }: { user: StaffUser }) {
           >
             <Icon name={item.icon} size={19} />
             <span className="flex-1">{item.label}</span>
-            <span aria-hidden="true" className="hidden h-1.5 w-1.5 rounded-full bg-purple group-[.is-active]:block" />
+            <span aria-hidden="true" className="hidden h-1.5 w-1.5 rounded-full bg-sand group-[.is-active]:block" />
             {item.badge === "alerts" && openAlerts > 0 ? (
               <span
                 aria-label={`${openAlerts} open`}
@@ -98,7 +98,7 @@ function Sidebar({ user }: { user: StaffUser }) {
         <div className="flex items-center gap-2.5">
           <span
             aria-hidden="true"
-            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] bg-purple-ink font-display text-[13px] font-extrabold text-white"
+            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] bg-sand font-display text-[13px] font-extrabold text-brand"
           >
             {initials(user.display_name)}
           </span>

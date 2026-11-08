@@ -11,6 +11,7 @@ import {
   type IconName,
 } from "@dinemate/ui";
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
+import { Link } from "react-router";
 
 export function Skeleton({ className }: { className?: string }) {
   return <div aria-hidden="true" className={cx("rounded-[18px] bg-line-soft motion-safe:animate-pulse", className)} />;
@@ -121,6 +122,19 @@ export function SafetyBanner({ event, layout }: SafetyBannerProps) {
         </div>
       </div>
       <span className="text-[13px] leading-[1.45] text-danger-body">{event.instructions}</span>
+    </HazardFrame>
+  );
+}
+
+export function SafetyCompact({ event }: { event: SafetyEvent }) {
+  return (
+    <HazardFrame tight className="rounded-2xl p-[3px]" innerClassName="rounded-[13px]">
+      <Link to="/alerts" className="flex min-h-11 items-center gap-2.5 px-3 text-danger-ink no-underline">
+        <Icon name="flame" size={18} className="shrink-0" />
+        <span className="min-w-0 flex-1 truncate text-sm font-bold">{event.title}</span>
+        <span className="shrink-0 rounded bg-hazard-black px-1.5 py-0.5 text-[11px] font-bold text-hazard-yellow">Simulation</span>
+        <Icon name="chevronRight" size={16} className="shrink-0" />
+      </Link>
     </HazardFrame>
   );
 }

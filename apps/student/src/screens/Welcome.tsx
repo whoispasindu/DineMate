@@ -61,7 +61,7 @@ export function WelcomeScreen() {
           <h1 className="m-0 font-display text-[44px] font-extrabold leading-none tracking-[-0.05em]">
             Know where
             <br />
-            to sit <span className="text-purple-soft">before</span>
+            to sit <span className="text-held">before</span>
             <br />
             you queue.
           </h1>

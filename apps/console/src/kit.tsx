@@ -78,7 +78,7 @@ export function Button({ tone = "secondary", className, ...props }: ButtonHTMLAt
   );
 }
 
-const FIELD = "min-h-10 rounded-[10px] border border-line bg-card px-3 text-sm text-ink focus:outline-2 focus:outline-purple";
+const FIELD = "min-h-10 rounded-[10px] border border-line bg-card px-3 text-sm text-ink focus:outline-2 focus:outline-brand";
 
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (

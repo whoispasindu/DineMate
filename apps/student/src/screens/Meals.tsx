@@ -37,7 +37,7 @@ function Countdown({ data, now, remaining }: { data: MealStatus; now: number; re
                 {Array.from({ length: 30 }, (_, i) => (
                   <span
                     key={i}
-                    className={cx("block h-[18px] rounded-[2px]", i < Math.round((progress / 100) * 30) ? "bg-purple" : "bg-sand/20")}
+                    className={cx("block h-[18px] rounded-[2px]", i < Math.round((progress / 100) * 30) ? "bg-sand" : "bg-sand/20")}
                   />
                 ))}
               </div>

@@ -11,6 +11,7 @@ import {
 } from "@dinemate/api-client";
 import {
   cx,
+  ApproxNumber,
   formatAgo,
   formatClock,
   formatClock24,
@@ -73,7 +74,7 @@ function Kpi({ title, value, suffix, sub, tone }: { title: string; value: string
           tone === "alert" && "text-crowd-mark",
         )}
       >
-        {value}
+        <ApproxNumber value={value} />
         {suffix ? (
           <span className={cx("ml-2 font-sans text-sm font-medium tracking-normal", hero ? "text-on-dark-faint" : "text-muted")}>
             {suffix}
@@ -123,7 +124,7 @@ function MealChip({ now }: { now: number }) {
   if (!focus) return null;
   return (
     <span className="inline-flex min-h-10 items-center gap-2 rounded-[10px] bg-side px-3.5 text-[13px] font-semibold text-white">
-      <span className="h-2 w-2 rounded-full bg-live-dot" />
+      <span className="h-2 w-2 rounded-full bg-sand" />
       {PERIOD_LABEL[focus.period]} · {data.current ? "ends" : "starts"} in{" "}
       <span className="tabular font-mono">{formatCountdown(Math.max(0, remaining))}</span>
     </span>

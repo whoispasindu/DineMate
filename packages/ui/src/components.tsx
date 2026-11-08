@@ -198,23 +198,30 @@ interface SeatStripProps {
 
 export function SeatStrip({ total, taken, held = 0, hidden = 0, dark, height = 8, className, stale }: SeatStripProps) {
   const free = Math.max(total - taken - held - hidden, 0);
-  const parts: { n: number; className: string }[] = [
+  const parts: { n: number; className: string; free?: boolean }[] = [
     { n: taken, className: dark ? "bg-sand" : "bg-brand" },
     { n: held, className: "bg-held" },
     { n: hidden, className: dark ? "bg-sand/35" : "bg-hidden" },
-    { n: free, className: dark ? "bg-sand/15" : "bg-track" },
+    {
+      n: free,
+      free: true,
+      className: dark ? "shadow-[inset_0_0_0_1.5px_var(--color-sand)]" : "bg-card shadow-[inset_0_0_0_1.5px_var(--color-brand)]",
+    },
   ];
+  const shown = parts.filter((p) => p.n > 0);
   return (
     <div
       aria-hidden="true"
       className={cx("flex w-full gap-0.5 overflow-hidden", stale && "opacity-50", className)}
       style={{ height, borderRadius: height }}
     >
-      {parts
-        .filter((p) => p.n > 0)
-        .map((p, i) => (
-          <div key={i} className={p.className} style={{ flex: p.n }} />
-        ))}
+      {shown.map((p, i) => (
+        <div
+          key={i}
+          className={p.className}
+          style={{ flex: p.n, borderRadius: p.free ? (i === 0 ? height : `0 ${height}px ${height}px 0`) : undefined }}
+        />
+      ))}
     </div>
   );
 }
@@ -245,5 +252,18 @@ export function LiveLine({ text, freshness = "live" }: { text: string; freshness
       <span className={cx("h-1.5 w-1.5 rounded-full", live ? "bg-purple" : "bg-dash")} />
       {text}
     </span>
+  );
+}
+
+export function ApproxNumber({ value }: { value: string }) {
+  if (!value.startsWith("~")) return <>{value}</>;
+  return (
+    <>
+      <span aria-hidden="true" className="mr-[0.02em] inline-block align-[0.14em] text-[0.58em] font-medium opacity-55">
+        ~
+      </span>
+      <span className="sr-only">about </span>
+      {value.slice(1)}
+    </>
   );
 }

@@ -8,7 +8,19 @@ import {
   type ZoneOccupancy,
   type ZoneSeats,
 } from "@dinemate/api-client";
-import { CanteenArt, canteenPhotoFor, cx, EmptyStrip, emptyArtFor, formatAgo, formatClock, Icon, levelFor, SeatStrip } from "@dinemate/ui";
+import {
+  ApproxNumber,
+  CanteenArt,
+  canteenPhotoFor,
+  cx,
+  EmptyStrip,
+  emptyArtFor,
+  formatAgo,
+  formatClock,
+  Icon,
+  levelFor,
+  SeatStrip,
+} from "@dinemate/ui";
 import { Link } from "react-router";
 import { useMemo } from "react";
 import { canteenInitial, canteenStrip, canteenWall, hasNumbers, seatNote, zoneStrip, type StripCounts } from "../lib/present";
@@ -57,7 +69,11 @@ export function Strip({
 }
 
 function BigNumber({ value, className }: { value: string; className?: string }) {
-  return <span className={cx("font-display font-extrabold leading-none tracking-[-0.04em]", className)}>{value}</span>;
+  return (
+    <span className={cx("font-display font-extrabold leading-none tracking-[-0.04em]", className)}>
+      <ApproxNumber value={value} />
+    </span>
+  );
 }
 
 function freeAbout(c: Pick<CanteenSummary, "free_about" | "free_range" | "freshness">): string {
@@ -164,7 +180,7 @@ function BestSpotBody({ canteen, big }: { canteen: CanteenSummary; big?: boolean
           </span>
         </div>
         <div className="text-right">
-          <BigNumber value={freeAbout(canteen)} className={big ? "text-[96px] leading-[0.82]" : "text-[72px] leading-[0.82]"} />
+          <BigNumber value={freeAbout(canteen)} className={big ? "text-[96px] leading-[0.82]" : "text-[56px] leading-[0.82]"} />
           <div className="mt-1.5 text-xs text-on-dark-faint">
             {hasNumbers(canteen) ? `seats free · ${canteen.free_range[0]}–${canteen.free_range[1]}` : "no live number"}
           </div>
@@ -202,7 +218,7 @@ function BestSpotBody({ canteen, big }: { canteen: CanteenSummary; big?: boolean
 
 export function BestSpotMobile({ canteen }: { canteen: CanteenSummary }) {
   return (
-    <section aria-label="Best spot now" className="slab flex flex-col gap-4 rounded-[26px] bg-brand px-5 pb-4 pt-[18px] text-sand">
+    <section aria-label="Best spot now" className="slab flex flex-col gap-3 rounded-[24px] bg-brand px-[18px] pb-3.5 pt-4 text-sand">
       <BestBadge />
       <BestSpotBody canteen={canteen} />
     </section>
@@ -262,7 +278,7 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
             Measured
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-[3px] border-[1.5px] border-dashed border-purple bg-purple-bg" />
+            <span className="forecast-stripes h-2.5 w-2.5 rounded-[3px]" />
             Forecast (experimental)
           </span>
         </div>
@@ -278,7 +294,7 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
               title={`${p.is_forecast ? "Forecast" : "Measured"} ${p.percent}%`}
               className={cx(
                 "w-full max-w-[46px] rounded-t-md rounded-b-sm",
-                p.is_forecast ? "border-[1.5px] border-dashed border-purple bg-purple-bg" : p.percent >= 80 ? "bg-crowd-mark" : "bg-brand",
+                p.is_forecast ? "forecast-stripes" : p.percent >= 80 ? "bg-crowd-mark" : "bg-brand",
               )}
               style={{ height: Math.round(p.percent * 1.2) }}
             />

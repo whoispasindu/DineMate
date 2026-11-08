@@ -9,7 +9,7 @@ import {
   type SeatStateName,
   type ZoneSeats,
 } from "@dinemate/api-client";
-import { cx, EmptyStrip, SampleBadge, SeatStrip, TableScene } from "@dinemate/ui";
+import { ApproxNumber, cx, EmptyStrip, SampleBadge, SeatStrip, TableScene } from "@dinemate/ui";
 import { useMemo, useState } from "react";
 import { Banner, errorText, Field, Page, Panel, Select } from "../kit";
 
@@ -52,7 +52,7 @@ function ZoneRow({ zone, first }: { zone: ZoneSeats; first: boolean }) {
         </div>
         <div className="text-right">
           <span className="font-display text-[34px] font-extrabold leading-none tracking-[-0.04em]">
-            {live ? `~${count(zone.free)}` : "—"}
+            {live ? <ApproxNumber value={`~${count(zone.free)}`} /> : "—"}
           </span>
           <div className={cx("mt-0.5 text-[13px] font-semibold", wordTone)}>{word}</div>
         </div>
@@ -85,7 +85,7 @@ const LEGEND: { swatch: string; label: string }[] = [
   { swatch: "bg-brand", label: "Taken" },
   { swatch: "bg-held", label: "Held by bags" },
   { swatch: "bg-hidden", label: "Hidden" },
-  { swatch: "bg-track", label: "Free" },
+  { swatch: "bg-card shadow-[inset_0_0_0_1.5px_var(--color-brand)]", label: "Free" },
 ];
 
 function SeatMap({ zoneId, now }: { zoneId: string; now: number }) {
@@ -134,7 +134,7 @@ function StayPanel({ canteenId }: { canteenId: string }) {
   if (!stays.data) return null;
   const s = stays.data;
   return (
-    <Panel title="Stay times" aside={<SampleBadge className="bg-purple-bg text-purple-ink">Experimental</SampleBadge>}>
+    <Panel title="Stay times" aside={<SampleBadge>Experimental</SampleBadge>}>
       {s.sessions === 0 ? (
         <span className="text-sm text-muted">No finished seat visits in the last {s.days} days yet.</span>
       ) : (

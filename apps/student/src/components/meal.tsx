@@ -69,8 +69,8 @@ export function MealPill() {
 
 export function MealBadge({ text }: { text: string }) {
   return (
-    <span className="inline-flex h-7 items-center gap-1.5 self-start rounded-full bg-purple/25 px-3 text-xs font-bold text-purple-soft">
-      <span className="h-1.5 w-1.5 rounded-full bg-purple" />
+    <span className="inline-flex h-7 items-center gap-1.5 self-start rounded-full bg-white/10 px-3 text-xs font-bold text-sand">
+      <span className="h-1.5 w-1.5 rounded-full bg-sand" />
       {text}
     </span>
   );
@@ -104,7 +104,7 @@ export function MealCountdownCard({ className }: { className?: string }) {
       )}
       {current ? (
         <div aria-hidden="true" className="h-2 overflow-hidden rounded bg-track-dark">
-          <div className="h-full rounded bg-purple" style={{ width: `${windowProgress(current, now)}%` }} />
+          <div className="h-full rounded bg-sand" style={{ width: `${windowProgress(current, now)}%` }} />
         </div>
       ) : null}
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-sm">
