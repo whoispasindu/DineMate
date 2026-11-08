@@ -214,8 +214,8 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 - [ ] Tables: group seats into tables in the zone tool and the dashboard; a table is free, occupied, held or needs clearing; party size from its seats
 - [ ] Customer visits: start and end per table (no identities), time at table, turns per table per day, busiest hours, stay after paying (matched to till orders by time, Phase 9)
 - [ ] Leave-time estimate per table ("likely free in about X–Y min") from time seated, party size, time of day and what is on the table, fitted on the venue's own history
-- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras, Settings; simple left navigation, everything reachable in two clicks
-- [ ] Business design: same design language as the campus apps with its own professional palette; designed in Figma first, reviewed, then built
+- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras, Settings, and a manager phone view; simple left navigation, every page one click away (Staff, Sales and Privacy & consent land in Phase 9)
+- [ ] Business design: same design language as the campus apps in navy `#14213D`, cream `#F4EDE0` and coral `#FF6B5B` (teal free, amber held, brick needs attention); v1 is in Figma for review, then built (docs/BUSINESS_DESIGN.md)
 - [ ] Sample café with simulated tables and visits, always labelled
 
 **Done when:** a sample café runs end to end: tables change state live, visits and turn times show in the dashboard, and the leave-time estimate is labelled experimental.
