@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
+from app.business import router as business
 from app.core.config import get_settings
 from app.core.errors import install_error_handling
 from app.jobs import lifespan
@@ -59,6 +60,7 @@ def create_app() -> FastAPI:
         manage_zones.router,
         seats.router,
         safety.router,
+        business.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

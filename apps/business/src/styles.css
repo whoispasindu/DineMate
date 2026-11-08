@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@import "../../../packages/ui/src/theme.css";
+@source "../../../packages/ui/src";
+
+@theme {
+  --color-page: #f4f5f7;
+  --color-card: #ffffff;
+  --color-line: #e2e5ea;
+  --color-line-soft: #edeff2;
+  --color-ink: #161a21;
+  --color-ink-2: #2a303b;
+  --color-muted: #5e6673;
+  --color-faint: #5e6673;
+
+  --color-brand: #1b1f27;
+  --color-brand-dark: #0f1217;
+  --color-brand-mid: #2a303b;
+  --color-mint: #e9ecf0;
+  --color-mint-soft: #e9ecf0;
+  --color-mint-line: #c9ced8;
+
+  --color-sand: #e9ecf0;
+  --color-sand-edge: #c9ced8;
+  --color-sand-deep: #d5dae1;
+  --color-purple: #2f5bea;
+  --color-purple-ink: #2147b8;
+  --color-purple-deep: #1a3a99;
+  --color-purple-bg: #e6edfd;
+  --color-purple-soft: #c9d6ff;
+  --color-held: #ecd29c;
+  --color-hidden: #c9ced8;
+
+  --color-chip: #e9ecf0;
+  --color-neutral: #e9ecf0;
+  --color-neutral-ink: #4b5260;
+  --color-dash: #9aa1ad;
+  --color-dash-soft: #c9ced8;
+  --color-track: #e9ecf0;
+  --color-surface-soft: #f4f5f7;
+
+  --color-on-dark: #f4f5f7;
+  --color-on-dark-strong: #ffffff;
+  --color-on-dark-faint: #b9c0cc;
+  --color-live: #2f5bea;
+  --color-live-ink: #c9d6ff;
+  --color-track-dark: #2a303b;
+
+  --color-ok: #13633f;
+  --color-ok-bg: #e3f3ea;
+  --color-ok-mark: #1e8e5a;
+  --color-busy: #7a4f0e;
+  --color-busy-bg: #fbf0dc;
+  --color-busy-mark: #b7791f;
+  --color-crowd: #8e2620;
+  --color-crowd-bg: #fbe7e5;
+  --color-crowd-mark: #c23b32;
+  --color-notify: #c23b32;
+
+  --color-side: #1b1f27;
+  --color-side-ink: #f4f5f7;
+  --color-side-muted: #b9c0cc;
+}

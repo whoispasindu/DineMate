@@ -36,6 +36,8 @@ const ROLE_LABEL: Record<StaffRole, string> = {
   canteen_manager: "Canteen manager",
   shop_manager: "Shop manager",
   safety_officer: "Safety officer",
+  owner: "Business owner",
+  venue_manager: "Venue manager",
 };
 
 function initials(name: string): string {

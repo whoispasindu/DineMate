@@ -45,5 +45,12 @@ export default defineConfig({
       timeout: 120_000,
       reuseExistingServer: false,
     },
+    {
+      command: "pnpm --filter business exec vite --port 5185 --strictPort",
+      url: "http://localhost:5185",
+      env: { VITE_API_URL: API },
+      timeout: 120_000,
+      reuseExistingServer: false,
+    },
   ],
 });

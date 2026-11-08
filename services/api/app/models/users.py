@@ -7,8 +7,11 @@ from sqlalchemy.dialects.postgresql import INET, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+from app.models.organization import CAMPUS_ORG
 
-ROLES = ("shop_manager", "canteen_manager", "campus_admin", "safety_officer")
+CAMPUS_ROLES = ("shop_manager", "canteen_manager", "campus_admin", "safety_officer")
+BUSINESS_ROLES = ("owner", "venue_manager")
+ROLES = (*CAMPUS_ROLES, *BUSINESS_ROLES)
 
 
 class User(Base):
@@ -23,6 +26,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(Text)
     display_name: Mapped[str] = mapped_column(Text)
     role: Mapped[str] = mapped_column(Text)
+    organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), server_default=CAMPUS_ORG, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

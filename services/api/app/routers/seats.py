@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query
 from sqlalchemy import func, select, update
 
 from app import models
+from app.business.service import update_tables
 from app.core.auth import StaffUser, can_manage_canteen, forbidden_scope
 from app.core.deps import NowDep, SessionDep
 from app.core.device_auth import DeviceDep, RealNowDep
@@ -116,6 +117,9 @@ def post_seats(
                 current.state, current.since = seat.state, started
         current.free_soon = seat.free_soon
         current.updated_at = captured_at
+    if models.is_venue_id(device.canteen_id):
+        touched = zone_uuids | {uuid.UUID(z.zone_id) for z in payload.zones}
+        update_tables(session, touched, captured_at, simulated)
     device.last_heartbeat_at = now
     session.commit()
     return SeatsAccepted(
@@ -146,7 +150,7 @@ def zone_statuses(session: SessionDep, canteen_id: str | None = None) -> list[tu
     query = (
         select(models.SeatingZone, models.ZoneSeatStatus)
         .join(models.ZoneSeatStatus, models.ZoneSeatStatus.zone_id == models.SeatingZone.id)
-        .where(models.SeatingZone.is_active)
+        .where(models.SeatingZone.is_active, models.SeatingZone.canteen_id.in_(models.campus_canteen_ids()))
         .order_by(models.SeatingZone.canteen_id, models.SeatingZone.sort_order, models.SeatingZone.name)
     )
     if canteen_id is not None:
@@ -156,7 +160,7 @@ def zone_statuses(session: SessionDep, canteen_id: str | None = None) -> list[tu
 
 @router.get("/canteens/{canteen_id}/seats", response_model=CanteenSeats, responses=NOT_FOUND)
 def get_canteen_seats(canteen_id: str, session: SessionDep, now: NowDep) -> CanteenSeats:
-    if session.get(models.Canteen, canteen_id) is None:
+    if models.is_venue_id(canteen_id) or session.get(models.Canteen, canteen_id) is None:
         raise not_found("Canteen", canteen_id)
     zones = [zone_seats(zone, status, now) for zone, status in zone_statuses(session, canteen_id)]
     return CanteenSeats(

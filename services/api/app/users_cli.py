@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.core.db import get_engine
 from app.core.security import hash_password
-from app.models.users import ROLES
+from app.models.users import BUSINESS_ROLES, ROLES
 from app.services.audit import record
 
 MIN_PASSWORD = 10
@@ -45,19 +45,32 @@ def create_user(
     password: str,
     canteens: list[str],
     shops: list[str],
+    organization: str = models.CAMPUS_ORG,
 ) -> models.User:
     if role not in ROLES:
         raise ValueError(f"Role must be one of: {', '.join(ROLES)}.")
+    org = session.get(models.Organization, organization)
+    if org is None:
+        raise ValueError(f"Organization '{organization}' does not exist.")
+    if (org.kind == "business") != (role in BUSINESS_ROLES):
+        raise ValueError(f"Role {role} does not belong to a {org.kind} organization.")
     _check_password(password)
     if find(session, email) is not None:
         raise ValueError(f"A user with email {email} already exists.")
     for canteen in canteens:
-        if session.get(models.Canteen, canteen) is None:
-            raise ValueError(f"Canteen '{canteen}' does not exist.")
+        found = session.get(models.Canteen, canteen)
+        if found is None or found.organization_id != organization:
+            raise ValueError(f"Canteen '{canteen}' does not exist in {organization}.")
     for shop in shops:
         if session.get(models.Shop, shop) is None:
             raise ValueError(f"Shop '{shop}' does not exist.")
-    user = models.User(email=email.strip(), display_name=name, role=role, password_hash=hash_password(password))
+    user = models.User(
+        email=email.strip(),
+        display_name=name,
+        role=role,
+        organization_id=organization,
+        password_hash=hash_password(password),
+    )
     user.canteen_scopes = [models.UserCanteenScope(canteen_id=c) for c in canteens]
     user.shop_scopes = [models.UserShopScope(shop_id=s) for s in shops]
     session.add(user)
@@ -75,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument("--role", required=True, choices=ROLES)
     create.add_argument("--canteen", action="append", default=[], help="canteen id this user manages (repeatable)")
     create.add_argument("--shop", action="append", default=[], help="shop id this user manages (repeatable)")
+    create.add_argument("--organization", default=models.CAMPUS_ORG, help="organization id (default: campus)")
     create.add_argument("--password-env", help="read the password from this environment variable instead of prompting")
     reset = sub.add_parser("set-password", help="set a new password")
     reset.add_argument("--email", required=True)
@@ -95,7 +109,10 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"{u.email:<32} {u.role:<16} {state:<9} scopes: {scopes}")
                 return 0
             if args.command == "create":
-                user = create_user(session, args.email, args.name, args.role, _password(args), args.canteen, args.shop)
+                password = _password(args)
+                user = create_user(
+                    session, args.email, args.name, args.role, password, args.canteen, args.shop, args.organization
+                )
                 session.commit()
                 print(f"Created {user.role} {user.email}.")
                 return 0

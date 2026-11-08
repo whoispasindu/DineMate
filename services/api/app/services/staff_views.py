@@ -124,7 +124,8 @@ def _devices(session: Session, now: datetime) -> list[staff.DeviceHealth]:
         )
     }
     result = []
-    for device in session.scalars(select(models.Device).order_by(models.Device.canteen_id, models.Device.id)):
+    campus_devices = select(models.Device).where(models.Device.canteen_id.in_(models.campus_canteen_ids()))
+    for device in session.scalars(campus_devices.order_by(models.Device.canteen_id, models.Device.id)):
         places = [zones[z] for z in by_device.get(device.id, []) if z in zones]
         where = f"{places[0][0]} · {', '.join(p[1] for p in places)}" if places else "no zones"
         seen = device.last_heartbeat_at

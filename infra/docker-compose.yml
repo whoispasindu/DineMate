@@ -3,7 +3,7 @@ name: dinemate
 x-api-env: &api-env
   DINEMATE_ENVIRONMENT: ${DINEMATE_ENVIRONMENT:-development}
   DINEMATE_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dinemate}:${POSTGRES_PASSWORD:-dinemate}@db:5432/${POSTGRES_DB:-dinemate}
-  DINEMATE_CORS_ORIGINS: ${DINEMATE_CORS_ORIGINS:-["http://localhost:5173","http://localhost:5174"]}
+  DINEMATE_CORS_ORIGINS: ${DINEMATE_CORS_ORIGINS:-["http://localhost:5173","http://localhost:5174","http://localhost:5177"]}
   DINEMATE_SIMULATION_MODE: ${DINEMATE_SIMULATION_MODE:-true}
   DINEMATE_DEMO_CLOCK_START: ${DINEMATE_DEMO_CLOCK_START:-}
   DINEMATE_SIMULATOR_TOKEN: ${DINEMATE_SIMULATOR_TOKEN:-dev-simulator-token}
@@ -51,6 +51,17 @@ services:
     environment:
       <<: *api-env
       DINEMATE_SIMULATOR_INTERVAL_S: ${DINEMATE_SIMULATOR_INTERVAL_S:-30}
+      DINEMATE_SIMULATOR_API_URL: http://api:8000/api/v1
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cafe-simulator:
+    build: ../services/api
+    command: ["python", "-m", "app.business.sim"]
+    environment:
+      <<: *api-env
       DINEMATE_SIMULATOR_API_URL: http://api:8000/api/v1
     depends_on:
       api:

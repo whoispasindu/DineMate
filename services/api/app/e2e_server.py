@@ -4,7 +4,7 @@ from pathlib import Path
 E2E_DATABASE_URL = "postgresql+psycopg://dinemate:dinemate@localhost:5432/dinemate_e2e"
 E2E_DEMO_CLOCK = "2026-11-20T12:40:30+05:30"
 E2E_PORT = 8001
-E2E_ORIGINS = '["http://localhost:5183","http://localhost:5184","http://localhost:4183"]'
+E2E_ORIGINS = '["http://localhost:5183","http://localhost:5184","http://localhost:5185","http://localhost:4183"]'
 
 
 def configure() -> None:
@@ -13,6 +13,7 @@ def configure() -> None:
     os.environ.setdefault("DINEMATE_CORS_ORIGINS", E2E_ORIGINS)
     os.environ.setdefault("DINEMATE_DEMO_PASSWORD", "e2e-demo-password")
     os.environ.setdefault("DINEMATE_RULES_INTERVAL_S", "2")
+    os.environ.setdefault("DINEMATE_LOGIN_ATTEMPTS_PER_MINUTE", "60")
 
 
 def prepare() -> None:

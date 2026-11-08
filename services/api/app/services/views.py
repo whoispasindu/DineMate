@@ -100,6 +100,7 @@ def load_bundles(session: Session, now: datetime, canteen_id: str | None = None)
     stmt = (
         select(models.Canteen)
         .options(selectinload(models.Canteen.zones), selectinload(models.Canteen.hours))
+        .where(models.Canteen.kind == models.CANTEEN)
         .order_by(models.Canteen.sort_order, models.Canteen.name)
     )
     if canteen_id is not None:
@@ -199,7 +200,7 @@ def _window(w: Window) -> schemas.MealWindow:
 
 def meal_status_schema(session: Session, now: datetime, canteen_id: str | None) -> schemas.MealStatus:
     state = meal_status(now, schedule_book(session, canteen_id))
-    is_sample = session.scalar(select(models.Canteen.is_sample).limit(1))
+    is_sample = session.scalar(select(models.Canteen.is_sample).where(models.Canteen.kind == models.CANTEEN).limit(1))
     return schemas.MealStatus(
         server_time=now,
         timezone="Asia/Colombo",

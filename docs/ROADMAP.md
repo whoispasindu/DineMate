@@ -19,7 +19,7 @@ One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–10 from the
 | 5. Safety module           | 8     | 21 – 27 Dec     | Labelled safety simulation end to end                   |
 | 6. Forecast, polish & demo | 9–10  | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed            |
 | 7. Seat-level occupancy    | TBD   | after judging   | Every seat is free, occupied, held or unknown           |
-| 8. Business core           | TBD   | after Phase 7   | DineMate Business: venues, tables, customer stays       |
+| 8. Business core           | Done  | after Phase 7   | DineMate Business: venues, tables, customer stays       |
 | 9. Staff and till          | TBD   | after Phase 8   | Staff recognition, work areas, till data per worker     |
 | 10. Deploy and sell        | TBD   | after Phase 9   | Local server, cloud plan, billing, first pilot shops    |
 
@@ -211,13 +211,13 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 
 ## Phase 8 — Business core
 
-- [ ] Tenancy: organizations and venues above canteens and zones; every query is scoped to the signed-in user's organization; the campus becomes one organization
-- [ ] Tables: group seats into tables in the zone tool and the dashboard; a table is free, occupied, held or needs clearing; party size from its seats
-- [ ] Customer visits: start and end per table (no identities), time at table, turns per table per day, busiest hours, stay after paying (matched to till orders by time, Phase 9)
-- [ ] Leave-time estimate per table ("likely free in about X–Y min") from time seated, party size, time of day and what is on the table, fitted on the venue's own history
-- [ ] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras (live view with tracking, camera health), Settings, and a manager phone view; simple left navigation, every page one click away (Staff, Sales and Privacy & consent land in Phase 9)
-- [ ] Business design: same design language as the campus apps in graphite `#1B1F27` and cobalt `#2F5BEA` on a cool grey page (green free, amber held, red needs attention); v2 is in Figma for review, then built (docs/BUSINESS_DESIGN.md)
-- [ ] Sample café with simulated tables and visits, always labelled
+- [x] Tenancy: organizations and venues above canteens and zones; every query is scoped to the signed-in user's organization; the campus becomes one organization — `organizations` table; a venue is a `canteens` row with `kind = 'venue'` and an id starting `v-`; roles `owner` and `venue_manager`; campus endpoints never list venues and campus roles cannot open `/business/*`
+- [x] Tables: group seats into tables in the zone tool and the dashboard; a table is free, occupied, held or needs clearing; party size from its seats — grouping is in the dashboard (Settings → Tables), not the OpenCV zone tool; the vision worker already reports per-seat states (`app/business/tables.py`)
+- [x] Customer visits: start and end per table (no identities), time at table, turns per table per day, busiest hours, stay after paying (matched to till orders by time, Phase 9) — visits are opened and closed on seat-snapshot ingest with a 60 s grace (`app/business/visits.py`); stay after paying waits for till data
+- [x] Leave-time estimate per table ("likely free in about X–Y min") from time seated, party size, time of day and what is on the table, fitted on the venue's own history — interquartile range of remaining time from the venue's last 28 days, labelled experimental (`app/business/estimate.py`, backtest in docs/RESULTS.md)
+- [x] `apps/business`: Live floor (table map with states and timers), Customers (visits, stays, turns), Reports (day, week, hours), Cameras (live view with tracking, camera health), Settings, and a manager phone view; simple left navigation, every page one click away (Staff, Sales and Privacy & consent land in Phase 9) — Cameras shows health now; the live stream is Phase 9
+- [x] Business design: same design language as the campus apps in graphite `#1B1F27` and cobalt `#2F5BEA` on a cool grey page (green free, amber held, red needs attention); v2 is in Figma for review, then built (docs/BUSINESS_DESIGN.md)
+- [x] Sample café with simulated tables and visits, always labelled — "Sample Café" with 12 tables and 28 days of simulated visits in the seed; `cafe-simulator` compose service posts per-seat snapshots
 
 **Done when:** a sample café runs end to end: tables change state live, visits and turn times show in the dashboard, and the leave-time estimate is labelled experimental.
 

@@ -4186,6 +4186,906 @@
           }
         }
       }
+    },
+    "/api/v1/business/venues": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "List Venues",
+        "operationId": "list_venues_api_v1_business_venues_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueList"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/floor": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Floor",
+        "operationId": "get_floor_api_v1_business_venues__venue_id__floor_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueFloor"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/customers": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Customers",
+        "operationId": "get_customers_api_v1_business_venues__venue_id__customers_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDay"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/reports": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Report",
+        "operationId": "get_report_api_v1_business_venues__venue_id__reports_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "day",
+                "week"
+              ],
+              "type": "string",
+              "default": "week",
+              "title": "Range"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/cameras": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Cameras",
+        "operationId": "get_cameras_api_v1_business_venues__venue_id__cameras_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueCameras"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/tables": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Tables",
+        "operationId": "get_tables_api_v1_business_venues__venue_id__tables_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableLayout"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Put Tables",
+        "operationId": "put_tables_api_v1_business_venues__venue_id__tables_put",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TablesIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableLayout"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/tables/{table_id}/cleared": {
+      "post": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Mark Cleared",
+        "operationId": "mark_cleared_api_v1_business_tables__table_id__cleared_post",
+        "parameters": [
+          {
+            "name": "table_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Table Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueFloor"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/settings": {
+      "get": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Get Settings View",
+        "operationId": "get_settings_view_api_v1_business_settings_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessSettings"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "business"
+        ],
+        "summary": "Patch Settings",
+        "operationId": "patch_settings_api_v1_business_settings_patch",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessSettings"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4283,6 +5183,35 @@
         ],
         "title": "BestCanteen"
       },
+      "BusinessSettings": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "organization_id": {
+            "type": "string",
+            "title": "Organization Id"
+          },
+          "organization_name": {
+            "type": "string",
+            "title": "Organization Name"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "organization_id",
+          "organization_name",
+          "retention_days"
+        ],
+        "title": "BusinessSettings"
+      },
       "BusyPoint": {
         "properties": {
           "label": {
@@ -4336,6 +5265,71 @@
           "points"
         ],
         "title": "BusyToday"
+      },
+      "CameraHealth": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "camera",
+              "simulator"
+            ],
+            "title": "Kind"
+          },
+          "zones": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "not_reporting",
+              "offline"
+            ],
+            "title": "Status"
+          },
+          "fps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fps"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "zones",
+          "status",
+          "fps",
+          "last_seen_at"
+        ],
+        "title": "CameraHealth"
       },
       "CanteenDetail": {
         "properties": {
@@ -4907,6 +5901,132 @@
         ],
         "title": "ConsoleZone"
       },
+      "CustomerDay": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          },
+          "visits_last_week": {
+            "type": "integer",
+            "title": "Visits Last Week"
+          },
+          "guests": {
+            "type": "integer",
+            "title": "Guests"
+          },
+          "avg_stay_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Stay Min"
+          },
+          "median_stay_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Stay Min"
+          },
+          "turns_per_table": {
+            "type": "number",
+            "title": "Turns Per Table"
+          },
+          "by_hour": {
+            "items": {
+              "$ref": "#/components/schemas/HourCount"
+            },
+            "type": "array",
+            "title": "By Hour"
+          },
+          "by_table": {
+            "items": {
+              "$ref": "#/components/schemas/TableStay"
+            },
+            "type": "array",
+            "title": "By Table"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "day",
+          "is_sample",
+          "visits",
+          "visits_last_week",
+          "guests",
+          "avg_stay_min",
+          "median_stay_min",
+          "turns_per_table",
+          "by_hour",
+          "by_table"
+        ],
+        "title": "CustomerDay"
+      },
+      "DayTotal": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          },
+          "guests": {
+            "type": "integer",
+            "title": "Guests"
+          },
+          "avg_stay_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Stay Min"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "visits",
+          "guests",
+          "avg_stay_min"
+        ],
+        "title": "DayTotal"
+      },
       "DeviceConfig": {
         "properties": {
           "server_time": {
@@ -5319,6 +6439,171 @@
         ],
         "title": "Excluded"
       },
+      "FloorTable": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "zone_name": {
+            "type": "string",
+            "title": "Zone Name"
+          },
+          "shape": {
+            "type": "string",
+            "enum": [
+              "round",
+              "rect"
+            ],
+            "title": "Shape"
+          },
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          },
+          "w": {
+            "type": "number",
+            "title": "W"
+          },
+          "h": {
+            "type": "number",
+            "title": "H"
+          },
+          "seats": {
+            "type": "integer",
+            "title": "Seats"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "free",
+              "occupied",
+              "held",
+              "needs_clearing",
+              "unknown"
+            ],
+            "title": "State"
+          },
+          "party_size": {
+            "type": "integer",
+            "title": "Party Size"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "seated_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seated Min"
+          },
+          "plates_left": {
+            "type": "boolean",
+            "title": "Plates Left"
+          },
+          "estimate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LeaveEstimate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "zone_name",
+          "shape",
+          "x",
+          "y",
+          "w",
+          "h",
+          "seats",
+          "state",
+          "party_size",
+          "since",
+          "seated_min",
+          "plates_left",
+          "estimate"
+        ],
+        "title": "FloorTable"
+      },
+      "FloorTotals": {
+        "properties": {
+          "tables": {
+            "type": "integer",
+            "title": "Tables"
+          },
+          "free": {
+            "type": "integer",
+            "title": "Free"
+          },
+          "guests_seated": {
+            "type": "integer",
+            "title": "Guests Seated"
+          },
+          "visits_today": {
+            "type": "integer",
+            "title": "Visits Today"
+          },
+          "avg_stay_today_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Stay Today Min"
+          },
+          "turns_today": {
+            "type": "number",
+            "title": "Turns Today"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tables",
+          "free",
+          "guests_seated",
+          "visits_today",
+          "avg_stay_today_min",
+          "turns_today"
+        ],
+        "title": "FloorTotals"
+      },
       "ForecastPoint": {
         "properties": {
           "at": {
@@ -5476,6 +6761,29 @@
         ],
         "title": "HeartbeatIn"
       },
+      "HeatCell": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "title": "Weekday"
+          },
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "hour",
+          "visits"
+        ],
+        "title": "HeatCell"
+      },
       "HistoryPointOut": {
         "properties": {
           "t": {
@@ -5509,6 +6817,24 @@
           "samples"
         ],
         "title": "HistoryPointOut"
+      },
+      "HourCount": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hour",
+          "visits"
+        ],
+        "title": "HourCount"
       },
       "HoursException-Input": {
         "properties": {
@@ -5871,6 +7197,50 @@
         ],
         "title": "LayoutVersion"
       },
+      "LayoutZoneSeats": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/SeatPoint"
+            },
+            "type": "array",
+            "title": "Seats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "name",
+          "seats"
+        ],
+        "title": "LayoutZoneSeats"
+      },
+      "LeaveEstimate": {
+        "properties": {
+          "low_min": {
+            "type": "integer",
+            "title": "Low Min"
+          },
+          "high_min": {
+            "type": "integer",
+            "title": "High Min"
+          }
+        },
+        "type": "object",
+        "required": [
+          "low_min",
+          "high_min"
+        ],
+        "title": "LeaveEstimate"
+      },
       "LoginIn": {
         "properties": {
           "email": {
@@ -6036,7 +7406,9 @@
               "shop_manager",
               "canteen_manager",
               "campus_admin",
-              "safety_officer"
+              "safety_officer",
+              "owner",
+              "venue_manager"
             ],
             "title": "Role"
           },
@@ -7606,6 +8978,29 @@
         ],
         "title": "SeatOverview"
       },
+      "SeatPoint": {
+        "properties": {
+          "seat_id": {
+            "type": "string",
+            "title": "Seat Id"
+          },
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seat_id",
+          "x",
+          "y"
+        ],
+        "title": "SeatPoint"
+      },
       "SeatSnapshotIn": {
         "properties": {
           "captured_at": {
@@ -7699,6 +9094,21 @@
           "user"
         ],
         "title": "Session"
+      },
+      "SettingsIn": {
+        "properties": {
+          "retention_days": {
+            "type": "integer",
+            "maximum": 730.0,
+            "minimum": 7.0,
+            "title": "Retention Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "retention_days"
+        ],
+        "title": "SettingsIn"
       },
       "Shop": {
         "properties": {
@@ -8700,6 +10110,236 @@
         ],
         "title": "StudentSummary"
       },
+      "TableIn": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 12,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "shape": {
+            "type": "string",
+            "enum": [
+              "round",
+              "rect"
+            ],
+            "title": "Shape",
+            "default": "rect"
+          },
+          "x": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y"
+          },
+          "w": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "W"
+          },
+          "h": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "H"
+          },
+          "seat_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Seat Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "zone_id",
+          "x",
+          "y",
+          "w",
+          "h",
+          "seat_ids"
+        ],
+        "title": "TableIn"
+      },
+      "TableLayout": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/LayoutZoneSeats"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/TableOut"
+            },
+            "type": "array",
+            "title": "Tables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "zones",
+          "tables"
+        ],
+        "title": "TableLayout"
+      },
+      "TableOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "shape": {
+            "type": "string",
+            "enum": [
+              "round",
+              "rect"
+            ],
+            "title": "Shape"
+          },
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          },
+          "w": {
+            "type": "number",
+            "title": "W"
+          },
+          "h": {
+            "type": "number",
+            "title": "H"
+          },
+          "seat_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Seat Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "zone_id",
+          "shape",
+          "x",
+          "y",
+          "w",
+          "h",
+          "seat_ids"
+        ],
+        "title": "TableOut"
+      },
+      "TableStay": {
+        "properties": {
+          "table_id": {
+            "type": "string",
+            "title": "Table Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "seats": {
+            "type": "integer",
+            "title": "Seats"
+          },
+          "avg_stay_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Stay Min"
+          },
+          "turns": {
+            "type": "integer",
+            "title": "Turns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "table_id",
+          "name",
+          "seats",
+          "avg_stay_min",
+          "turns"
+        ],
+        "title": "TableStay"
+      },
+      "TablesIn": {
+        "properties": {
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/TableIn"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Tables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tables"
+        ],
+        "title": "TablesIn"
+      },
       "ThresholdList": {
         "properties": {
           "server_time": {
@@ -8836,6 +10476,222 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VenueCameras": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CameraHealth"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "items"
+        ],
+        "title": "VenueCameras"
+      },
+      "VenueFloor": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "venue_name": {
+            "type": "string",
+            "title": "Venue Name"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/FloorTotals"
+          },
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/FloorTable"
+            },
+            "type": "array",
+            "title": "Tables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "venue_name",
+          "is_sample",
+          "updated_at",
+          "totals",
+          "tables"
+        ],
+        "title": "VenueFloor"
+      },
+      "VenueList": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/VenueSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "items"
+        ],
+        "title": "VenueList"
+      },
+      "VenueReport": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "range": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week"
+            ],
+            "title": "Range"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DayTotal"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "heat": {
+            "items": {
+              "$ref": "#/components/schemas/HeatCell"
+            },
+            "type": "array",
+            "title": "Heat"
+          },
+          "heat_days": {
+            "type": "integer",
+            "title": "Heat Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "range",
+          "is_sample",
+          "days",
+          "heat",
+          "heat_days"
+        ],
+        "title": "VenueReport"
+      },
+      "VenueSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "organization_name": {
+            "type": "string",
+            "title": "Organization Name"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/VenueZone"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "tables": {
+            "type": "integer",
+            "title": "Tables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "organization_name",
+          "is_sample",
+          "zones",
+          "tables"
+        ],
+        "title": "VenueSummary"
+      },
+      "VenueZone": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "VenueZone"
       },
       "WalkTime": {
         "properties": {

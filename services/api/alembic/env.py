@@ -16,6 +16,7 @@ if not config.get_main_option("sqlalchemy.url"):
     config.set_main_option("sqlalchemy.url", get_settings().database_url.replace("%", "%%"))
 
 import_module("app.safety.models")
+import_module("app.business.models")
 target_metadata = Base.metadata
 
 

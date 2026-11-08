@@ -38,4 +38,11 @@ export type ApiContract = [
   Expect<Assignable<Schemas["SeatOverview"], T.SeatOverview>>,
   Expect<Assignable<Schemas["ZoneSeatMap"], T.ZoneSeatMap>>,
   Expect<Assignable<Schemas["StayTimes"], T.StayTimes>>,
+  Expect<Assignable<Schemas["VenueList"], T.VenueList>>,
+  Expect<Assignable<Schemas["VenueFloor"], T.VenueFloor>>,
+  Expect<Assignable<Schemas["CustomerDay"], T.CustomerDay>>,
+  Expect<Assignable<Schemas["VenueReport"], T.VenueReport>>,
+  Expect<Assignable<Schemas["VenueCameras"], T.VenueCameras>>,
+  Expect<Assignable<Schemas["TableLayout"], T.TableLayout>>,
+  Expect<Assignable<Schemas["BusinessSettings"], T.BusinessSettings>>,
 ];

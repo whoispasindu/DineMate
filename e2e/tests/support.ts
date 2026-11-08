@@ -4,6 +4,7 @@ import { expect, type APIRequestContext, type Page } from "@playwright/test";
 export const API = "http://localhost:8001/api/v1";
 export const STUDENT = "http://localhost:5183";
 export const CONSOLE = "http://localhost:5184";
+export const BUSINESS = "http://localhost:5185";
 export const PASSWORD = process.env.DINEMATE_DEMO_PASSWORD ?? "e2e-demo-password";
 export const SIM_TOKEN = "dev-simulator-token";
 

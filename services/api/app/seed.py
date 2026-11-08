@@ -8,6 +8,10 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app import models
+from app.business.models import BUSINESS_TABLES
+from app.business.seed import ORG_ID as CAFE_ORG
+from app.business.seed import VENUE_ID as CAFE_VENUE
+from app.business.seed import seed_sample_cafe
 from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
@@ -15,7 +19,7 @@ from app.core.device_auth import hash_token
 from app.safety.models import SAFETY_TABLES
 from app.safety.service import ensure_simulator_source
 from app.services.timeutil import at_local, local_date
-from app.users_cli import create_user
+from app.users_cli import create_user, find
 
 ALL_DAY = ("breakfast", "lunch", "dinner")
 LUNCH = ("lunch",)
@@ -222,6 +226,7 @@ MEALS = [("breakfast", "07:00", "09:30"), ("lunch", "11:30", "14:00"), ("dinner"
 SATURDAY_MEALS = [("lunch", "11:30", "13:30")]
 
 TABLES = [
+    *BUSINESS_TABLES,
     *SAFETY_TABLES,
     "audit_log",
     "refresh_tokens",
@@ -240,6 +245,7 @@ TABLES = [
     "seating_zones",
     "canteen_hours",
     "canteens",
+    "organizations",
 ]
 
 
@@ -256,6 +262,12 @@ def _zone_polygon(index: int, count: int) -> list[list[float]]:
         [round(left + width - 0.02, 3), 0.95],
         [round(left, 3), 0.95],
     ]
+
+
+def ensure_campus_org(session: Session) -> None:
+    if session.get(models.Organization, models.CAMPUS_ORG) is None:
+        session.add(models.Organization(id=models.CAMPUS_ORG, name="Campus", kind="campus", is_sample=True))
+        session.flush()
 
 
 def _seed_canteens(session: Session, now: datetime) -> None:
@@ -369,23 +381,31 @@ def _seed_schedules(session: Session) -> None:
 
 
 DEMO_USERS = [
-    ("admin@dinemate.test", "Campus administrator", "campus_admin", [], []),
-    ("canteen.a@dinemate.test", "Canteen A manager", "canteen_manager", ["a"], []),
-    ("rice.stall@dinemate.test", "Rice & Curry Stall manager", "shop_manager", [], ["s-rice"]),
-    ("safety@dinemate.test", "Safety officer", "safety_officer", [], []),
+    ("admin@dinemate.test", "Campus administrator", "campus_admin", [], [], models.CAMPUS_ORG),
+    ("canteen.a@dinemate.test", "Canteen A manager", "canteen_manager", ["a"], [], models.CAMPUS_ORG),
+    ("rice.stall@dinemate.test", "Rice & Curry Stall manager", "shop_manager", [], ["s-rice"], models.CAMPUS_ORG),
+    ("safety@dinemate.test", "Safety officer", "safety_officer", [], [], models.CAMPUS_ORG),
+    ("owner@dinemate.test", "Sample Café owner", "owner", [], [], CAFE_ORG),
+    ("manager@dinemate.test", "Sample Café manager", "venue_manager", [CAFE_VENUE], [], CAFE_ORG),
 ]
 
 
-def seed_demo_users(session: Session, password: str) -> None:
-    for email, name, role, canteens, shops in DEMO_USERS:
-        create_user(session, email, name, role, password, canteens, shops)
+def seed_demo_users(session: Session, password: str) -> int:
+    created = 0
+    for email, name, role, canteens, shops, org in DEMO_USERS:
+        if find(session, email) is None:
+            create_user(session, email, name, role, password, canteens, shops, org)
+            created += 1
+    return created
 
 
 def seed(session: Session, now: datetime, demo_password: str | None = None) -> None:
+    ensure_campus_org(session)
     _seed_canteens(session, now)
     _seed_shops(session, now)
     _seed_schedules(session)
     ensure_simulator_source(session)
+    seed_sample_cafe(session, now)
     session.flush()
     if demo_password:
         seed_demo_users(session, demo_password)
@@ -409,11 +429,14 @@ def main(argv: list[str] | None = None) -> int:
             if args.if_empty:
                 print("Sample data already present; skipping seed.")
                 ensure_simulator_source(session)
+                if seed_sample_cafe(session, clock.now(settings)):
+                    print("Added the labelled Sample Café venue.")
                 session.commit()
-                if settings.demo_password and not session.scalar(select(func.count()).select_from(models.User)):
-                    seed_demo_users(session, settings.demo_password)
+                if settings.demo_password:
+                    created = seed_demo_users(session, settings.demo_password)
                     session.commit()
-                    print(f"Created {len(DEMO_USERS)} demo staff accounts (password from DINEMATE_DEMO_PASSWORD).")
+                    if created:
+                        print(f"Created {created} demo staff accounts (password from DINEMATE_DEMO_PASSWORD).")
                 return 0
             print("Data already present. Re-run with --reset to replace it.", file=sys.stderr)
             return 1

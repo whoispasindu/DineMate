@@ -155,6 +155,25 @@ const stroked = {
     </>
   ),
   shield: <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" />,
+  chart: <path d="M4 20V10M10 20V4M16 20v-7M21 20H3" />,
+  badge: (
+    <>
+      <rect x="6" y="3" width="12" height="18" rx="2" />
+      <path d="M10 7h4M9 12h6M9 15h6" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="10" width="14" height="10" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  coffee: (
+    <>
+      <path d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" />
+      <path d="M16 11h2a2.5 2.5 0 0 1 0 5h-2M8 3v3M12 3v3" />
+    </>
+  ),
   sliders: (
     <>
       <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" />
