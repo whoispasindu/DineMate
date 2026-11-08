@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query
 from sqlalchemy import func, select, update
 
 from app import models
+from app.business.service import update_tables
 from app.core.auth import StaffUser, can_manage_canteen, forbidden_scope
 from app.core.deps import NowDep, SessionDep
 from app.core.device_auth import DeviceDep, RealNowDep
@@ -116,6 +117,9 @@ def post_seats(
                 current.state, current.since = seat.state, started
         current.free_soon = seat.free_soon
         current.updated_at = captured_at
+    if models.is_venue_id(device.canteen_id):
+        touched = zone_uuids | {uuid.UUID(z.zone_id) for z in payload.zones}
+        update_tables(session, touched, captured_at, simulated)
     device.last_heartbeat_at = now
     session.commit()
     return SeatsAccepted(

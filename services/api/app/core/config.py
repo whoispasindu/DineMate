@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     simulator_token: str = "dev-simulator-token"
     safety_simulator_token: str = "dev-safety-sim-token"
     simulator_devices: list[str] = ["sim-a", "sim-b", "sim-c"]
+    cafe_simulator_device: str = "sim-cafe"
+    cafe_simulator_interval_s: float = 5.0
+    cafe_timezone: str = "Asia/Colombo"
     rules_interval_s: float = 15.0
     jwt_secret: str = DEV_JWT_SECRET
     access_token_minutes: int = 15

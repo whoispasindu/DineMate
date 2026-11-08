@@ -874,6 +874,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/business/venues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Venues */
+        get: operations["list_venues_api_v1_business_venues_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/floor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Floor */
+        get: operations["get_floor_api_v1_business_venues__venue_id__floor_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Customers */
+        get: operations["get_customers_api_v1_business_venues__venue_id__customers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Report */
+        get: operations["get_report_api_v1_business_venues__venue_id__reports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/cameras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Cameras */
+        get: operations["get_cameras_api_v1_business_venues__venue_id__cameras_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/tables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tables */
+        get: operations["get_tables_api_v1_business_venues__venue_id__tables_get"];
+        /** Put Tables */
+        put: operations["put_tables_api_v1_business_venues__venue_id__tables_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/tables/{table_id}/cleared": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Cleared */
+        post: operations["mark_cleared_api_v1_business_tables__table_id__cleared_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings View */
+        get: operations["get_settings_view_api_v1_business_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Patch Settings */
+        patch: operations["patch_settings_api_v1_business_settings_patch"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -915,6 +1053,20 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** BusinessSettings */
+        BusinessSettings: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Organization Name */
+            organization_name: string;
+            /** Retention Days */
+            retention_days: number;
+        };
         /** BusyPoint */
         BusyPoint: {
             /** Label */
@@ -934,6 +1086,27 @@ export interface components {
             canteen_name: string;
             /** Points */
             points: components["schemas"]["BusyPoint"][];
+        };
+        /** CameraHealth */
+        CameraHealth: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "camera" | "simulator";
+            /** Zones */
+            zones: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "not_reporting" | "offline";
+            /** Fps */
+            fps: number | null;
+            /** Last Seen At */
+            last_seen_at: string | null;
         };
         /** CanteenDetail */
         CanteenDetail: {
@@ -1124,6 +1297,53 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
         };
+        /** CustomerDay */
+        CustomerDay: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Is Sample */
+            is_sample: boolean;
+            /** Visits */
+            visits: number;
+            /** Visits Last Week */
+            visits_last_week: number;
+            /** Guests */
+            guests: number;
+            /** Avg Stay Min */
+            avg_stay_min: number | null;
+            /** Median Stay Min */
+            median_stay_min: number | null;
+            /** Turns Per Table */
+            turns_per_table: number;
+            /** By Hour */
+            by_hour: components["schemas"]["HourCount"][];
+            /** By Table */
+            by_table: components["schemas"]["TableStay"][];
+        };
+        /** DayTotal */
+        DayTotal: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Visits */
+            visits: number;
+            /** Guests */
+            guests: number;
+            /** Avg Stay Min */
+            avg_stay_min: number | null;
+        };
         /** DeviceConfig */
         DeviceConfig: {
             /**
@@ -1265,6 +1485,61 @@ export interface components {
              */
             reason: "no_live_data" | "too_crowded";
         };
+        /** FloorTable */
+        FloorTable: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Zone Id */
+            zone_id: string;
+            /** Zone Name */
+            zone_name: string;
+            /**
+             * Shape
+             * @enum {string}
+             */
+            shape: "round" | "rect";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** W */
+            w: number;
+            /** H */
+            h: number;
+            /** Seats */
+            seats: number;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "free" | "occupied" | "held" | "needs_clearing" | "unknown";
+            /** Party Size */
+            party_size: number;
+            /** Since */
+            since: string | null;
+            /** Seated Min */
+            seated_min: number | null;
+            /** Plates Left */
+            plates_left: boolean;
+            estimate: components["schemas"]["LeaveEstimate"] | null;
+        };
+        /** FloorTotals */
+        FloorTotals: {
+            /** Tables */
+            tables: number;
+            /** Free */
+            free: number;
+            /** Guests Seated */
+            guests_seated: number;
+            /** Visits Today */
+            visits_today: number;
+            /** Avg Stay Today Min */
+            avg_stay_today_min: number | null;
+            /** Turns Today */
+            turns_today: number;
+        };
         /** ForecastPoint */
         ForecastPoint: {
             /**
@@ -1333,6 +1608,15 @@ export interface components {
             /** Message */
             message?: string | null;
         };
+        /** HeatCell */
+        HeatCell: {
+            /** Weekday */
+            weekday: number;
+            /** Hour */
+            hour: number;
+            /** Visits */
+            visits: number;
+        };
         /** HistoryPointOut */
         HistoryPointOut: {
             /**
@@ -1348,6 +1632,13 @@ export interface components {
             high: number;
             /** Samples */
             samples: number;
+        };
+        /** HourCount */
+        HourCount: {
+            /** Hour */
+            hour: number;
+            /** Visits */
+            visits: number;
         };
         /** HoursException */
         "HoursException-Input": {
@@ -1458,6 +1749,22 @@ export interface components {
             /** Seating Zones */
             seating_zones: number;
         };
+        /** LayoutZoneSeats */
+        LayoutZoneSeats: {
+            /** Zone Id */
+            zone_id: string;
+            /** Name */
+            name: string;
+            /** Seats */
+            seats: components["schemas"]["SeatPoint"][];
+        };
+        /** LeaveEstimate */
+        LeaveEstimate: {
+            /** Low Min */
+            low_min: number;
+            /** High Min */
+            high_min: number;
+        };
         /** LoginIn */
         LoginIn: {
             /** Email */
@@ -1523,7 +1830,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer";
+            role: "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer" | "owner" | "venue_manager";
             /** Canteen Ids */
             canteen_ids: string[];
             /** Shop Ids */
@@ -2052,6 +2359,15 @@ export interface components {
             /** Items */
             items: components["schemas"]["CanteenSeatTotals"][];
         };
+        /** SeatPoint */
+        SeatPoint: {
+            /** Seat Id */
+            seat_id: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
         /** SeatSnapshotIn */
         SeatSnapshotIn: {
             /**
@@ -2092,6 +2408,11 @@ export interface components {
             /** Expires In */
             expires_in: number;
             user: components["schemas"]["Me"];
+        };
+        /** SettingsIn */
+        SettingsIn: {
+            /** Retention Days */
+            retention_days: number;
         };
         /** Shop */
         Shop: {
@@ -2429,6 +2750,87 @@ export interface components {
             busy_today: components["schemas"]["BusyToday"] | null;
             safety: components["schemas"]["SafetyStatus"];
         };
+        /** TableIn */
+        TableIn: {
+            /** Id */
+            id?: string | null;
+            /** Name */
+            name: string;
+            /** Zone Id */
+            zone_id: string;
+            /**
+             * Shape
+             * @default rect
+             * @enum {string}
+             */
+            shape: "round" | "rect";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** W */
+            w: number;
+            /** H */
+            h: number;
+            /** Seat Ids */
+            seat_ids: string[];
+        };
+        /** TableLayout */
+        TableLayout: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Zones */
+            zones: components["schemas"]["LayoutZoneSeats"][];
+            /** Tables */
+            tables: components["schemas"]["TableOut"][];
+        };
+        /** TableOut */
+        TableOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Zone Id */
+            zone_id: string;
+            /**
+             * Shape
+             * @enum {string}
+             */
+            shape: "round" | "rect";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** W */
+            w: number;
+            /** H */
+            h: number;
+            /** Seat Ids */
+            seat_ids: string[];
+        };
+        /** TableStay */
+        TableStay: {
+            /** Table Id */
+            table_id: string;
+            /** Name */
+            name: string;
+            /** Seats */
+            seats: number;
+            /** Avg Stay Min */
+            avg_stay_min: number | null;
+            /** Turns */
+            turns: number;
+        };
+        /** TablesIn */
+        TablesIn: {
+            /** Tables */
+            tables: components["schemas"]["TableIn"][];
+        };
         /** ThresholdList */
         ThresholdList: {
             /**
@@ -2479,6 +2881,92 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VenueCameras */
+        VenueCameras: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Items */
+            items: components["schemas"]["CameraHealth"][];
+        };
+        /** VenueFloor */
+        VenueFloor: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Venue Name */
+            venue_name: string;
+            /** Is Sample */
+            is_sample: boolean;
+            /** Updated At */
+            updated_at: string | null;
+            totals: components["schemas"]["FloorTotals"];
+            /** Tables */
+            tables: components["schemas"]["FloorTable"][];
+        };
+        /** VenueList */
+        VenueList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["VenueSummary"][];
+        };
+        /** VenueReport */
+        VenueReport: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /**
+             * Range
+             * @enum {string}
+             */
+            range: "day" | "week";
+            /** Is Sample */
+            is_sample: boolean;
+            /** Days */
+            days: components["schemas"]["DayTotal"][];
+            /** Heat */
+            heat: components["schemas"]["HeatCell"][];
+            /** Heat Days */
+            heat_days: number;
+        };
+        /** VenueSummary */
+        VenueSummary: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Organization Name */
+            organization_name: string;
+            /** Is Sample */
+            is_sample: boolean;
+            /** Zones */
+            zones: components["schemas"]["VenueZone"][];
+            /** Tables */
+            tables: number;
+        };
+        /** VenueZone */
+        VenueZone: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** WalkTime */
         WalkTime: {
@@ -5562,6 +6050,612 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_venues_api_v1_business_venues_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_floor_api_v1_business_venues__venue_id__floor_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueFloor"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_customers_api_v1_business_venues__venue_id__customers_get: {
+        parameters: {
+            query?: {
+                day?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerDay"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_report_api_v1_business_venues__venue_id__reports_get: {
+        parameters: {
+            query?: {
+                range?: "day" | "week";
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueReport"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_cameras_api_v1_business_venues__venue_id__cameras_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueCameras"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_tables_api_v1_business_venues__venue_id__tables_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TableLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    put_tables_api_v1_business_venues__venue_id__tables_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TablesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TableLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    mark_cleared_api_v1_business_tables__table_id__cleared_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                table_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FloorTable"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_settings_view_api_v1_business_settings_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessSettings"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    patch_settings_api_v1_business_settings_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessSettings"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

@@ -64,6 +64,8 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_users_organization_id"), table_name="users")
     op.drop_constraint(op.f("fk_users_organization_id_organizations"), "users", type_="foreignkey")
     op.drop_column("users", "organization_id")
+    op.execute("DELETE FROM occupancy_readings WHERE device_id IN (SELECT id FROM devices WHERE canteen_id LIKE 'v-%')")
+    op.execute("DELETE FROM devices WHERE canteen_id LIKE 'v-%'")
     op.execute("DELETE FROM canteens WHERE kind = 'venue'")
     op.drop_constraint(op.f("ck_canteens_venue_id_prefix"), "canteens", type_="check")
     op.drop_constraint(op.f("ck_canteens_kind"), "canteens", type_="check")

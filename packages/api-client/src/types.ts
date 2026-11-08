@@ -246,7 +246,9 @@ export interface ConsoleOverview extends Timestamped {
   };
 }
 
-export type StaffRole = "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer";
+export type StaffRole = "shop_manager" | "canteen_manager" | "campus_admin" | "safety_officer" | "owner" | "venue_manager";
+
+export const BUSINESS_ROLES: readonly StaffRole[] = ["owner", "venue_manager"];
 
 export interface StaffUser {
   id: string;
