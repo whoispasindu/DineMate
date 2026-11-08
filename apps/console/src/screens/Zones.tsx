@@ -558,7 +558,7 @@ export function ZonesScreen() {
       {layout.data ? (
         <LayoutEditor key={layout.data.device_id} layout={layout.data} />
       ) : layout.isPending && deviceId ? (
-        <div aria-busy="true" className="aspect-video w-full rounded-2xl border border-line bg-card" />
+        <div aria-busy="true" className="aspect-video w-full rounded-[20px] bg-line-soft motion-safe:animate-pulse" />
       ) : null}
     </Page>
   );

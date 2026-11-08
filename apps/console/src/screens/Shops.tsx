@@ -338,7 +338,7 @@ function EditorView({ shopId, onDirty }: { shopId: string; onDirty: (dirty: bool
   return (
     <>
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="m-0 text-xl font-extrabold">{data.shop.name}</h2>
+        <h2 className="m-0 text-[22px] font-semibold">{data.shop.name}</h2>
         <StatePill state={data.shop.status.state} />
         <span className="text-sm text-muted">{data.shop.canteen_name}</span>
       </div>

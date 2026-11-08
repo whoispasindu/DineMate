@@ -80,7 +80,7 @@ function EventCard({ event, now }: { event: StaffSafetyEvent; now: number }) {
     <div className="flex flex-col gap-2.5">
       {event.is_simulation ? <SimulationLabel /> : null}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-lg font-extrabold">{event.title}</span>
+        <span className="text-lg font-bold">{event.title}</span>
         <Chip className={SEVERITY_STYLE[event.severity]}>{event.severity}</Chip>
         <Chip className={event.status === "active" ? "bg-crowd-mark text-white" : "bg-neutral text-neutral-ink"}>
           {STATUS_LABEL[event.status]}

@@ -20,6 +20,7 @@ import {
   Icon,
   levelFor,
   SeatStrip,
+  StatusPill,
 } from "@dinemate/ui";
 import { Link } from "react-router";
 import { useMemo } from "react";
@@ -92,7 +93,6 @@ function seatsLabel(c: Pick<CanteenSummary, "name" | "free_about" | "free_range"
 
 export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: number }) {
   const held = useHeldSeats(canteen.id);
-  const style = levelFor(canteen.level, canteen.freshness);
   const stale = canteen.freshness === "stale";
   return (
     <Link to={`/canteens/${canteen.id}`} className="flex items-center gap-3.5 py-3.5 text-ink no-underline hover:opacity-90">
@@ -108,10 +108,10 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <span className="text-base font-bold">{canteen.name}</span>
         <Strip counts={canteenStrip(canteen, held)} height={5} stale={stale} />
-        <span className="truncate text-[13px] font-semibold">
-          <span className={style.word}>{style.label}</span>
-          <span className="font-medium text-faint"> · {rowNote(canteen, held, now)}</span>
-        </span>
+        <div className="flex min-w-0 items-center gap-2">
+          <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" />
+          <span className="truncate text-[13px] text-faint">{rowNote(canteen, held, now)}</span>
+        </div>
       </div>
       <div aria-hidden="true" className={cx("w-[78px] shrink-0 whitespace-nowrap text-right", stale && "opacity-60")}>
         <BigNumber value={freeAbout(canteen)} className="text-[30px]" />
@@ -123,7 +123,6 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
 
 export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: number }) {
   const held = useHeldSeats(canteen.id);
-  const style = levelFor(canteen.level, canteen.freshness);
   const stale = canteen.freshness === "stale";
   return (
     <Link
@@ -142,7 +141,7 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-1">
             <span className="text-lg font-bold">{canteen.name}</span>
-            <span className={cx("text-[13px] font-semibold", style.word)}>{style.label}</span>
+            <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" className="self-start" />
           </div>
           <div aria-hidden="true" className={cx("whitespace-nowrap text-right", stale && "opacity-60")}>
             <BigNumber value={freeAbout(canteen)} className="text-[34px]" />
@@ -393,7 +392,7 @@ export function SeatLegend({ counts, free }: { counts: StripCounts | null; free:
       </span>
       {counts.held ? (
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-1.5 w-3 rounded-full bg-held" />
+          <span className="held-stripes h-1.5 w-3 rounded-full" />
           {counts.held} held by bags
         </span>
       ) : null}

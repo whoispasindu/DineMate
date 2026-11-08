@@ -1,14 +1,40 @@
+import { useStudentSummary } from "@dinemate/api-client";
 import { APP_NAME, BrandMark, Icon, TableScene, welcomePhoto, type IconName } from "@dinemate/ui";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { isStandalone, useInstall } from "../lib/device";
 import { welcomeSeen } from "../lib/prefs";
+import { hasNumbers } from "../lib/present";
 
 const FEATURES: { icon: IconName; label: string }[] = [
   { icon: "seat", label: "Live seats" },
   { icon: "utensils", label: "Menus" },
   { icon: "clock", label: "Meal times" },
 ];
+
+function LiveTeaser() {
+  const summary = useStudentSummary();
+  const data = summary.data;
+  const best = data?.canteens.find((c) => c.id === data.best?.canteen_id);
+  if (best && hasNumbers(best) && best.freshness === "live") {
+    return (
+      <span className="flex flex-col gap-0.5">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-ink">
+          <span className="h-1.5 w-1.5 rounded-full bg-purple" />
+          Live now{best.is_sample ? " · sample" : ""}
+        </span>
+        <span className="font-display text-lg font-extrabold leading-tight">~{best.free_about} free</span>
+        <span className="text-xs text-muted">{best.name}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="flex flex-col gap-0.5">
+      <span className="text-xs font-semibold text-muted">For every canteen</span>
+      <span className="font-display text-lg font-extrabold leading-tight">Seats, menus, meal times</span>
+    </span>
+  );
+}
 
 export function WelcomeScreen() {
   const navigate = useNavigate();
@@ -48,13 +74,7 @@ export function WelcomeScreen() {
           </div>
           <div className="edge-sand absolute -bottom-7 left-5 flex items-center gap-2.5 rounded-[18px] bg-sand py-2 pl-2.5 pr-4 text-brand">
             <TableScene width={56} />
-            <span className="flex flex-col gap-0.5">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-ink">
-                <span className="h-1.5 w-1.5 rounded-full bg-purple" />
-                Live estimates
-              </span>
-              <span className="font-display text-lg font-extrabold leading-tight">Every canteen</span>
-            </span>
+            <LiveTeaser />
           </div>
         </div>
         <div className="mt-12 flex flex-1 flex-col gap-3.5">

@@ -83,7 +83,7 @@ function ZoneRow({ zone, first }: { zone: ZoneSeats; first: boolean }) {
 
 const LEGEND: { swatch: string; label: string }[] = [
   { swatch: "bg-brand", label: "Taken" },
-  { swatch: "bg-held", label: "Held by bags" },
+  { swatch: "held-stripes", label: "Held by bags" },
   { swatch: "bg-hidden", label: "Hidden" },
   { swatch: "bg-card shadow-[inset_0_0_0_1.5px_var(--color-brand)]", label: "Free" },
 ];

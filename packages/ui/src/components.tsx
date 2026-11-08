@@ -200,7 +200,7 @@ export function SeatStrip({ total, taken, held = 0, hidden = 0, dark, height = 8
   const free = Math.max(total - taken - held - hidden, 0);
   const parts: { n: number; className: string; free?: boolean }[] = [
     { n: taken, className: dark ? "bg-sand" : "bg-brand" },
-    { n: held, className: "bg-held" },
+    { n: held, className: "held-stripes" },
     { n: hidden, className: dark ? "bg-sand/35" : "bg-hidden" },
     {
       n: free,

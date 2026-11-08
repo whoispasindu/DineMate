@@ -94,7 +94,7 @@ export function HoursPanel({ editor, onDirty }: { editor: ShopEditor; onDirty: (
         })}
       </div>
 
-      <h3 className="m-0 mt-2 text-sm font-extrabold">Exceptions (holidays and special hours)</h3>
+      <h3 className="m-0 mt-2 font-display text-base font-semibold">Exceptions (holidays and special hours)</h3>
       {draft.exceptions.length === 0 ? <span className="text-sm text-muted">No exceptions.</span> : null}
       {draft.exceptions.map((e, i) => (
         <div key={i} className="flex flex-wrap items-center gap-2.5">

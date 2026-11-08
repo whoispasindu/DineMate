@@ -4,9 +4,9 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --color-page: #f3ecdd;
-  --color-card: #fbf7ee;
+  --color-card: #fffcf6;
   --color-line: #e2d6bd;
-  --color-line-soft: #ebe2cf;
+  --color-line-soft: #ede5d4;
   --color-ink: #1f3d2b;
   --color-ink-2: #2f4a38;
   --color-muted: #57534a;
@@ -16,7 +16,7 @@
   --color-brand-dark: #10241a;
   --color-brand-mid: #2e5743;
   --color-mint: #e8dcc4;
-  --color-mint-soft: #efe6d3;
+  --color-mint-soft: #e8dcc4;
   --color-mint-line: #cdbb95;
   --color-mint-art: #e8dcc4;
 
@@ -31,13 +31,13 @@
   --color-held: #c3a874;
   --color-hidden: #cfc5b0;
 
-  --color-chip: #e4ddcc;
-  --color-neutral: #ece5d5;
+  --color-chip: #e8dcc4;
+  --color-neutral: #e8dcc4;
   --color-neutral-ink: #57534a;
   --color-dash: #a69e89;
   --color-dash-soft: #cfc5b0;
-  --color-track: #e4d9c3;
-  --color-surface-soft: #f7f1e4;
+  --color-track: #e8dcc4;
+  --color-surface-soft: #f3ecdd;
 
   --color-on-dark: #e8dcc4;
   --color-on-dark-strong: #f3ecdd;
@@ -71,7 +71,7 @@
   --color-danger-meta: #5a4535;
 
   --color-forecast: #c9b98f;
-  --color-forecast-soft: #f3ecdd;
+  --color-forecast-soft: #fffcf6;
 }
 
 @utility hazard-stripes {

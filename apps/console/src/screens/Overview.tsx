@@ -123,7 +123,7 @@ function MealChip({ now }: { now: number }) {
   const focus = data.current ?? data.next;
   if (!focus) return null;
   return (
-    <span className="inline-flex min-h-10 items-center gap-2 rounded-[10px] bg-side px-3.5 text-[13px] font-semibold text-white">
+    <span className="inline-flex min-h-10 items-center gap-2 rounded-[10px] bg-brand px-3.5 text-[13px] font-semibold text-sand">
       <span className="h-2 w-2 rounded-full bg-sand" />
       {PERIOD_LABEL[focus.period]} · {data.current ? "ends" : "starts"} in{" "}
       <span className="tabular font-mono">{formatCountdown(Math.max(0, remaining))}</span>
@@ -135,7 +135,7 @@ function ZoneTable({ zones, now }: { zones: ConsoleZone[]; now: number }) {
   return (
     <Card labelledBy="occ-title" className="flex-[2_1_620px] gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="occ-title" className="m-0 text-[17px] font-extrabold">
+        <h2 id="occ-title" className="m-0 text-[22px] font-semibold">
           Live occupancy by zone
         </h2>
         <span className="text-xs text-muted">Estimates · ranges are 80% intervals</span>
@@ -228,7 +228,7 @@ function AlertItem({ alert, now }: { alert: StaffAlert; now: number }) {
               type="button"
               disabled={acknowledge.isPending}
               onClick={() => acknowledge.mutate(alert.id)}
-              className="min-h-9 rounded-lg border-0 bg-brand px-3 text-[13px] font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+              className="edge-forest min-h-9 rounded-lg border-0 bg-brand px-3 text-[13px] font-bold text-sand hover:bg-brand-mid disabled:opacity-60"
             >
               {acknowledge.isPending ? "Saving…" : "Acknowledge"}
             </button>
@@ -267,7 +267,7 @@ function AlertQueue({ alerts, now }: { alerts: StaffAlert[]; now: number }) {
   return (
     <Card labelledBy="alerts-title" className="flex-[1_1_320px] gap-3">
       <div className="flex items-center justify-between">
-        <h2 id="alerts-title" className="m-0 text-[17px] font-extrabold">
+        <h2 id="alerts-title" className="m-0 text-[22px] font-semibold">
           Alert queue
         </h2>
         <Link to="/alerts" className="text-[13px] font-semibold text-brand no-underline hover:text-brand-dark">
@@ -299,7 +299,7 @@ function OccupancyChart({ title, points, now }: { title: string; points: Occupan
     <Card labelledBy="chart-title" className="flex-[2_1_620px] gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <h2 id="chart-title" className="m-0 text-[17px] font-extrabold">
+          <h2 id="chart-title" className="m-0 text-[22px] font-semibold">
             {title}
           </h2>
           <span className="text-xs text-muted">10-minute averages, % of monitored seats</span>
@@ -361,7 +361,7 @@ function SafetyCard({ safety, now }: { safety: ConsoleOverview["safety"]; now: n
   return (
     <Card labelledBy="safety-title" className="gap-2.5">
       <div className="flex items-center justify-between">
-        <h2 id="safety-title" className="m-0 inline-flex items-center gap-2 text-[17px] font-extrabold">
+        <h2 id="safety-title" className="m-0 inline-flex items-center gap-2 text-[22px] font-semibold">
           <Icon name="shield" size={18} />
           Safety
         </h2>
@@ -412,7 +412,7 @@ function deviceMeta(d: DeviceHealth, now: number): string {
 function DeviceList({ devices, now }: { devices: DeviceHealth[]; now: number }) {
   return (
     <Card labelledBy="dev-title" className="gap-1">
-      <h2 id="dev-title" className="m-0 mb-1.5 text-[17px] font-extrabold">
+      <h2 id="dev-title" className="m-0 mb-1.5 text-[22px] font-semibold">
         Device health
       </h2>
       <ul className="m-0 flex list-none flex-col p-0">
@@ -455,7 +455,7 @@ function SafetyEventBanner({ safety }: { safety: ConsoleOverview["safety"] }) {
           >
             <div className="flex flex-col gap-1.5">
               {e.is_simulation ? <SimulationLabel /> : null}
-              <span className="inline-flex items-center gap-2 text-[17px] font-extrabold text-danger-ink">
+              <span className="inline-flex items-center gap-2 text-[22px] font-semibold text-danger-ink">
                 <Icon name="flame" size={20} />
                 {e.title}
                 {e.canteen_name ? ` · ${e.canteen_name}` : ""}
@@ -488,7 +488,7 @@ export function OverviewScreen() {
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
-            <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.02em]">Overview</h1>
+            <h1 className="m-0 font-display text-[40px] font-extrabold leading-none tracking-[-0.04em]">Overview</h1>
             {data?.is_sample ? <SampleBadge /> : null}
           </div>
           <span className="text-sm text-muted">
