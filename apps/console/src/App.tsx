@@ -7,6 +7,7 @@ import { OccupancyScreen } from "./screens/Occupancy";
 import { PlannedScreen } from "./screens/Planned";
 import { SafetyScreen } from "./screens/Safety";
 import { SchedulesScreen } from "./screens/Schedules";
+import { SeatsScreen } from "./screens/Seats";
 import { ShopsScreen } from "./screens/Shops";
 import { SignInScreen } from "./screens/SignIn";
 import { ThresholdsScreen } from "./screens/Thresholds";
@@ -19,6 +20,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/config": ThresholdsScreen,
   "/safety": SafetyScreen,
   "/occupancy": OccupancyScreen,
+  "/seats": SeatsScreen,
 };
 
 function Home({ user }: { user: StaffUser }) {

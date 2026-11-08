@@ -1,4 +1,4 @@
-from vision.metrics import Sample, level_for, summarize, table
+from vision.metrics import Sample, SeatSample, confusion, level_for, seat_table, summarize, summarize_seats, table
 
 
 def sample(truth: int, estimate: int, low: int, high: int, capacity: int = 20) -> Sample:
@@ -25,3 +25,24 @@ def test_empty_summary_and_table() -> None:
     assert summarize("none", []).samples == 0
     text = table([summarize("lunch", [sample(10, 12, 9, 15)])])
     assert "lunch" in text and "2.00" in text and "+2.00" in text
+
+
+def seat(truth: str, estimate: str) -> SeatSample:
+    return SeatSample("clip.mp4", 10.0, "seat-1", truth, estimate)
+
+
+def test_seat_summary_counts_false_free_and_per_state() -> None:
+    samples = [
+        seat("free", "free"),
+        seat("occupied", "occupied"),
+        seat("held", "free"),
+        seat("held", "held"),
+        seat("occupied", "unknown"),
+    ]
+    summary = summarize_seats("clip", samples)
+    assert summary.accuracy == 3 / 5
+    assert summary.false_free == 1 / 5
+    assert summary.hidden == 1 / 5
+    assert summary.per_state == {"free": 1.0, "occupied": 0.5, "held": 0.5}
+    assert "false free" in seat_table([summary])
+    assert confusion(samples).splitlines()[3].split() == ["held", "1", "0", "1", "0"]

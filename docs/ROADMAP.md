@@ -1,6 +1,6 @@
 # DineMate — Solo Roadmap
 
-One developer, seven phases, Week 0 → 10 Jan 2027. This replaces the four-person allocation in Section 21 of the [development plan](DineMate_Development_Plan.md); everything else in the plan still applies.
+One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–8 from the judges' feedback. This replaces the four-person allocation in Section 21 of the [development plan](DineMate_Development_Plan.md); everything else in the plan still applies.
 
 **How to work through it**
 
@@ -18,6 +18,8 @@ One developer, seven phases, Week 0 → 10 Jan 2027. This replaces the four-pers
 | 4. Staff tools             | 6–7   | 7 – 20 Dec      | Login, shop manager, schedules, zone editor             |
 | 5. Safety module           | 8     | 21 – 27 Dec     | Labelled safety simulation end to end                   |
 | 6. Forecast, polish & demo | 9–10  | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed            |
+| 7. Seat-level occupancy    | TBD   | after judging   | Every seat is free, occupied, held or unknown           |
+| 8. Business demo           | TBD   | after Phase 7   | Same software shown on a sample restaurant              |
 
 ---
 
@@ -153,6 +155,58 @@ Notes from Phase 6:
 - On simulated history the blend matches the historical average (α ≈ 0) with about 75% coverage of the 80% band. That only shows the pipeline works.
 - The console Occupancy page charts zone history (4 h, 24 h, 7 days).
 - A database seeded with the demo clock and later run on real time keeps future-dated readings, which hide live ones. Reset with `pnpm stack:down`, `docker volume rm dinemate_db-data` and `pnpm stack:up`, or keep using the demo clock.
+
+## Phase 7 — Seat-level occupancy (after judging)
+
+Judges asked (5 Nov 2026) how we tell sitting from standing, what happens when bags hold chairs, how short visits are handled, what happens when students leave bags while buying food, and how a big crowd around tables is counted. The answer to all five is to track each seat, not just people per zone. Plan 7.4 already says held seats are reported separately and never counted as occupied.
+
+Every seat has one state:
+
+| State    | Meaning                                                            | Shown to students as |
+| -------- | ------------------------------------------------------------------ | -------------------- |
+| free     | Empty chair seen clearly for 30 s, nothing on it or in front of it | free                 |
+| occupied | A seated person stayed for the dwell time                          | taken                |
+| held     | Belongings on or in front of the seat, nobody sitting              | held by bags         |
+| unknown  | The seat is hidden (crowd, standing people, poor view)             | not counted as free  |
+
+- [x] Seat map: the zone tool and studio (**T**) and the console Zones page (**Place seats**) put one point per chair inside a seating zone; seats are saved inside each seating polygon of the layout version (no migration needed), validated (inside the polygon, unique ids) and sent in the device config; a zone's capacity becomes its seat count when seats exist
+- [ ] Detector: people with pose keypoints (YOLO11n-pose, `--pose-model`) every frame; belongings and table items (backpack, handbag, suitcase, laptop, book, cup, bowl, bottle, cutlery, food) every 5 s; zones without seats keep zone-only counting. **You:** measure fps on the laptop CPU with a real clip
+- [x] Seated check (pure module, unit tests): knee angle when legs are visible, the existing height calibration when they are not, close to a seat point, and still for the dwell time → seated, standing or unsure
+- [x] Seat state machine (pure module like `crowding.py`, unit tests): free, occupied, held and unknown with a held timer; a hidden seat keeps its last state for a while, so a passing crowd never creates a free seat; plates left with nobody there mark the seat "free soon"
+- [x] Crowd mode: many standing people or 40% of seats hidden → the zone says "Crowded, few or no seats"; hidden seats count as taken, so the range never promises seats we can't see
+- [x] API: `POST /devices/{id}/seats` (seat snapshot), `seat_states` (current state) and `seat_sessions` (start and end of each seat state, no identities) tables; zone summaries gain `held` and `unknown`; new schemas live in their own module, so `schemas.py` stays untouched
+- [x] Student app: "about N free · M held by bags"; crowded zones say so; held and unknown seats are never counted as free
+- [ ] Console: **Seats** page with free/taken/held/hidden per zone, a seat map (one dot per seat, coloured by state), seats held over 15 minutes and typical stay time by hour. Still to do: held limit and crowd settings on the Thresholds page (fixed defaults for now)
+- [x] Stay times: median seat-session length by hour, and "about N seats likely to free up in 10 min" (labelled experimental, like the forecast)
+- [x] Simulator: seat summaries per zone (held seats that rise at peak, hidden seats and standing people when a zone is crowded), so canteens without cameras and the demo keep working
+- [ ] Validation: `vision.validate --seats` compares hand-labelled seat states (CSV: video, t_seconds, seat, state) and reports agreement, the false-free rate and accuracy per state. **You:** record three staged clips with friends who agree to it: a standing chat at a table, bags left while queuing, a crowd around several tables
+- [x] Demo: one scenario per judge question in `docs/DEMO.md`
+
+**Done when:** on the staged clips a standing person is never counted as seated, a bag-only seat shows as held, a seat stays held while its owner queues and turns occupied when they return, a crowd never produces a free seat that isn't free, and seat-state accuracy is measured.
+
+Not in this phase: identifying people, following anyone between cameras, face recognition, recognising which dish someone eats.
+
+Notes from Phase 7:
+
+- Local Python (uv's Python 3.12) is blocked by Windows Application Control on this laptop since 5 Nov, so API and vision tests ran in Docker (`python:3.12-slim`) against the Compose Postgres. The YOLO models themselves were not run here; the pose and object paths are covered by tests with fake detectors.
+- The worker still posts zone readings to `/occupancy` (held and hidden seats count as taken) and adds a seat snapshot to `/seats`. An older API without the seat endpoint just gets zone counts.
+- Seat sessions store a seat id, a state and start/end times only. Nothing identifies a person.
+
+## Phase 8 — Business demo (separate from the campus app)
+
+Goal: show that the same software works for restaurants and food courts. This is a demo on labelled sample data, not a product launch: no billing, no real restaurant brands, nothing added to the student app. It builds on Phase 7's seats.
+
+- [ ] Tables: group seats into tables in the layout; a table is free, occupied, held or needs clearing
+- [ ] Table board (console page behind a demo flag): live tables with party size, time seated and "likely free in about X–Y min"
+- [ ] "Check before you come" page: free tables now and likely free in 15 min for one labelled sample venue
+- [ ] Turn-time report: time at table, table turns per day, busiest hours
+- [ ] Leave-time estimate per table: time seated, party size, time of day and the meal stage seen on the table (food, empty plates, cleared), fitted on the venue's own history (simulated and labelled for the demo)
+- [ ] Counter-service orders: a sample till feed (simulated orders) drives "tables needed in the next 15 min" without linking orders to tables; experiment: a numbered table stand with a printed marker the camera reads, to link an order to a table without tracking people
+- [ ] Venue simulator and a demo script; a one-page "how a restaurant would use it", with pricing left as `[__]` until we talk to venues
+
+**Done when:** a judge can watch tables change state on the board and see a "likely free" estimate and a turn-time report for the sample venue, with every number labelled sample or estimate.
+
+Not in this phase: payments, a real till integration, recognising dishes by camera, following customers from the counter to a table, real brand names.
 
 ---
 

@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 from vision.counting import Assignment, Zone
+from vision.seats import Seat, SeatSettings
 
 FALLBACK_SCREEN = (1600, 900)
 SCREEN_USE = (0.92, 0.82)
@@ -13,8 +14,16 @@ ZONE_COLOR = (69, 160, 31)
 IGNORE_COLOR = (170, 170, 170)
 REASON_COLORS = {
     "counted": (60, 200, 80),
+    "seated": (60, 200, 80),
     "waiting for dwell": (30, 200, 240),
+    "unsure": (30, 200, 240),
     "standing": (230, 140, 60),
+}
+SEAT_COLORS = {
+    "free": (80, 200, 80),
+    "occupied": (60, 60, 230),
+    "held": (0, 170, 255),
+    "unknown": (150, 150, 150),
 }
 OTHER_COLOR = (150, 150, 150)
 
@@ -69,6 +78,8 @@ def draw(
     readings: dict[str, dict[str, Any]],
     status: str,
     limits: tuple[int, int],
+    seat_states: list[tuple[Seat, str]] | None = None,
+    labels: dict[str, str] | None = None,
 ) -> np.ndarray:
     canvas, scale = fit(image, limits)
     height, width = canvas.shape[:2]
@@ -80,6 +91,14 @@ def draw(
         cv2.fillPoly(overlay, [pts], ZONE_COLOR)
         canvas = cv2.addWeighted(overlay, 0.12, canvas, 0.88, 0)
         cv2.polylines(canvas, [pts], True, ZONE_COLOR, 2)
+    radius = max(round(SeatSettings().seat_radius * width), 4)
+    for seat, state in seat_states or []:
+        centre = (round(seat.x * width), round(seat.y * height))
+        color = SEAT_COLORS.get(state, OTHER_COLOR)
+        cv2.circle(canvas, centre, radius, color, 2, cv2.LINE_AA)
+        cv2.putText(
+            canvas, state, (centre[0] - radius, centre[1] + radius + 14), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1
+        )
     for a in assignments:
         d = a.detection
         color = REASON_COLORS.get(a.reason, OTHER_COLOR)
@@ -99,7 +118,7 @@ def draw(
     for zone in zones:
         pts = _pixels(zone.points, width, height)
         x, y = int(pts[:, 0].min()) + 6, int(pts[:, 1].min()) + 22
-        label = zone_label(zone, readings.get(zone.zone_id))
+        label = (labels or {}).get(zone.zone_id) or zone_label(zone, readings.get(zone.zone_id))
         (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.65, 2)
         cv2.rectangle(canvas, (x - 4, y - th - 6), (x + tw + 4, y + 6), (24, 24, 24), -1)
         cv2.putText(canvas, label, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (120, 230, 120), 2, cv2.LINE_AA)

@@ -18,6 +18,7 @@ class Detection:
     x2: float
     y2: float
     confidence: float
+    keypoints: tuple[tuple[float, float, float], ...] | None = None
 
 
 @dataclass(frozen=True)

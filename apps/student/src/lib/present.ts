@@ -1,4 +1,4 @@
-import type { CanteenSummary, MealPeriod, MealWindow, NoticeKind, ZoneOccupancy } from "@dinemate/api-client";
+import type { CanteenSummary, MealPeriod, MealWindow, NoticeKind, ZoneOccupancy, ZoneSeats } from "@dinemate/api-client";
 import { formatClock, formatIn, formatWeekday, type IconName } from "@dinemate/ui";
 
 const CANTEEN_WALLS: Record<string, string> = {
@@ -32,6 +32,15 @@ export function freeShort(o: Occupancy): string {
 
 export function rangeText(o: Occupancy): string {
   return hasNumbers(o) ? `(${o.free_range[0]}–${o.free_range[1]})` : "";
+}
+
+export function seatNote(seats: ZoneSeats | undefined): string | null {
+  if (!seats || seats.freshness === "unavailable" || seats.held === null) return null;
+  if (seats.crowded) return "Crowded, few or no seats";
+  const parts = [seats.held ? `${seats.held} held by bags` : null, seats.unknown ? `${seats.unknown} hidden` : null].filter(
+    (p): p is string => p !== null,
+  );
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 export const PERIOD_LABEL: Record<MealPeriod, string> = {

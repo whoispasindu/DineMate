@@ -16,6 +16,7 @@ from app.routers import (
     manage_shops,
     manage_zones,
     schedules,
+    seats,
     shops,
     student,
 )
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
         manage_shops.router,
         manage_config.router,
         manage_zones.router,
+        seats.router,
         safety.router,
     ):
         app.include_router(router, prefix=API_PREFIX)

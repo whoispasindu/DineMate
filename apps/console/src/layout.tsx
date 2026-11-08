@@ -17,6 +17,7 @@ const MANAGERS: StaffRole[] = ["campus_admin", "canteen_manager"];
 export const NAV: NavItem[] = [
   { to: "/", label: "Overview", icon: "grid", end: true, roles: MANAGERS },
   { to: "/occupancy", label: "Occupancy", icon: "pulse", roles: MANAGERS },
+  { to: "/seats", label: "Seats", icon: "bench", roles: MANAGERS },
   { to: "/alerts", label: "Alerts", icon: "bell", badge: "alerts", roles: MANAGERS },
   { to: "/shops", label: "Shops & menus", icon: "store", roles: [...MANAGERS, "shop_manager"] },
   { to: "/schedules", label: "Meal schedules", icon: "calendar", roles: MANAGERS },

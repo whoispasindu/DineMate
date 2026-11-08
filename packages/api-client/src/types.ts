@@ -380,10 +380,17 @@ export interface ThresholdResult extends Timestamped {
 
 export type PolygonType = "seating" | "queue" | "walkway" | "ignore";
 
+export interface LayoutSeat {
+  seat_id: string;
+  x: number;
+  y: number;
+}
+
 export interface LayoutPolygon {
   type: PolygonType;
   zone_id: string | null;
   points: [number, number][];
+  seats?: LayoutSeat[];
 }
 
 export interface EditableZone {
@@ -527,4 +534,74 @@ export interface RecommendationResult extends Timestamped {
   recommendation: Recommendation | null;
   message: string | null;
   excluded: { canteen_id: string; name: string; reason: "no_live_data" | "too_crowded" }[];
+}
+
+export type SeatStateName = "free" | "occupied" | "held" | "unknown";
+
+export interface ZoneSeats {
+  zone_id: string;
+  name: string;
+  freshness: Freshness;
+  seats: number;
+  free: number | null;
+  occupied: number | null;
+  held: number | null;
+  unknown: number | null;
+  free_soon: number | null;
+  standing: number | null;
+  crowded: boolean;
+  updated_at: string | null;
+}
+
+export interface CanteenSeats extends Timestamped {
+  canteen_id: string;
+  zones: ZoneSeats[];
+  held: number;
+  free_soon: number;
+  crowded_zones: number;
+}
+
+export interface CanteenSeatTotals {
+  canteen_id: string;
+  zones_with_seats: number;
+  held: number;
+  free_soon: number;
+  crowded_zones: number;
+}
+
+export interface SeatOverview extends Timestamped {
+  items: CanteenSeatTotals[];
+}
+
+export interface SeatDetail {
+  seat_id: string;
+  x: number;
+  y: number;
+  state: SeatStateName;
+  since: string | null;
+  free_soon: boolean;
+}
+
+export interface ZoneSeatMap extends Timestamped {
+  zone_id: string;
+  name: string;
+  freshness: Freshness;
+  seats: SeatDetail[];
+}
+
+export interface StayHour {
+  hour: number;
+  median_minutes: number;
+  sessions: number;
+}
+
+export interface StayTimes extends Timestamped {
+  canteen_id: string;
+  days: number;
+  sessions: number;
+  median_minutes: number | null;
+  hours: StayHour[];
+  occupied_now: number;
+  likely_free_10min: number | null;
+  is_experimental: boolean;
 }

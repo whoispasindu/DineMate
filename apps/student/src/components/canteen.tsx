@@ -1,7 +1,17 @@
-import { useRecommendation, type BusyPoint, type CanteenSummary, type Freshness, type ZoneOccupancy } from "@dinemate/api-client";
+import {
+  useCanteenSeats,
+  useRecommendation,
+  useSeatOverview,
+  type BusyPoint,
+  type CanteenSummary,
+  type Freshness,
+  type ZoneOccupancy,
+  type ZoneSeats,
+} from "@dinemate/api-client";
 import { CanteenArt, canteenPhotoFor, cx, emptyArtFor, formatAgo, formatClock, Icon, levelFor, Ring, StatusPill } from "@dinemate/ui";
 import { Link } from "react-router";
-import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText } from "../lib/present";
+import { useMemo } from "react";
+import { canteenInitial, canteenWall, freeShort, hasNumbers, rangeText, seatNote } from "../lib/present";
 
 export function freshnessText(freshness: Freshness, updatedAt: string | null, now: number): string {
   if (updatedAt === null) return "No live data yet";
@@ -11,13 +21,28 @@ export function freshnessText(freshness: Freshness, updatedAt: string | null, no
   return `No live data · last reading ${ago}`;
 }
 
-function metaLine(c: CanteenSummary, now: number): string {
+export function useHeldSeats(canteenId: string): number {
+  const overview = useSeatOverview();
+  return overview.data?.items.find((i) => i.canteen_id === canteenId)?.held ?? 0;
+}
+
+export function useZoneSeats(canteenId: string): Map<string, ZoneSeats> {
+  const seats = useCanteenSeats(canteenId);
+  return useMemo(() => new Map((seats.data?.zones ?? []).map((z) => [z.zone_id, z])), [seats.data]);
+}
+
+function heldText(held: number): string {
+  return held > 0 ? ` · ${held} held` : "";
+}
+
+function metaLine(c: CanteenSummary, now: number, held: number): string {
   if (!hasNumbers(c)) return "No info right now";
-  const base = `${freeShort(c)} ${rangeText(c)} · ${formatAgo(c.updated_at, now)}`;
+  const base = `${freeShort(c)} ${rangeText(c)}${heldText(held)} · ${formatAgo(c.updated_at, now)}`;
   return c.freshness === "stale" ? `${base} — may be out of date` : base;
 }
 
 export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: number }) {
+  const held = useHeldSeats(canteen.id);
   return (
     <Link
       to={`/canteens/${canteen.id}`}
@@ -34,7 +59,7 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-[15px] font-extrabold">{canteen.name}</span>
         <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" className="self-start" />
-        <span className={cx("text-xs text-muted", canteen.freshness === "stale" && "opacity-70")}>{metaLine(canteen, now)}</span>
+        <span className={cx("text-xs text-muted", canteen.freshness === "stale" && "opacity-70")}>{metaLine(canteen, now, held)}</span>
       </div>
       <Ring
         percent={canteen.percent}
@@ -49,6 +74,7 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
 }
 
 export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: number }) {
+  const held = useHeldSeats(canteen.id);
   return (
     <Link
       to={`/canteens/${canteen.id}`}
@@ -80,6 +106,7 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
             {hasNumbers(canteen) ? (
               <>
                 <strong>{freeShort(canteen)}</strong> <span className="text-muted">{rangeText(canteen)}</span>
+                {held > 0 ? <span className="text-muted"> · {held} held by bags</span> : null}
               </>
             ) : (
               "No info right now"
@@ -247,9 +274,10 @@ export function BusyTimesChart({ title, points }: { title: string; points: BusyP
   );
 }
 
-export function ZoneBarRow({ zone, last }: { zone: ZoneOccupancy; last: boolean }) {
+export function ZoneBarRow({ zone, last, seats }: { zone: ZoneOccupancy; last: boolean; seats?: ZoneSeats }) {
   const style = levelFor(zone.level, zone.freshness);
   const numbers = hasNumbers(zone);
+  const note = numbers ? seatNote(seats) : null;
   return (
     <li className={cx("flex items-center gap-3 py-3", !last && "border-b border-line-soft")}>
       <div className="flex flex-1 flex-col gap-1.5">
@@ -273,14 +301,16 @@ export function ZoneBarRow({ zone, last }: { zone: ZoneOccupancy; last: boolean 
             />
           ) : null}
         </div>
+        {note ? <span className="text-xs font-semibold text-ink-2">{note}</span> : null}
       </div>
       <span className="w-10 text-right text-sm font-extrabold">{numbers ? `${zone.percent}%` : "—"}</span>
     </li>
   );
 }
 
-export function ZoneCard({ zone, now }: { zone: ZoneOccupancy; now: number }) {
+export function ZoneCard({ zone, now, seats }: { zone: ZoneOccupancy; now: number; seats?: ZoneSeats }) {
   const numbers = hasNumbers(zone);
+  const note = numbers ? seatNote(seats) : null;
   return (
     <div
       className={cx(
@@ -299,6 +329,7 @@ export function ZoneCard({ zone, now }: { zone: ZoneOccupancy; now: number }) {
               ? `${zone.capacity} seats · sensor offline since ${formatClock(zone.updated_at)}`
               : `${zone.capacity} seats · not monitored yet`}
         </span>
+        {note ? <span className="text-[13px] font-semibold text-ink-2">{note}</span> : null}
       </div>
     </div>
   );

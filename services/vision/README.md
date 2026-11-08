@@ -2,7 +2,7 @@
 
 Counts seated people per seating zone from a webcam or a video file and posts **counts only** to the API. Frames stay in memory and are never written to disk; the optional preview window is local and saves nothing.
 
-Pipeline (plan Section 7.3): YOLO11n person detection → ByteTrack IDs → torso point inside a zone polygon → walkway/queue areas dropped → optional seated filter → dwell (default 20 s) → 60 s median → uncertainty band → `POST /devices/{id}/occupancy` every 15 s, heartbeat every 30 s, layout re-read every 30 s.
+With seats placed, the worker tracks each seat instead (see Seats below). Without seats, the pipeline (plan Section 7.3) is: YOLO11n person detection → ByteTrack IDs → torso point inside a zone polygon → walkway/queue areas dropped → optional seated filter → dwell (default 20 s) → 60 s median → uncertainty band → `POST /devices/{id}/occupancy` every 15 s, heartbeat every 30 s, layout re-read every 30 s.
 
 ## Webcam demo (about 10 minutes)
 
@@ -66,6 +66,32 @@ uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout lay
 
 Boxes in the studio and in `--preview`: green = counted, yellow = waiting for the dwell, grey = outside zones or in a walkway. Both windows scale to fit the screen.
 
+## Seats (Phase 7)
+
+A zone can also hold **seats**: one point per chair. With seats, the worker tracks every seat instead of counting people in the zone, so it can tell sitting from standing and a bag from a person.
+
+| State    | Meaning                                                            |
+| -------- | ------------------------------------------------------------------ |
+| free     | Empty chair seen clearly for 30 s, nothing on it or in front of it |
+| occupied | A seated person stayed for the dwell time (shown as "taken")       |
+| held     | Belongings on or in front of the seat, nobody sitting              |
+| unknown  | The seat is hidden (crowd, standing people, poor view)             |
+
+Only free seats are ever counted as free. Held and hidden seats count as taken in the zone reading, so the student app never shows a seat it can't see.
+
+**Placing seats.** In the zone tool or the studio, draw the seating zones as before, then press **T** and click each chair where a seated person's hips would be. **U** removes the last seat, **T** finishes. A zone's capacity becomes its seat count. The console's Zones page has the same thing: select a seating shape and press **Place seats**.
+
+**How a seat is decided** (`vision/posture.py`, `vision/seats.py`, both unit-tested without YOLO):
+
+- People come from the pose model (`--pose-model`, default `models/yolo11n-pose.pt`, downloaded on first use). Bent knees mean sitting, straight legs mean standing, and hips well above the seat point mean standing. When legs are hidden the height calibration is used; conflicting signals are "unsure".
+- Belongings and table items (backpack, handbag, suitcase, laptop, book, cup, bowl, bottle, cutlery, food) come from the normal model every `objects_every_s` (5 s).
+- A person who leaves a bag behind turns the seat **held** straight away; it turns **occupied** again within 3 s when they come back. A bag on an empty seat holds it after 20 s.
+- A seat hidden by standing people keeps its last state for up to 2 minutes, so a crowd walking past never creates a free seat. A free seat that stays hidden for 10 s turns **unknown**.
+- Plates left with nobody there mark the seat **free soon**; after 5 minutes it turns free.
+- A zone is **crowded** when 40% or more of its seats are hidden, or when many people are standing in it.
+
+Seat circles in the studio and `--preview`: green free, red taken, amber held, grey hidden. The worker posts the zone readings as before plus a seat snapshot to `POST /devices/{id}/seats` (states and how long each has lasted, never images or identities).
+
 ## Checking accuracy against your own counts (plan Section 7.6)
 
 1. Draw zones for each video with the studio (names matter: they go in the CSV).
@@ -87,11 +113,28 @@ Boxes in the studio and in `--preview`: green = counted, yellow = waiting for th
 
 It prints, per video and overall: **MAE** (average seats off), **bias** (+ means over-counting), **±2** (share within 2 seats), **in range** (share where your count falls inside the shown range; aim for about 80%) and **level ok** (same status word). The plan's targets: MAE ≤ 3 seats and ≥ 80% within ±3 on a 24–48-seat zone (Section 20). Keep counts files out of git if they name real places or times you don't want shared; `validation/*.csv` other than the example is ignored.
 
+### Checking seat states
+
+Label seats by hand at a few moments and compare (states: `free`, `occupied` or `held`):
+
+```csv
+video,layout,t_seconds,seat,state
+../../../data/videos/staged-bags.mp4,,90,seat-3,held
+```
+
+```bash
+uv run python -m vision.validate --seats validation/seats.csv
+```
+
+It prints how often DineMate agrees with you, the **false free** rate (shown free when it was taken or held; this should be close to 0), how often a seat was hidden, and a table of your labels against DineMate's states. See `validation/seats.example.csv`.
+
 ## Settings
 
 Detection size: the worker uses YOLO at 1280 px for sources 1920 px wide or more (Full HD, 4K) and 640 px otherwise; people in high-resolution canteen footage are too small at 640. Override with `--imgsz`. The chosen size is logged at start.
 
 Per-device settings live in the device config served by the API (`dwell_s`, `post_every_s`, `smoothing_s`, `fps`, `min_confidence`, `seated_ratio`, `h_stand_a`, `h_stand_b`). Set the first four with `devices_cli register`. The seated filter stays off until `h_stand_a`/`h_stand_b` are calibrated (Phase 3).
+
+Seat settings, also in the device config: `clear_s` (30), `held_after_s` (20), `hidden_free_s` (10), `hidden_hold_s` (120), `abandoned_s` (300), `seat_radius` (0.06 of the frame width) and `objects_every_s` (5).
 
 ## Tests
 

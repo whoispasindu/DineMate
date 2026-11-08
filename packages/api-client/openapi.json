@@ -3159,6 +3159,315 @@
         }
       }
     },
+    "/api/v1/devices/{device_id}/seats": {
+      "post": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Post Seats",
+        "operationId": "post_seats_api_v1_devices__device_id__seats_post",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeatSnapshotIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeatsAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/canteens/{canteen_id}/seats": {
+      "get": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Get Canteen Seats",
+        "operationId": "get_canteen_seats_api_v1_canteens__canteen_id__seats_get",
+        "parameters": [
+          {
+            "name": "canteen_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Canteen Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanteenSeats"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/seats/overview": {
+      "get": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Get Seat Overview",
+        "operationId": "get_seat_overview_api_v1_seats_overview_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeatOverview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/zones/{zone_id}/seats": {
+      "get": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Get Zone Seat Map",
+        "operationId": "get_zone_seat_map_api_v1_zones__zone_id__seats_get",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Zone Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZoneSeatMap"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/canteens/{canteen_id}/stay-times": {
+      "get": {
+        "tags": [
+          "seats"
+        ],
+        "summary": "Get Stay Times",
+        "operationId": "get_stay_times_api_v1_canteens__canteen_id__stay_times_get",
+        "parameters": [
+          {
+            "name": "canteen_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Canteen Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 28,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StayTimes"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/safety/events": {
       "post": {
         "tags": [
@@ -4100,6 +4409,81 @@
         ],
         "title": "CanteenList"
       },
+      "CanteenSeatTotals": {
+        "properties": {
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "zones_with_seats": {
+            "type": "integer",
+            "title": "Zones With Seats"
+          },
+          "held": {
+            "type": "integer",
+            "title": "Held"
+          },
+          "free_soon": {
+            "type": "integer",
+            "title": "Free Soon"
+          },
+          "crowded_zones": {
+            "type": "integer",
+            "title": "Crowded Zones"
+          }
+        },
+        "type": "object",
+        "required": [
+          "canteen_id",
+          "zones_with_seats",
+          "held",
+          "free_soon",
+          "crowded_zones"
+        ],
+        "title": "CanteenSeatTotals"
+      },
+      "CanteenSeats": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ZoneSeats"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "held": {
+            "type": "integer",
+            "title": "Held"
+          },
+          "free_soon": {
+            "type": "integer",
+            "title": "Free Soon"
+          },
+          "crowded_zones": {
+            "type": "integer",
+            "title": "Crowded Zones"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "canteen_id",
+          "zones",
+          "held",
+          "free_soon",
+          "crowded_zones"
+        ],
+        "title": "CanteenSeats"
+      },
       "CanteenSummary": {
         "properties": {
           "id": {
@@ -4273,6 +4657,29 @@
         ],
         "title": "ClosureIn"
       },
+      "ConfigSeat": {
+        "properties": {
+          "seat_id": {
+            "type": "string",
+            "title": "Seat Id"
+          },
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seat_id",
+          "x",
+          "y"
+        ],
+        "title": "ConfigSeat"
+      },
       "ConfigZone": {
         "properties": {
           "zone_id": {
@@ -4303,6 +4710,13 @@
             },
             "type": "array",
             "title": "Points"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigSeat"
+            },
+            "type": "array",
+            "title": "Seats"
           }
         },
         "type": "object",
@@ -4310,7 +4724,8 @@
           "zone_id",
           "name",
           "capacity",
-          "points"
+          "points",
+          "seats"
         ],
         "title": "ConfigZone"
       },
@@ -5318,6 +5733,14 @@
             "maxItems": 32,
             "minItems": 3,
             "title": "Points"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/LayoutSeat"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Seats"
           }
         },
         "type": "object",
@@ -5372,15 +5795,52 @@
             "maxItems": 32,
             "minItems": 3,
             "title": "Points"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/LayoutSeat"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Seats"
           }
         },
         "type": "object",
         "required": [
           "type",
           "zone_id",
-          "points"
+          "points",
+          "seats"
         ],
         "title": "LayoutPolygon"
+      },
+      "LayoutSeat": {
+        "properties": {
+          "seat_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,40}$",
+            "title": "Seat Id"
+          },
+          "x": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seat_id",
+          "x",
+          "y"
+        ],
+        "title": "LayoutSeat"
       },
       "LayoutVersion": {
         "properties": {
@@ -7029,6 +7489,189 @@
         ],
         "title": "SafetyStatus"
       },
+      "SeatDetail": {
+        "properties": {
+          "seat_id": {
+            "type": "string",
+            "title": "Seat Id"
+          },
+          "x": {
+            "type": "number",
+            "title": "X"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "free",
+              "occupied",
+              "held",
+              "unknown"
+            ],
+            "title": "State"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "free_soon": {
+            "type": "boolean",
+            "title": "Free Soon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seat_id",
+          "x",
+          "y",
+          "state",
+          "since",
+          "free_soon"
+        ],
+        "title": "SeatDetail"
+      },
+      "SeatIn": {
+        "properties": {
+          "seat_id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Seat Id"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "free",
+              "occupied",
+              "held",
+              "unknown"
+            ],
+            "title": "State"
+          },
+          "for_s": {
+            "type": "number",
+            "maximum": 604800.0,
+            "minimum": 0.0,
+            "title": "For S"
+          },
+          "free_soon": {
+            "type": "boolean",
+            "title": "Free Soon",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "seat_id",
+          "zone_id",
+          "state",
+          "for_s"
+        ],
+        "title": "SeatIn"
+      },
+      "SeatOverview": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CanteenSeatTotals"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "items"
+        ],
+        "title": "SeatOverview"
+      },
+      "SeatSnapshotIn": {
+        "properties": {
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ZoneSeatsIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Zones"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/SeatIn"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Seats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "captured_at",
+          "zones"
+        ],
+        "title": "SeatSnapshotIn"
+      },
+      "SeatsAccepted": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "zones": {
+            "type": "integer",
+            "title": "Zones"
+          },
+          "seats": {
+            "type": "integer",
+            "title": "Seats"
+          },
+          "changed": {
+            "type": "integer",
+            "title": "Changed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "zones",
+          "seats",
+          "changed"
+        ],
+        "title": "SeatsAccepted"
+      },
       "Session": {
         "properties": {
           "access_token": {
@@ -7907,6 +8550,100 @@
         ],
         "title": "StaffSafetyEventResult"
       },
+      "StayHour": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "median_minutes": {
+            "type": "number",
+            "title": "Median Minutes"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hour",
+          "median_minutes",
+          "sessions"
+        ],
+        "title": "StayHour"
+      },
+      "StayTimes": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "canteen_id": {
+            "type": "string",
+            "title": "Canteen Id"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "median_minutes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Minutes"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/StayHour"
+            },
+            "type": "array",
+            "title": "Hours"
+          },
+          "occupied_now": {
+            "type": "integer",
+            "title": "Occupied Now"
+          },
+          "likely_free_10min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likely Free 10Min"
+          },
+          "is_experimental": {
+            "type": "boolean",
+            "title": "Is Experimental"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "canteen_id",
+          "days",
+          "sessions",
+          "median_minutes",
+          "hours",
+          "occupied_now",
+          "likely_free_10min",
+          "is_experimental"
+        ],
+        "title": "StayTimes"
+      },
       "StudentSummary": {
         "properties": {
           "server_time": {
@@ -8242,6 +8979,41 @@
               }
             ],
             "title": "H Stand B"
+          },
+          "clear_s": {
+            "type": "number",
+            "title": "Clear S",
+            "default": 30.0
+          },
+          "held_after_s": {
+            "type": "number",
+            "title": "Held After S",
+            "default": 20.0
+          },
+          "hidden_free_s": {
+            "type": "number",
+            "title": "Hidden Free S",
+            "default": 10.0
+          },
+          "hidden_hold_s": {
+            "type": "number",
+            "title": "Hidden Hold S",
+            "default": 120.0
+          },
+          "abandoned_s": {
+            "type": "number",
+            "title": "Abandoned S",
+            "default": 300.0
+          },
+          "seat_radius": {
+            "type": "number",
+            "title": "Seat Radius",
+            "default": 0.06
+          },
+          "objects_every_s": {
+            "type": "number",
+            "title": "Objects Every S",
+            "default": 5.0
           }
         },
         "type": "object",
@@ -8253,7 +9025,14 @@
           "min_confidence",
           "seated_ratio",
           "h_stand_a",
-          "h_stand_b"
+          "h_stand_b",
+          "clear_s",
+          "held_after_s",
+          "hidden_free_s",
+          "hidden_hold_s",
+          "abandoned_s",
+          "seat_radius",
+          "objects_every_s"
         ],
         "title": "WorkerSettings"
       },
@@ -8593,6 +9372,231 @@
           "zone"
         ],
         "title": "ZoneResult"
+      },
+      "ZoneSeatMap": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "freshness": {
+            "type": "string",
+            "enum": [
+              "live",
+              "stale",
+              "unavailable"
+            ],
+            "title": "Freshness"
+          },
+          "seats": {
+            "items": {
+              "$ref": "#/components/schemas/SeatDetail"
+            },
+            "type": "array",
+            "title": "Seats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "zone_id",
+          "name",
+          "freshness",
+          "seats"
+        ],
+        "title": "ZoneSeatMap"
+      },
+      "ZoneSeats": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "freshness": {
+            "type": "string",
+            "enum": [
+              "live",
+              "stale",
+              "unavailable"
+            ],
+            "title": "Freshness"
+          },
+          "seats": {
+            "type": "integer",
+            "title": "Seats"
+          },
+          "free": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free"
+          },
+          "occupied": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupied"
+          },
+          "held": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held"
+          },
+          "unknown": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unknown"
+          },
+          "free_soon": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Soon"
+          },
+          "standing": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standing"
+          },
+          "crowded": {
+            "type": "boolean",
+            "title": "Crowded"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "name",
+          "freshness",
+          "seats",
+          "free",
+          "occupied",
+          "held",
+          "unknown",
+          "free_soon",
+          "standing",
+          "crowded",
+          "updated_at"
+        ],
+        "title": "ZoneSeats"
+      },
+      "ZoneSeatsIn": {
+        "properties": {
+          "zone_id": {
+            "type": "string",
+            "title": "Zone Id"
+          },
+          "free": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Free"
+          },
+          "occupied": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Occupied"
+          },
+          "held": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Held"
+          },
+          "unknown": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Unknown"
+          },
+          "free_soon": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "Free Soon",
+            "default": 0
+          },
+          "standing": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Standing",
+            "default": 0
+          },
+          "crowded": {
+            "type": "boolean",
+            "title": "Crowded",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "zone_id",
+          "free",
+          "occupied",
+          "held",
+          "unknown"
+        ],
+        "title": "ZoneSeatsIn"
       },
       "ZoneThresholds": {
         "properties": {

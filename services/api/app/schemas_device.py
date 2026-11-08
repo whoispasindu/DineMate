@@ -7,11 +7,18 @@ from app.schemas import Schema, Timestamped
 Point = tuple[float, float]
 
 
+class ConfigSeat(Schema):
+    seat_id: str
+    x: float
+    y: float
+
+
 class ConfigZone(Schema):
     zone_id: str
     name: str
     capacity: int
     points: list[Point]
+    seats: list[ConfigSeat] = Field(default_factory=list)
 
 
 class IgnoreArea(Schema):
@@ -28,6 +35,13 @@ class WorkerSettings(Schema):
     seated_ratio: float
     h_stand_a: float | None
     h_stand_b: float | None
+    clear_s: float = 30.0
+    held_after_s: float = 20.0
+    hidden_free_s: float = 10.0
+    hidden_hold_s: float = 120.0
+    abandoned_s: float = 300.0
+    seat_radius: float = 0.06
+    objects_every_s: float = 5.0
 
 
 class SimulationProfile(Schema):

@@ -669,6 +669,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/devices/{device_id}/seats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Seats */
+        post: operations["post_seats_api_v1_devices__device_id__seats_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/canteens/{canteen_id}/seats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Canteen Seats */
+        get: operations["get_canteen_seats_api_v1_canteens__canteen_id__seats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seats/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Seat Overview */
+        get: operations["get_seat_overview_api_v1_seats_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zones/{zone_id}/seats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Zone Seat Map */
+        get: operations["get_zone_seat_map_api_v1_zones__zone_id__seats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/canteens/{canteen_id}/stay-times": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Stay Times */
+        get: operations["get_stay_times_api_v1_canteens__canteen_id__stay_times_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/safety/events": {
         parameters: {
             query?: never;
@@ -877,6 +962,37 @@ export interface components {
             /** Items */
             items: components["schemas"]["CanteenSummary"][];
         };
+        /** CanteenSeatTotals */
+        CanteenSeatTotals: {
+            /** Canteen Id */
+            canteen_id: string;
+            /** Zones With Seats */
+            zones_with_seats: number;
+            /** Held */
+            held: number;
+            /** Free Soon */
+            free_soon: number;
+            /** Crowded Zones */
+            crowded_zones: number;
+        };
+        /** CanteenSeats */
+        CanteenSeats: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Zones */
+            zones: components["schemas"]["ZoneSeats"][];
+            /** Held */
+            held: number;
+            /** Free Soon */
+            free_soon: number;
+            /** Crowded Zones */
+            crowded_zones: number;
+        };
         /** CanteenSummary */
         CanteenSummary: {
             /** Id */
@@ -925,6 +1041,15 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** ConfigSeat */
+        ConfigSeat: {
+            /** Seat Id */
+            seat_id: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
         /** ConfigZone */
         ConfigZone: {
             /** Zone Id */
@@ -938,6 +1063,8 @@ export interface components {
                 number,
                 number
             ][];
+            /** Seats */
+            seats: components["schemas"]["ConfigSeat"][];
         };
         /** ConsoleOverview */
         ConsoleOverview: {
@@ -1288,6 +1415,8 @@ export interface components {
                 number,
                 number
             ][];
+            /** Seats */
+            seats?: components["schemas"]["LayoutSeat"][];
         };
         /** LayoutPolygon */
         "LayoutPolygon-Output": {
@@ -1303,6 +1432,17 @@ export interface components {
                 number,
                 number
             ][];
+            /** Seats */
+            seats: components["schemas"]["LayoutSeat"][];
+        };
+        /** LayoutSeat */
+        LayoutSeat: {
+            /** Seat Id */
+            seat_id: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** LayoutVersion */
         LayoutVersion: {
@@ -1865,6 +2005,81 @@ export interface components {
             /** Events */
             events: components["schemas"]["SafetyEvent"][];
         };
+        /** SeatDetail */
+        SeatDetail: {
+            /** Seat Id */
+            seat_id: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "free" | "occupied" | "held" | "unknown";
+            /** Since */
+            since: string | null;
+            /** Free Soon */
+            free_soon: boolean;
+        };
+        /** SeatIn */
+        SeatIn: {
+            /** Seat Id */
+            seat_id: string;
+            /** Zone Id */
+            zone_id: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "free" | "occupied" | "held" | "unknown";
+            /** For S */
+            for_s: number;
+            /**
+             * Free Soon
+             * @default false
+             */
+            free_soon: boolean;
+        };
+        /** SeatOverview */
+        SeatOverview: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["CanteenSeatTotals"][];
+        };
+        /** SeatSnapshotIn */
+        SeatSnapshotIn: {
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Zones */
+            zones: components["schemas"]["ZoneSeatsIn"][];
+            /** Seats */
+            seats?: components["schemas"]["SeatIn"][];
+        };
+        /** SeatsAccepted */
+        SeatsAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Zones */
+            zones: number;
+            /** Seats */
+            seats: number;
+            /** Changed */
+            changed: number;
+        };
         /** Session */
         Session: {
             /** Access Token */
@@ -2166,6 +2381,39 @@ export interface components {
             server_time: string;
             event: components["schemas"]["StaffSafetyEvent"];
         };
+        /** StayHour */
+        StayHour: {
+            /** Hour */
+            hour: number;
+            /** Median Minutes */
+            median_minutes: number;
+            /** Sessions */
+            sessions: number;
+        };
+        /** StayTimes */
+        StayTimes: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Canteen Id */
+            canteen_id: string;
+            /** Days */
+            days: number;
+            /** Sessions */
+            sessions: number;
+            /** Median Minutes */
+            median_minutes: number | null;
+            /** Hours */
+            hours: components["schemas"]["StayHour"][];
+            /** Occupied Now */
+            occupied_now: number;
+            /** Likely Free 10Min */
+            likely_free_10min: number | null;
+            /** Is Experimental */
+            is_experimental: boolean;
+        };
         /** StudentSummary */
         StudentSummary: {
             /**
@@ -2290,6 +2538,41 @@ export interface components {
             h_stand_a: number | null;
             /** H Stand B */
             h_stand_b: number | null;
+            /**
+             * Clear S
+             * @default 30
+             */
+            clear_s: number;
+            /**
+             * Held After S
+             * @default 20
+             */
+            held_after_s: number;
+            /**
+             * Hidden Free S
+             * @default 10
+             */
+            hidden_free_s: number;
+            /**
+             * Hidden Hold S
+             * @default 120
+             */
+            hidden_hold_s: number;
+            /**
+             * Abandoned S
+             * @default 300
+             */
+            abandoned_s: number;
+            /**
+             * Seat Radius
+             * @default 0.06
+             */
+            seat_radius: number;
+            /**
+             * Objects Every S
+             * @default 5
+             */
+            objects_every_s: number;
         };
         /** ZoneHistory */
         ZoneHistory: {
@@ -2401,6 +2684,83 @@ export interface components {
              */
             server_time: string;
             zone: components["schemas"]["EditableZone"];
+        };
+        /** ZoneSeatMap */
+        ZoneSeatMap: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Zone Id */
+            zone_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Freshness
+             * @enum {string}
+             */
+            freshness: "live" | "stale" | "unavailable";
+            /** Seats */
+            seats: components["schemas"]["SeatDetail"][];
+        };
+        /** ZoneSeats */
+        ZoneSeats: {
+            /** Zone Id */
+            zone_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Freshness
+             * @enum {string}
+             */
+            freshness: "live" | "stale" | "unavailable";
+            /** Seats */
+            seats: number;
+            /** Free */
+            free: number | null;
+            /** Occupied */
+            occupied: number | null;
+            /** Held */
+            held: number | null;
+            /** Unknown */
+            unknown: number | null;
+            /** Free Soon */
+            free_soon: number | null;
+            /** Standing */
+            standing: number | null;
+            /** Crowded */
+            crowded: boolean;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** ZoneSeatsIn */
+        ZoneSeatsIn: {
+            /** Zone Id */
+            zone_id: string;
+            /** Free */
+            free: number;
+            /** Occupied */
+            occupied: number;
+            /** Held */
+            held: number;
+            /** Unknown */
+            unknown: number;
+            /**
+             * Free Soon
+             * @default 0
+             */
+            free_soon: number;
+            /**
+             * Standing
+             * @default 0
+             */
+            standing: number;
+            /**
+             * Crowded
+             * @default false
+             */
+            crowded: boolean;
         };
         /** ZoneThresholds */
         ZoneThresholds: {
@@ -4527,6 +4887,207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_seats_api_v1_devices__device_id__seats_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeatSnapshotIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeatsAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_canteen_seats_api_v1_canteens__canteen_id__seats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                canteen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CanteenSeats"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_seat_overview_api_v1_seats_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeatOverview"];
+                };
+            };
+        };
+    };
+    get_zone_seat_map_api_v1_zones__zone_id__seats_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                zone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZoneSeatMap"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_stay_times_api_v1_canteens__canteen_id__stay_times_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                canteen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StayTimes"];
                 };
             };
             /** @description Not Found */

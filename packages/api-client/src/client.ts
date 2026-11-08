@@ -4,10 +4,15 @@ import { acknowledgeAlert, consoleOverview } from "./sample/console";
 import { mealStatus } from "./sample/schedule";
 import { menuItems, shopById, shopsFor } from "./sample/shops";
 import { alertFeed, canteenDetail, canteenIds, safetyStatus, sampleRecommendation, studentSummary } from "./sample/student";
+import { sampleCanteenSeats, sampleSeatOverview } from "./sample/seats";
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
   AlertFeed,
+  CanteenSeats,
+  SeatOverview,
+  StayTimes,
+  ZoneSeatMap,
   HistoryBucket,
   RecommendationResult,
   ZoneHistory,
@@ -286,4 +291,9 @@ export const api = {
     ),
   zoneHistory: (zoneId: string, from: string, bucket: HistoryBucket): Promise<ZoneHistory> =>
     staffOnly(`/zones/${enc(zoneId)}/occupancy/history?from=${enc(from)}&bucket=${bucket}`),
+  canteenSeats: (canteenId: string): Promise<CanteenSeats> =>
+    either(`/canteens/${enc(canteenId)}/seats`, (now) => sampleCanteenSeats(canteenId, now), "Canteen not found"),
+  seatOverview: (): Promise<SeatOverview> => either("/seats/overview", sampleSeatOverview, "Seat overview unavailable"),
+  zoneSeatMap: (zoneId: string): Promise<ZoneSeatMap> => staffOnly(`/zones/${enc(zoneId)}/seats`),
+  stayTimes: (canteenId: string): Promise<StayTimes> => staffOnly(`/canteens/${enc(canteenId)}/stay-times`),
 };

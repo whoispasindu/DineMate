@@ -15,6 +15,9 @@ from app.sim_shape import daily_shape
 DRIFT = 4
 STEPS = (-1, 0, 0, 1)
 CATCH_UP = 3
+HELD_SHARE = 0.15
+FREE_SOON_SHARE = 0.08
+CROWDED_SHARE = 0.9
 
 log = logging.getLogger("dinemate.sim")
 
@@ -79,6 +82,27 @@ class ApiClient:
         payload = {"captured_at": datetime.now(UTC).isoformat(), "readings": readings}
         self._request("POST", f"/devices/{device_id}/occupancy", payload)
 
+    def post_seats(self, device_id: str, zones: list[dict[str, Any]]) -> None:
+        payload = {"captured_at": datetime.now(UTC).isoformat(), "zones": zones, "seats": []}
+        self._request("POST", f"/devices/{device_id}/seats", payload)
+
+
+def seat_summary(zone_id: str, capacity: int, occupied: int, at: datetime, rng: random.Random) -> dict[str, Any]:
+    crowded = occupied >= CROWDED_SHARE * capacity
+    held = min(occupied, round(occupied * HELD_SHARE * daily_shape(at)))
+    unknown = min(capacity - occupied, rng.randint(1, 3)) if crowded else 0
+    seated = occupied - held
+    return {
+        "zone_id": zone_id,
+        "free": capacity - occupied - unknown,
+        "occupied": seated,
+        "held": held,
+        "unknown": unknown,
+        "free_soon": round(seated * FREE_SOON_SHARE),
+        "standing": rng.randint(3, 6) if crowded else rng.randint(0, 2),
+        "crowded": crowded,
+    }
+
 
 def readings_for(device: SimulatedDevice, rng: random.Random) -> list[dict[str, Any]]:
     config = device.config or {}
@@ -114,6 +138,17 @@ def run(settings: Settings, rng: random.Random) -> None:
                 readings = readings_for(device, rng)
                 if readings:
                     client.post(device.device_id, readings)
+                    capacities = {z["zone_id"]: z["capacity"] for z in (device.config or {}).get("zones", [])}
+                    server_now = datetime.now(UTC) + device.server_offset
+                    client.post_seats(
+                        device.device_id,
+                        [
+                            seat_summary(
+                                r["zone_id"], capacities[r["zone_id"]], r["estimated_occupied"], server_now, rng
+                            )
+                            for r in readings
+                        ],
+                    )
                 log.info("%s: posted %d simulated readings", device.device_id, len(readings))
             except (OSError, RuntimeError) as exc:
                 log.warning("%s: %s", device.device_id, exc)

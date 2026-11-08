@@ -2,24 +2,38 @@ import argparse
 import csv
 import sys
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
+from typing import Any
 
 import cv2
 
 from vision.counting import ZoneCounter, zones_from_config
-from vision.metrics import Sample, Summary, summarize, table
-from vision.worker import DEFAULT_MODEL, apply_overrides, layout_config
+from vision.metrics import (
+    TRUTH_STATES,
+    Sample,
+    SeatSample,
+    SeatSummary,
+    Summary,
+    confusion,
+    seat_table,
+    summarize,
+    summarize_seats,
+    table,
+)
+from vision.worker import DEFAULT_MODEL, DEFAULT_POSE_MODEL, apply_overrides, layout_config
 
 LAYOUT_DIR = Path(__file__).resolve().parents[1] / "layouts"
 COLUMNS = ("video", "t_seconds", "zone", "count")
+SEAT_COLUMNS = ("video", "t_seconds", "seat", "state")
 
 
-def read_counts(path: Path) -> dict[tuple[Path, Path], list[dict[str, str]]]:
+def read_counts(path: Path, columns: tuple[str, ...] = COLUMNS) -> dict[tuple[Path, Path], list[dict[str, str]]]:
     groups: dict[tuple[Path, Path], list[dict[str, str]]] = defaultdict(list)
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
-        missing = [c for c in COLUMNS if c not in (reader.fieldnames or [])]
+        missing = [c for c in columns if c not in (reader.fieldnames or [])]
         if missing:
             raise ValueError(f"{path} is missing column(s): {', '.join(missing)}")
         for row in reader:
@@ -34,25 +48,25 @@ def read_counts(path: Path) -> dict[tuple[Path, Path], list[dict[str, str]]]:
     return groups
 
 
-def run_video(video: Path, layout: Path, rows: list[dict[str, str]], args: argparse.Namespace) -> list[Sample]:
-    from vision.detector import YoloDetector
-
+def check_files(video: Path, layout: Path) -> None:
     if not video.exists():
         raise OSError(f"Video not found: {video}")
     if not layout.exists():
         raise OSError(f"Zones file not found for {video.name}: {layout} (draw it with vision.studio first)")
-    config = apply_overrides(layout_config(str(layout)), args)
-    counter = ZoneCounter(*zones_from_config(config))
-    zones = {z.name: z for z in counter.zones}
-    unknown = sorted({r["zone"] for r in rows} - set(zones))
-    if unknown:
-        raise ValueError(f"{video.name}: zone(s) {', '.join(unknown)} are not in {layout.name} ({', '.join(zones)})")
+
+
+def play(
+    video: Path,
+    fps: float,
+    rows: list[dict[str, str]],
+    process: Callable[[Any, float], None],
+    snapshot: Callable[[], Any],
+) -> dict[float, Any]:
     targets = sorted({float(r["t_seconds"]) for r in rows})
-    detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(config["settings"]["min_confidence"]))
     capture = cv2.VideoCapture(str(video))
     video_fps = capture.get(cv2.CAP_PROP_FPS) or 25.0
-    step = max(1, round(video_fps / float(config["settings"]["fps"])))
-    snapshots: dict[float, dict[str, dict[str, int]]] = {}
+    step = max(1, round(video_fps / fps))
+    snapshots: dict[float, Any] = {}
     index = 0
     try:
         while targets:
@@ -63,16 +77,41 @@ def run_video(video: Path, layout: Path, rows: list[dict[str, str]], args: argpa
             index += 1
             if (index - 1) % step:
                 continue
-            height, width = image.shape[:2]
-            counter.update(detector.detect(image), width, height, t)
+            process(image, t)
             while targets and t >= targets[0]:
-                snapshots[targets.pop(0)] = {r["zone_id"]: r for r in counter.readings()}
+                snapshots[targets.pop(0)] = snapshot()
     finally:
         capture.release()
     if targets:
         print(
             f"  {video.name}: video ended before t = {', '.join(f'{x:g}' for x in targets)} s; those rows are skipped"
         )
+    return snapshots
+
+
+def run_video(video: Path, layout: Path, rows: list[dict[str, str]], args: argparse.Namespace) -> list[Sample]:
+    from vision.detector import YoloDetector
+
+    check_files(video, layout)
+    config = apply_overrides(layout_config(str(layout)), args)
+    counter = ZoneCounter(*zones_from_config(config))
+    zones = {z.name: z for z in counter.zones}
+    unknown = sorted({r["zone"] for r in rows} - set(zones))
+    if unknown:
+        raise ValueError(f"{video.name}: zone(s) {', '.join(unknown)} are not in {layout.name} ({', '.join(zones)})")
+    detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(config["settings"]["min_confidence"]))
+
+    def process(image: Any, t: float) -> None:
+        height, width = image.shape[:2]
+        counter.update(detector.detect(image), width, height, t)
+
+    snapshots = play(
+        video,
+        float(config["settings"]["fps"]),
+        rows,
+        process,
+        lambda: {r["zone_id"]: r for r in counter.readings()},
+    )
     samples = []
     for row in rows:
         t = float(row["t_seconds"])
@@ -94,6 +133,64 @@ def run_video(video: Path, layout: Path, rows: list[dict[str, str]], args: argpa
     return samples
 
 
+def run_seat_video(video: Path, layout: Path, rows: list[dict[str, str]], args: argparse.Namespace) -> list[SeatSample]:
+    from vision.pipeline import Models, Pipeline
+
+    check_files(video, layout)
+    config = apply_overrides(layout_config(str(layout)), args)
+    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz))
+    seat_ids = {s.seat_id for s in pipeline.tracker.seats}
+    if not seat_ids:
+        raise ValueError(f"{layout.name} has no seats yet: open it in the zone tool or studio and press T")
+    unknown = sorted({r["seat"] for r in rows} - seat_ids)
+    if unknown:
+        raise ValueError(f"{video.name}: seat(s) {', '.join(unknown)} are not in {layout.name}")
+    wrong = sorted({r["state"] for r in rows} - set(TRUTH_STATES))
+    if wrong:
+        raise ValueError(f"{video.name}: state must be one of {', '.join(TRUTH_STATES)}, not {', '.join(wrong)}")
+
+    def process(image: Any, t: float) -> None:
+        pipeline.process(image, t)
+
+    snapshots = play(
+        video,
+        float(config["settings"]["fps"]),
+        rows,
+        process,
+        lambda: {seat.seat_id: state for seat, state in pipeline.seat_states()},
+    )
+    return [
+        SeatSample(
+            video.name, float(r["t_seconds"]), r["seat"], r["state"], snapshots[float(r["t_seconds"])][r["seat"]]
+        )
+        for r in rows
+        if float(r["t_seconds"]) in snapshots
+    ]
+
+
+def check_seats(path: Path, args: argparse.Namespace) -> int:
+    groups = read_counts(path, SEAT_COLUMNS)
+    samples: list[SeatSample] = []
+    summaries: list[SeatSummary] = []
+    for (video, layout), rows in groups.items():
+        print(f"Checking seats in {video.name} ({len(rows)} labels) with {layout.name} ...")
+        found = run_seat_video(video, layout, rows, args)
+        samples.extend(found)
+        summaries.append(summarize_seats(video.name, found))
+    if not samples:
+        print("No seat labels could be compared.")
+        return 1
+    if len(summaries) > 1:
+        summaries.append(summarize_seats("All videos", samples))
+    print()
+    print(seat_table(summaries))
+    print()
+    print(confusion(samples))
+    print("\nright = same state as your label; false free = shown free when it was taken or held (should be ~0);")
+    print("hidden = shown as unknown. Per-state columns: share of your labels DineMate got right.")
+    return 0
+
+
 def write_samples(path: Path, samples: list[Sample]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
@@ -108,13 +205,23 @@ def main(argv: list[str] | None = None) -> int:
         description="Compare the worker's estimates with seated people you counted by hand (plan Section 7.6)."
     )
     parser.add_argument("counts", help="CSV with columns video, t_seconds, zone, count (and optional layout)")
+    parser.add_argument(
+        "--seats", action="store_true", help="the CSV has columns video, t_seconds, seat, state (free/occupied/held)"
+    )
     parser.add_argument("--out", help="write every compared sample to this CSV")
     parser.add_argument("--model", default=str(DEFAULT_MODEL))
+    parser.add_argument("--pose-model", default=str(DEFAULT_POSE_MODEL), help="pose model used for seats")
     parser.add_argument("--imgsz", type=int, help="YOLO input size; default 1280 for sources 1920 px wide or more")
     parser.add_argument("--dwell-s", type=float, help="seconds someone must stay in a zone before counting")
     parser.add_argument("--smoothing-s", type=float, help="length of the median window in seconds")
     parser.add_argument("--post-every-s", type=float, help="ignored here; readings are taken at your timestamps")
     args = parser.parse_args(argv)
+    if args.seats:
+        try:
+            return check_seats(Path(args.counts), args)
+        except (OSError, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
     try:
         groups = read_counts(Path(args.counts))
         all_samples: list[Sample] = []

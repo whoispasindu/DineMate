@@ -8,10 +8,10 @@ from typing import Any
 import cv2
 import numpy as np
 
-from vision.counting import ZoneCounter, zones_from_config
 from vision.overlay import draw, screen_limits, status_bar, zone_label
+from vision.pipeline import Models, Pipeline
 from vision.source import FrameSource, grab_still, is_camera, open_capture
-from vision.worker import DEFAULT_MODEL, apply_overrides, layout_config
+from vision.worker import DEFAULT_MODEL, DEFAULT_POSE_MODEL, apply_overrides, layout_config
 from vision.zone_tool import edit_zones, save_layout
 
 WINDOW = "DineMate studio (local only, nothing is saved)"
@@ -53,6 +53,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--imgsz", type=int, help="YOLO input size; default 1280 for sources 1920 px wide or more")
     parser.add_argument("--fast", action="store_true", help="process as fast as possible instead of in real time")
     parser.add_argument("--model", default=str(DEFAULT_MODEL))
+    parser.add_argument("--pose-model", default=str(DEFAULT_POSE_MODEL), help="pose model used for seats")
     parser.add_argument("--dwell-s", type=float, help="seconds someone must stay in a zone before counting")
     parser.add_argument("--smoothing-s", type=float, help="length of the median window in seconds")
     parser.add_argument("--post-every-s", type=float, help="seconds between readings")
@@ -61,14 +62,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 class Player:
     def __init__(self, args: argparse.Namespace, layout_path: Path) -> None:
-        from vision.detector import YoloDetector
-
         self.args = args
         self.layout_path = layout_path
         self.config = apply_overrides(layout_config(str(layout_path)), args)
-        self.counter = ZoneCounter(*zones_from_config(self.config))
+        self.pipeline = Pipeline(self.config, Models(args.model, args.pose_model, args.imgsz))
         self.settings = self.config["settings"]
-        self.detector = YoloDetector(args.model, imgsz=args.imgsz, confidence=float(self.settings["min_confidence"]))
         self.source = FrameSource(
             args.source, fps=float(self.settings["fps"]), loop=not is_camera(args.source), realtime=not args.fast
         )
@@ -78,7 +76,7 @@ class Player:
     def reload_zones(self, layout: dict[str, Any]) -> None:
         save_layout(layout, self.layout_path)
         self.config = apply_overrides(layout_config(str(self.layout_path)), self.args)
-        self.counter.reconfigure(*zones_from_config(self.config))
+        self.pipeline.configure(self.config)
         self.readings = {}
         print(f"Zones updated and saved to {self.layout_path}.")
 
@@ -114,24 +112,34 @@ class Player:
         cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
         try:
             for frame in self.source.frames():
-                detections = self.detector.detect(frame.image)
+                assignments = self.pipeline.process(frame.image, frame.at)
                 height, width = frame.image.shape[:2]
-                assignments = self.counter.update(detections, width, height, frame.at)
                 if last_post is None:
                     last_post = frame.at
-                    print(f"Playing {width}x{height}, detecting at {self.detector.imgsz} px.")
+                    print(f"Playing {width}x{height}, detecting at {self.pipeline.imgsz} px.")
+                    if self.pipeline.seat_mode:
+                        print(f"Tracking {len(self.pipeline.tracker.seats)} seat(s).")
                 if frame.at - last_post >= float(self.settings["post_every_s"]):
                     last_post = frame.at
-                    self.readings = {r["zone_id"]: r for r in self.counter.readings()}
-                    print("  " + ", ".join(zone_label(z, self.readings.get(z.zone_id)) for z in self.counter.zones))
+                    self.readings = {r["zone_id"]: r for r in self.pipeline.readings()}
+                    labels = self.pipeline.labels()
+                    print(
+                        "  "
+                        + ", ".join(
+                            labels.get(z.zone_id) or zone_label(z, self.readings.get(z.zone_id))
+                            for z in self.pipeline.zones
+                        )
+                    )
                 canvas = draw(
                     frame.image,
-                    self.counter.zones,
-                    self.counter.ignore,
+                    self.pipeline.zones,
+                    self.pipeline.ignore,
                     assignments,
                     self.readings,
-                    f"{PLAYING} | detecting at {self.detector.imgsz}px",
+                    f"{PLAYING} | detecting at {self.pipeline.imgsz}px",
                     self.limits,
+                    self.pipeline.seat_states(),
+                    self.pipeline.labels(),
                 )
                 cv2.imshow(WINDOW, canvas)
                 key = cv2.waitKey(1) & 0xFF

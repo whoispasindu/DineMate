@@ -26,7 +26,7 @@ import {
 } from "@dinemate/ui";
 import type { ReactNode } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
-import { AlternativeCard, freshnessText, ZoneBarRow, ZoneCard } from "../components/canteen";
+import { AlternativeCard, freshnessText, useZoneSeats, ZoneBarRow, ZoneCard } from "../components/canteen";
 import { Footnote, Loading, MessageCard, OfflineCard, ShopStatusText, Skeleton } from "../components/common";
 import { useIsDesktop, useOnline } from "../lib/device";
 import { favourites } from "../lib/prefs";
@@ -189,6 +189,7 @@ function ForecastTip({ point }: { point: ForecastPoint }) {
 
 function CanteenMobile({ data, now, online }: ViewProps) {
   const { canteen, zones, forecast, hours_today } = data;
+  const seats = useZoneSeats(canteen.id);
   const firstForecast = forecast[0];
   return (
     <main id="main" className="flex flex-1 flex-col">
@@ -251,7 +252,7 @@ function CanteenMobile({ data, now, online }: ViewProps) {
         {online ? (
           <ul className="m-0 flex list-none flex-col rounded-[18px] border border-line bg-card px-3.5 py-1">
             {zones.map((z, i) => (
-              <ZoneBarRow key={z.zone_id} zone={z} last={i === zones.length - 1} />
+              <ZoneBarRow key={z.zone_id} zone={z} last={i === zones.length - 1} seats={seats.get(z.zone_id)} />
             ))}
           </ul>
         ) : null}
@@ -307,6 +308,7 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
 
 function CanteenWeb({ data, now, online }: ViewProps) {
   const { canteen, zones, forecast, hours_today, shops } = data;
+  const seats = useZoneSeats(canteen.id);
   return (
     <main id="main" className="mx-auto flex max-w-[1200px] flex-col gap-[22px] px-6 pb-10 pt-[22px]">
       <Link
@@ -367,7 +369,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
       {online ? (
         <div className="flex flex-wrap gap-5">
           {zones.map((z) => (
-            <ZoneCard key={z.zone_id} zone={z} now={now} />
+            <ZoneCard key={z.zone_id} zone={z} now={now} seats={seats.get(z.zone_id)} />
           ))}
         </div>
       ) : (

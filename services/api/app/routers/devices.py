@@ -13,6 +13,7 @@ from app.core.device_auth import DeviceDep, RealNowDep
 from app.core.errors import ApiError
 from app.schemas import ErrorResponse
 from app.schemas_device import (
+    ConfigSeat,
     ConfigZone,
     DeviceConfig,
     HeartbeatAccepted,
@@ -36,6 +37,13 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "seated_ratio": 0.7,
     "h_stand_a": None,
     "h_stand_b": None,
+    "clear_s": 30.0,
+    "held_after_s": 20.0,
+    "hidden_free_s": 10.0,
+    "hidden_hold_s": 120.0,
+    "abandoned_s": 300.0,
+    "seat_radius": 0.06,
+    "objects_every_s": 5.0,
 }
 AUTH_RESPONSES: dict[int | str, dict[str, Any]] = {401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}}
 
@@ -68,6 +76,7 @@ def build_config(session: SessionDep, device: models.Device) -> dict[str, Any]:
             name=zones[str(p["zone_id"])].name,
             capacity=zones[str(p["zone_id"])].capacity,
             points=p["points"],
+            seats=[ConfigSeat(**seat) for seat in p.get("seats", [])],
         )
         for p in polygons
         if p.get("type") == "seating" and str(p.get("zone_id")) in zones and zones[str(p["zone_id"])].is_active

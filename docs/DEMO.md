@@ -43,6 +43,22 @@ About 4 minutes of live demo inside the 10-minute talk (plan Section 25.1). Ever
 | 7   | Safety page → **Trigger simulation** (Canteen A, note "Judging demo"). The student banner shows **SIMULATION — NOT A REAL EMERGENCY**. Acknowledge, then Resolve with a note, and show **Resolved** with who and when | Console (safety) + Student | "The safety module is separate and only takes signed messages from approved sources. The simulator can never send a real alarm." |
 | 8   | Stop the camera worker or simulator. The zone goes grey "may be out of date", then **No live data**                                                                                                                   | Student                    | "Old numbers are never shown as current."                                                                                        |
 
+## Judge questions: seat-level scenarios (Phase 7)
+
+Record three short staged clips with friends who agree to it, place seats on each with the studio (`T`), then play them in the studio. Seat circles change colour live: green free, red taken, amber held, grey hidden.
+
+| Question                                  | Clip                                                     | What to point at                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Sitting or standing?                      | Two people chat standing at a table next to one who sits | Only the seated person's seat turns red. The standing people are boxed as "standing" and not counted |
+| Bags on chairs?                           | Someone puts a backpack on an empty chair and walks off  | After 20 s the seat turns amber: held, not free                                                      |
+| Short visit or staying?                   | Someone sits for under 20 s, then leaves                 | The seat never turns taken. Console → Seats shows typical stay times for longer visits               |
+| Bags left while buying food?              | A seated person leaves their bag and goes to the counter | The seat turns amber straight away, then red again within 3 s of them coming back                    |
+| Big crowd around a table (birthday party) | Several people stand around two tables                   | Hidden seats go grey and the zone says "Crowded". No seat behind the crowd ever shows as free        |
+
+In the apps: the student canteen page shows "4 held by bags" or "Crowded, few or no seats" under each zone. The console's **Seats** page lists free, taken, held and hidden seats per zone, a seat map, seats held for over 15 minutes, and stay times (experimental).
+
+Measure it: label seat states at a few moments in each clip and run `python -m vision.validate --seats validation/seats.csv` from `services/vision`.
+
 ## Results slide (1 min)
 
 - Accuracy: `python -m vision.validate validation/counts.csv` from `services/vision` (MAE, bias, % within ±2, interval coverage, level accuracy) for 3+ canteen videos.

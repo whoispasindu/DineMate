@@ -109,3 +109,47 @@ def test_d_does_nothing_while_drawing_a_shape() -> None:
     editor.click(10, 10)
     press(editor, "d")
     assert len(editor.shapes) == 1 and len(editor.current) == 1
+
+
+def test_seats_are_placed_inside_zones_and_set_capacity() -> None:
+    editor = ZoneEditor(1000, 1000)
+    square(editor, 100, 100, 400)
+    press(editor, [ENTER])
+    press(editor, "s")
+    press(editor, [ENTER])
+    press(editor, "6")
+    press(editor, [ENTER])
+    press(editor, "t")
+    assert editor.mode == "seats"
+    editor.click(200, 200)
+    editor.click(300, 200)
+    editor.click(900, 900)
+    assert "inside a seating zone" in editor.prompt()
+    editor.click(400, 400)
+    press(editor, "u")
+    zone = editor.layout()["zones"][0]
+    assert zone["capacity"] == 2
+    assert zone["seats"] == [{"seat_id": "seat-1", "x": 0.2, "y": 0.2}, {"seat_id": "seat-2", "x": 0.3, "y": 0.2}]
+    press(editor, "t")
+    assert editor.mode == "points"
+
+
+def test_seats_survive_loading_a_layout() -> None:
+    editor = ZoneEditor(1000, 1000)
+    editor.load(
+        {
+            "zones": [
+                {
+                    "name": "Front",
+                    "capacity": 9,
+                    "points": [[0.1, 0.1], [0.5, 0.1], [0.5, 0.5], [0.1, 0.5]],
+                    "seats": [{"seat_id": "a1", "x": 0.2, "y": 0.2}],
+                }
+            ]
+        }
+    )
+    press(editor, "t")
+    editor.click(300, 300)
+    zone = editor.layout()["zones"][0]
+    assert [s["seat_id"] for s in zone["seats"]] == ["a1", "seat-2"]
+    assert zone["capacity"] == 2
