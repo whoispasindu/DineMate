@@ -46,5 +46,5 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - pnpm test:api — pytest; integration tests use `dinemate_test` on localhost:5432 and skip if Postgres is down (set DINEMATE_REQUIRE_DB_TESTS=1 to fail instead)
 - pnpm api:types — after changing API schemas: re-export openapi.json and regenerate TS types (CI checks both)
 - pnpm e2e — Playwright demo flows + axe + PWA check; starts its own API on :8001 (`app.e2e_server`, database `dinemate_e2e`) and web apps on 5183/5184/4183. Needs Postgres on :5432 and Chrome locally
-- Reports (services/api): `uv run python -m app.forecast_report`, `uv run python -m app.utilisation_report`; demo steps in docs/DEMO.md, results in docs/RESULTS.md
+- Reports (services/api): `uv run python -m app.forecast_report`, `uv run python -m app.utilisation_report`; results in docs/RESULTS.md
 - In services/api: `uv run alembic revision --autogenerate -m "..."`, `uv run alembic upgrade head`, `uv run python -m app.seed --reset`
