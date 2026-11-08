@@ -1,5 +1,5 @@
 import { apiMode, signIn } from "@dinemate/api-client";
-import { APP_NAME, Icon } from "@dinemate/ui";
+import { APP_NAME, BrandMark } from "@dinemate/ui";
 import { useState, type FormEvent } from "react";
 import { Banner, Button, errorText, Field, TextInput } from "../kit";
 
@@ -24,17 +24,18 @@ export function SignInScreen() {
 
   return (
     <main id="main" className="flex min-h-dvh items-center justify-center bg-page px-4">
-      <form onSubmit={(e) => void submit(e)} className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-line bg-card p-6">
+      <form
+        onSubmit={(e) => void submit(e)}
+        className="raised flex w-full max-w-sm flex-col gap-4 rounded-[22px] border border-line bg-card p-7"
+      >
         <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-brand text-white">
-            <Icon name="bench" size={20} />
-          </span>
+          <BrandMark size={36} />
           <span className="flex flex-col">
-            <span className="text-[17px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
+            <span className="font-display text-[19px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
             <span className="text-xs text-muted">Staff console</span>
           </span>
         </div>
-        <h1 className="m-0 text-[22px] font-extrabold">Sign in</h1>
+        <h1 className="m-0 font-display text-[32px] font-extrabold tracking-[-0.04em]">Sign in</h1>
         {sample ? (
           <Banner>Sample data mode: sign in as admin@, canteen.a@, rice.stall@ or safety@dinemate.test with any password.</Banner>
         ) : null}

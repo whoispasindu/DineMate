@@ -89,7 +89,7 @@ function NoticeRow({ notice, layout, last }: { notice: Notice; layout: "mobile" 
       </span>
       <div className={cx("flex flex-1 flex-col", web ? "gap-1" : "gap-0.5")}>
         <div className="flex justify-between gap-2.5">
-          <span className={cx("font-extrabold", web ? "text-base" : "text-sm")}>{notice.title}</span>
+          <span className={cx("font-bold", web ? "text-base" : "text-[15px]")}>{notice.title}</span>
           <span className={cx("whitespace-nowrap text-muted", web ? "text-[13px]" : "text-xs")}>
             {web ? formatClock(notice.at) : formatClock24(notice.at)}
           </span>
@@ -138,7 +138,7 @@ export function AlertsScreen() {
       <main id="main" className="mx-auto flex max-w-[1200px] flex-col gap-5 px-6 pb-10 pt-7">
         <div className="flex flex-wrap items-end justify-between gap-3.5">
           <div className="flex flex-col gap-1">
-            <h1 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">Alerts</h1>
+            <h1 className="m-0 font-display text-[44px] font-extrabold tracking-[-0.04em]">Alerts</h1>
             <span className="text-[15px] text-muted">Safety notices are kept separate from everyday updates.</span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -149,14 +149,7 @@ export function AlertsScreen() {
             >
               Mark all read
             </button>
-            <Segmented
-              label="Filter alerts"
-              options={WEB_FILTERS}
-              value={filter}
-              onChange={setFilter}
-              panelId={panelId}
-              className="bg-chip"
-            />
+            <Segmented label="Filter alerts" options={WEB_FILTERS} value={filter} onChange={setFilter} panelId={panelId} />
           </div>
         </div>
         <div className="flex flex-wrap items-start gap-5">
@@ -169,9 +162,9 @@ export function AlertsScreen() {
             ) : null}
             {empty ? <MessageCard icon="checkCircle" art="no-alerts" title="No alerts today" /> : null}
             {notices.length > 0 ? (
-              <section aria-labelledby="today-title" className="flex flex-col rounded-[22px] border border-line bg-card px-5 py-2">
-                <h2 id="today-title" className="mb-1 mt-3 text-[13px] font-extrabold tracking-[0.06em] text-muted">
-                  TODAY
+              <section aria-labelledby="today-title" className="raised flex flex-col rounded-[22px] border border-line bg-card px-5 py-2">
+                <h2 id="today-title" className="mb-1 mt-3 font-sans text-[13px] font-semibold tracking-normal text-muted">
+                  Today
                 </h2>
                 <ul className="m-0 flex list-none flex-col p-0">
                   {notices.map((n, i) => (
@@ -185,7 +178,7 @@ export function AlertsScreen() {
             aria-labelledby="prefs-title"
             className="flex min-w-0 flex-[1_1_300px] flex-col gap-1.5 rounded-[22px] border border-line bg-card p-5"
           >
-            <h2 id="prefs-title" className="m-0 mb-2 text-[17px] font-extrabold">
+            <h2 id="prefs-title" className="m-0 mb-2 text-xl font-semibold">
               Notify me about
             </h2>
             <Preferences />
@@ -202,7 +195,7 @@ export function AlertsScreen() {
     <>
       <header className="flex flex-col gap-3 px-4 pb-2.5 pt-[18px]">
         <div className="flex items-center justify-between">
-          <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em]">Alerts</h1>
+          <h1 className="m-0 font-display text-[34px] font-extrabold tracking-[-0.04em]">Alerts</h1>
           <button
             type="button"
             onClick={markAllRead}
@@ -216,7 +209,7 @@ export function AlertsScreen() {
       <main id="main" className="flex flex-1 flex-col gap-3 px-4 pb-4 pt-1">
         {showSafety && (events.length > 0 || feed.isError) ? (
           <>
-            <h2 className="m-0 text-xs font-extrabold tracking-[0.06em] text-muted">SAFETY</h2>
+            <h2 className="m-0 font-sans text-[13px] font-semibold tracking-normal text-muted">Safety</h2>
             {safetyBlock}
           </>
         ) : null}
@@ -228,8 +221,8 @@ export function AlertsScreen() {
         {empty ? <MessageCard icon="checkCircle" art="no-alerts" title="No alerts today" /> : null}
         {notices.length > 0 ? (
           <>
-            <h2 className="m-0 mt-1 text-xs font-extrabold tracking-[0.06em] text-muted">TODAY</h2>
-            <ul className="m-0 flex list-none flex-col rounded-[20px] border border-line bg-card px-3.5 py-1">
+            <h2 className="m-0 mt-1 font-sans text-[13px] font-semibold tracking-normal text-muted">Today</h2>
+            <ul className="m-0 flex list-none flex-col px-1.5">
               {notices.map((n, i) => (
                 <NoticeRow key={n.id} notice={n} layout="mobile" last={i === notices.length - 1} />
               ))}

@@ -56,15 +56,31 @@ function Card({ children, className, labelledBy }: { children: ReactNode; classN
   );
 }
 
-function Kpi({ title, value, suffix, sub, tone }: { title: string; value: string; suffix?: string; sub: string; tone?: "alert" }) {
+function Kpi({ title, value, suffix, sub, tone }: { title: string; value: string; suffix?: string; sub: string; tone?: "alert" | "hero" }) {
+  const hero = tone === "hero";
   return (
-    <div className="flex flex-[1_1_200px] flex-col gap-1.5 rounded-2xl border border-line bg-card px-[18px] py-4">
-      <span className="text-[13px] font-semibold text-muted">{title}</span>
-      <span className={cx("text-[30px] font-extrabold tracking-[-0.02em]", tone === "alert" && "text-crowd")}>
+    <div
+      className={cx(
+        "flex flex-col gap-2.5 rounded-[20px] px-[22px] py-5",
+        hero ? "slab flex-[1.4_1_260px] bg-brand text-sand" : "raised flex-[1_1_200px] border border-line bg-card",
+      )}
+    >
+      <span className={cx("text-[13px] font-semibold", hero ? "text-on-dark-faint" : "text-muted")}>{title}</span>
+      <span
+        className={cx(
+          "font-display font-extrabold leading-none tracking-[-0.04em]",
+          hero ? "text-[54px]" : "text-[40px]",
+          tone === "alert" && "text-crowd-mark",
+        )}
+      >
         {value}
-        {suffix ? <span className="text-base font-semibold text-muted"> {suffix}</span> : null}
+        {suffix ? (
+          <span className={cx("ml-2 font-sans text-sm font-medium tracking-normal", hero ? "text-on-dark-faint" : "text-muted")}>
+            {suffix}
+          </span>
+        ) : null}
       </span>
-      <span className="text-xs text-muted">{sub}</span>
+      <span className={cx("text-[13px]", hero ? "text-on-dark-faint" : "text-muted")}>{sub}</span>
     </div>
   );
 }
@@ -472,7 +488,7 @@ export function OverviewScreen() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
             <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.02em]">Overview</h1>
-            {data?.is_sample ? <SampleBadge className="font-bold">SAMPLE DATA</SampleBadge> : null}
+            {data?.is_sample ? <SampleBadge /> : null}
           </div>
           <span className="text-sm text-muted">
             {formatDateLine(now)} · {formatClock(now)} · Asia/Colombo
@@ -500,16 +516,17 @@ export function OverviewScreen() {
       {k ? (
         <section aria-label="Key figures" className="flex flex-wrap gap-4">
           <Kpi
-            title="Zones with live data"
-            value={String(k.live)}
-            suffix={`of ${data?.zones.length ?? 0}`}
-            sub={`${k.stale} stale · ${k.unavailable} unavailable`}
-          />
-          <Kpi
             title="Free seats (live zones, est.)"
             value={`~${k.free}`}
             suffix={`${k.low}–${k.high}`}
             sub={`of ${k.capacity} monitored seats`}
+            tone="hero"
+          />
+          <Kpi
+            title="Zones with live data"
+            value={String(k.live)}
+            suffix={`of ${data?.zones.length ?? 0}`}
+            sub={`${k.stale} stale · ${k.unavailable} unavailable`}
           />
           <Kpi
             title="Open crowding alerts"

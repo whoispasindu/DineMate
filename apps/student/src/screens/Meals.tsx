@@ -12,35 +12,38 @@ function Countdown({ data, now, remaining }: { data: MealStatus; now: number; re
   const progress = current ? windowProgress(current, now) : 0;
   const far = !current && remaining !== null && remaining > FAR_AWAY_MS;
   return (
-    <section
-      aria-label="Meal countdown"
-      className="flex flex-col items-center gap-3.5 rounded-3xl bg-brand-dark px-[18px] py-[22px] text-white"
-    >
+    <section aria-label="Meal countdown" className="slab flex flex-col gap-2 rounded-[26px] bg-brand px-[22px] pb-5 pt-[22px] text-sand">
       <MealBadge text={mealBadgeText(current, next)} />
       {focus && remaining !== null ? (
-        <>
-          <div
-            className="flex h-[196px] w-[196px] items-center justify-center rounded-full"
-            style={{ background: `conic-gradient(var(--color-live) 0 ${progress}%, var(--color-track-dark) ${progress}% 100%)` }}
-          >
-            <div className="flex h-[170px] w-[170px] flex-col items-center justify-center gap-1 rounded-full bg-brand-dark text-center">
-              {far ? (
-                <>
-                  <span className="text-[28px] font-extrabold tracking-[-0.02em]">{startsLabel(focus, now)}</span>
-                  <span className="text-[13px] text-on-dark">{PERIOD_LABEL[focus.period].toLowerCase()} starts</span>
-                </>
-              ) : (
-                <>
-                  <span className="tabular text-[34px] font-extrabold tracking-[-0.02em]">{formatCountdown(remaining)}</span>
-                  <span className="text-[13px] text-on-dark">
-                    until {PERIOD_LABEL[focus.period].toLowerCase()} {current ? "ends" : "starts"}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-          <span className="text-sm text-on-dark-strong">{formatRange(focus.starts, focus.ends)}</span>
-        </>
+        far ? (
+          <>
+            <span className="mt-2 font-display text-[44px] font-extrabold leading-none tracking-[-0.04em]">{startsLabel(focus, now)}</span>
+            <span className="text-[13px] text-on-dark-faint">
+              {PERIOD_LABEL[focus.period]} starts · {formatRange(focus.starts, focus.ends)}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="tabular mt-2 font-mono text-[56px] font-bold leading-none tracking-[-0.06em]">
+              {formatCountdown(remaining).slice(0, 5)}
+              <span className="text-on-dark-faint/70">{formatCountdown(remaining).slice(5)}</span>
+            </span>
+            <span className="text-[13px] text-on-dark-faint">
+              {current ? "left until" : "until it starts at"} {formatRange(focus.starts, focus.ends).split(" – ")[current ? 1 : 0]} · read
+              from the campus clock
+            </span>
+            {current ? (
+              <div aria-hidden="true" className="mt-3 grid grid-cols-[repeat(30,minmax(0,1fr))] gap-[3px]">
+                {Array.from({ length: 30 }, (_, i) => (
+                  <span
+                    key={i}
+                    className={cx("block h-[18px] rounded-[2px]", i < Math.round((progress / 100) * 30) ? "bg-purple" : "bg-sand/20")}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </>
+        )
       ) : (
         <span className="py-6 text-lg font-bold">No meals scheduled this week</span>
       )}
@@ -56,7 +59,7 @@ function TodayRow({ window, now }: { window: MealWindow; now: number }) {
         className={cx(
           "flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]",
           state.kind === "ended" && "bg-neutral text-muted",
-          state.kind === "now" && "bg-brand text-white",
+          state.kind === "now" && "bg-brand text-sand",
           state.kind === "upcoming" && "bg-busy-bg text-busy",
         )}
       >
@@ -88,13 +91,13 @@ function DayCell({ day }: { day: WeekDay }) {
       aria-current={day.is_today ? "date" : undefined}
       className={cx(
         "flex flex-col items-center gap-1 rounded-xl py-2",
-        day.is_today && "bg-brand text-white",
+        day.is_today && "bg-brand text-sand",
         !day.is_today && day.kind === "regular" && "border border-line bg-card",
         !day.is_today && day.kind === "special" && "border border-busy-line bg-busy-bg",
         !day.is_today && day.kind === "closed" && "border border-dashed border-dash bg-page",
       )}
     >
-      <span className={cx("text-[11px]", day.is_today ? "font-semibold text-white" : day.kind === "special" ? "text-busy" : "text-muted")}>
+      <span className={cx("text-[11px]", day.is_today ? "font-semibold text-sand" : day.kind === "special" ? "text-busy" : "text-muted")}>
         {day.weekday}
       </span>
       <span
@@ -120,9 +123,9 @@ export function MealsScreen() {
       <header className="flex items-end justify-between gap-3 px-4 pb-2.5 pt-[18px] md:px-6">
         <div className="flex flex-col gap-0.5">
           <span className="text-[13px] text-muted">Today · {formatWeekday(now)}</span>
-          <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em] md:text-[32px] md:tracking-[-0.03em]">Meal times</h1>
+          <h1 className="m-0 font-display text-[34px] font-extrabold tracking-[-0.04em] md:text-[44px]">Meal times</h1>
         </div>
-        {data?.is_sample ? <SampleBadge>SAMPLE SCHEDULE</SampleBadge> : null}
+        {data?.is_sample ? <SampleBadge>Sample schedule</SampleBadge> : null}
       </header>
       <main id="main" className="flex flex-1 flex-col gap-3.5 px-4 pb-4 pt-1 md:px-6 md:pb-10">
         {!data ? (
@@ -149,7 +152,7 @@ export function MealsScreen() {
               )}
             </section>
             <section aria-labelledby="week-title" className="flex flex-col gap-2.5">
-              <h2 id="week-title" className="m-0 text-[17px] font-extrabold">
+              <h2 id="week-title" className="m-0 text-[22px] font-semibold">
                 This week
               </h2>
               <ol className="m-0 grid list-none grid-cols-7 gap-1.5 p-0">

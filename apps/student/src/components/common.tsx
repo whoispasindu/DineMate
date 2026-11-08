@@ -52,7 +52,7 @@ export function MessageCard({ icon, title, body, dashed, className, art }: Messa
         </span>
       )}
       <span className="flex flex-col gap-0.5">
-        <span className="text-[15px] font-extrabold">{title}</span>
+        <span className="text-[15px] font-bold">{title}</span>
         {body ? <span className="text-[13px] leading-snug text-muted">{body}</span> : null}
       </span>
     </div>
@@ -201,7 +201,7 @@ export function FilterChips<T extends string>({ label, options, value, onChange,
             onClick={() => onChange(o.value)}
             className={cx(
               "min-h-9 shrink-0 rounded-full px-3.5 text-[13px] md:min-h-[38px] md:px-4",
-              active ? "border-0 bg-brand font-bold text-white" : "border border-line bg-card font-semibold text-ink-2 hover:bg-page",
+              active ? "border-0 bg-brand font-bold text-sand" : "border border-line bg-card font-semibold text-ink-2 hover:bg-page",
             )}
           >
             {o.label}
@@ -234,7 +234,7 @@ export function Segmented<T extends string>({ label, options, value, onChange, p
     <div
       role="tablist"
       aria-label={label}
-      className={cx("gap-1 rounded-[14px] p-1", stretch ? "grid" : "flex flex-wrap", className)}
+      className={cx("gap-1 rounded-[14px] bg-sand p-1", stretch ? "grid" : "flex flex-wrap", className)}
       style={stretch ? { gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` } : undefined}
     >
       {options.map((o, i) => {
@@ -254,7 +254,7 @@ export function Segmented<T extends string>({ label, options, value, onChange, p
             onKeyDown={(e) => onKeyDown(e, i)}
             className={cx(
               "min-h-[38px] rounded-[10px] border-0 px-3.5 text-[13px] md:px-4",
-              active ? "bg-card font-extrabold text-ink" : "bg-transparent font-bold text-muted hover:text-ink",
+              active ? "bg-brand font-bold text-sand" : "bg-transparent font-semibold text-muted hover:text-ink",
             )}
           >
             {o.label}

@@ -79,11 +79,7 @@ export function CanteenRow({ canteen, now }: { canteen: CanteenSummary; now: num
   const style = levelFor(canteen.level, canteen.freshness);
   const stale = canteen.freshness === "stale";
   return (
-    <Link
-      to={`/canteens/${canteen.id}`}
-      aria-label={seatsLabel(canteen)}
-      className="flex items-center gap-3.5 py-3.5 text-ink no-underline hover:opacity-90"
-    >
+    <Link to={`/canteens/${canteen.id}`} className="flex items-center gap-3.5 py-3.5 text-ink no-underline hover:opacity-90">
       <div className="relative h-[58px] w-[58px] shrink-0">
         <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} className="rounded-2xl" />
         <span
@@ -116,7 +112,6 @@ export function CanteenCard({ canteen, now }: { canteen: CanteenSummary; now: nu
   return (
     <Link
       to={`/canteens/${canteen.id}`}
-      aria-label={seatsLabel(canteen)}
       className="raised flex flex-[1_1_300px] flex-col gap-4 rounded-[22px] border border-line bg-card p-3 text-ink no-underline hover:border-mint-line"
     >
       <div className="h-[150px]">
@@ -360,6 +355,7 @@ export function ZoneBarRow({ zone, seats, now }: { zone: ZoneOccupancy; last?: b
 export function ZoneCard({ zone, now, seats }: { zone: ZoneOccupancy; now: number; seats?: ZoneSeats }) {
   return (
     <div
+      role="group"
       aria-label={seatsLabel(zone)}
       className={cx(
         "flex flex-[1_1_300px] flex-col gap-3.5 rounded-[22px] p-5",

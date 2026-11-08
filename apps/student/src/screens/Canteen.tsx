@@ -16,7 +16,6 @@ import {
   formatClock,
   formatClock24,
   formatLocalRange,
-  HalfGauge,
   Icon,
   levelFor,
   LiveLine,
@@ -26,11 +25,11 @@ import {
 } from "@dinemate/ui";
 import type { ReactNode } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
-import { AlternativeCard, freshnessText, useZoneSeats, ZoneBarRow, ZoneCard } from "../components/canteen";
+import { AlternativeCard, freshnessText, SeatLegend, Strip, useHeldSeats, useZoneSeats, ZoneBarRow, ZoneCard } from "../components/canteen";
 import { Footnote, Loading, MessageCard, OfflineCard, ShopStatusText, Skeleton } from "../components/common";
 import { useIsDesktop, useOnline } from "../lib/device";
 import { favourites } from "../lib/prefs";
-import { canteenInitial, canteenWall, hasNumbers } from "../lib/present";
+import { canteenInitial, canteenStrip, canteenWall, hasNumbers } from "../lib/present";
 
 function isOpenNow(hours: OpeningHours[], now: number): boolean {
   const hm = formatClock24(now);
@@ -108,7 +107,7 @@ function FavouriteButton({ canteen, className }: { canteen: CanteenSummary; clas
       aria-pressed={saved}
       aria-label={saved ? `Remove ${canteen.name} from favourites` : `Save ${canteen.name} to favourites`}
       onClick={toggle}
-      className={cx("flex items-center justify-center border-0 bg-card text-crowd-mark", className)}
+      className={cx("flex items-center justify-center border-0 bg-card/90 text-crowd-mark", className)}
     >
       <Icon name={saved ? "heartSolid" : "heart"} size={20} strokeWidth={2.2} />
     </button>
@@ -127,7 +126,7 @@ function BackButton({ className }: { className?: string }) {
       type="button"
       aria-label="Back"
       onClick={goBack}
-      className={cx("flex items-center justify-center border-0 bg-card text-ink", className)}
+      className={cx("flex items-center justify-center border-0 bg-card/90 text-ink", className)}
     >
       <Icon name="arrowLeft" size={20} strokeWidth={2.2} />
     </button>
@@ -138,8 +137,8 @@ function Tile({ icon, title, sub, to, className }: { icon: IconName; title: stri
   const body: ReactNode = (
     <>
       <Icon name={icon} size={18} className="text-brand" />
-      <span className="text-xs font-extrabold md:text-[13px]">{title}</span>
-      <span className="text-[11px] text-muted md:text-xs">{sub}</span>
+      <span className="text-xs font-bold md:text-[13px]">{title}</span>
+      <span className="text-xs text-muted">{sub}</span>
     </>
   );
   const base = cx("flex flex-col gap-1 rounded-2xl p-2.5 md:p-3", className);
@@ -153,35 +152,45 @@ function Tile({ icon, title, sub, to, className }: { icon: IconName; title: stri
 }
 
 function SeatHeadline({ canteen, large }: { canteen: CanteenSummary; large?: boolean }) {
-  if (!hasNumbers(canteen)) {
-    return (
-      <div className={cx("flex flex-col gap-1", !large && "items-center text-center")}>
-        <span className={cx("font-extrabold", large ? "text-[26px] tracking-[-0.02em]" : "mt-1.5 text-lg")}>No info right now</span>
-        <span className={cx("text-muted", large ? "text-sm" : "text-[13px]")}>Seat numbers are hidden until live readings return.</span>
-      </div>
-    );
-  }
+  const numbers = hasNumbers(canteen);
   return (
-    <div className={cx("flex flex-col gap-1", !large && "items-center text-center", canteen.freshness === "stale" && "opacity-70")}>
-      <span className={cx("font-extrabold", large ? "text-[26px] tracking-[-0.02em]" : "mt-1.5 text-lg")}>
-        ~{canteen.free_about} seats free
-      </span>
-      <span className={cx("text-muted", large ? "text-sm" : "text-[13px]")}>
-        Estimated {canteen.free_range[0]}–{canteen.free_range[1]} of {canteen.monitored_capacity} monitored seats
-      </span>
+    <div className={cx("shrink-0 text-right", canteen.freshness === "stale" && "opacity-60")}>
+      <div className={cx("font-display font-extrabold leading-[0.85] tracking-[-0.05em]", large ? "text-[72px]" : "text-[52px]")}>
+        {numbers ? `~${canteen.free_about}` : "—"}
+      </div>
+      <div className="mt-1.5 text-xs text-muted">{numbers ? `of ${canteen.monitored_capacity} seats free` : "no live number"}</div>
     </div>
+  );
+}
+
+function SeatSummary({ canteen }: { canteen: CanteenSummary }) {
+  const held = useHeldSeats(canteen.id);
+  const counts = canteenStrip(canteen, held);
+  return (
+    <section aria-label="Seat estimate" className="flex flex-col gap-2.5">
+      <Strip counts={counts} height={12} stale={canteen.freshness === "stale"} />
+      {counts ? (
+        <SeatLegend counts={counts} free={hasNumbers(canteen) ? `~${canteen.free_about}` : "—"} />
+      ) : (
+        <span className="text-[13px] text-muted">Seat numbers are hidden until live readings return.</span>
+      )}
+    </section>
   );
 }
 
 function ForecastTip({ point }: { point: ForecastPoint }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-2xl bg-mint-soft px-3.5 py-3">
-      <Icon name="trend" size={20} className="shrink-0 text-brand" />
+    <div className="flex items-center gap-3.5 rounded-[20px] bg-purple-bg px-4 py-3.5">
+      <div aria-hidden="true" className="flex h-[34px] items-end gap-1">
+        {[30, 24, 17, 10].map((h, i) => (
+          <span key={h} className="block w-2 rounded-[3px] bg-purple" style={{ height: h, opacity: 1 - i * 0.2 }} />
+        ))}
+      </div>
       <div className="flex flex-col">
-        <span className="text-[13px] font-extrabold">
+        <span className="text-sm font-bold text-purple-deep">
           Likely {point.low}–{point.high}% at {formatClock(point.at)}
         </span>
-        <span className="text-xs text-muted">Experimental forecast</span>
+        <span className="text-xs text-purple-ink">Experimental forecast</span>
       </div>
     </div>
   );
@@ -195,60 +204,56 @@ function CanteenMobile({ data, now, online }: ViewProps) {
     <main id="main" className="flex flex-1 flex-col">
       <div className="relative h-[250px] shrink-0">
         <CanteenArt wall={canteenWall(canteen.id)} photo={canteenPhotoFor(canteen.id)} />
-        <BackButton className="absolute left-4 top-[18px] h-11 w-11 rounded-[14px]" />
-        <FavouriteButton canteen={canteen} className="absolute right-4 top-[18px] h-11 w-11 rounded-[14px]" />
+        <BackButton className="absolute left-4 top-[18px] h-[42px] w-[42px] rounded-[14px]" />
+        <FavouriteButton canteen={canteen} className="absolute right-4 top-[18px] h-[42px] w-[42px] rounded-[14px]" />
       </div>
-      <div className="relative -mt-7 flex flex-col gap-3.5 rounded-t-[28px] bg-page px-4 py-5">
-        <div className="flex items-start justify-between gap-2.5">
-          <div className="flex flex-col gap-1">
-            <h1 className="m-0 text-[26px] font-extrabold tracking-[-0.02em]">{canteen.name}</h1>
-            <LiveLine freshness={canteen.freshness} text={freshnessText(canteen.freshness, canteen.updated_at, now)} />
+      <div className="relative -mt-9 flex flex-col gap-4 rounded-t-[28px] bg-page px-[18px] py-[22px]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-2">
+            <h1 className="m-0 font-display text-[32px] font-extrabold leading-none tracking-[-0.04em]">{canteen.name}</h1>
+            <div className="flex flex-wrap gap-2">
+              <StatusPill level={canteen.level} freshness={canteen.freshness} size="sm" />
+              <LiveLine freshness={canteen.freshness} text={freshnessText(canteen.freshness, canteen.updated_at, now)} />
+            </div>
           </div>
-          <StatusPill level={canteen.level} freshness={canteen.freshness} />
+          {online ? <SeatHeadline canteen={canteen} /> : null}
         </div>
-        {online ? (
-          <section
-            aria-label="Seat estimate"
-            className="flex flex-col items-center gap-1.5 rounded-[22px] border border-line bg-card px-4 pb-4 pt-[18px]"
-          >
-            <HalfGauge percent={canteen.percent} level={canteen.level} freshness={canteen.freshness} caption="seats in use (est.)" />
-            <SeatHeadline canteen={canteen} />
-          </section>
-        ) : (
-          <OfflineCard />
-        )}
+        {online ? <SeatSummary canteen={canteen} /> : <OfflineCard />}
         {online ? <AlternativeCard canteen={canteen} /> : null}
         <div className="grid grid-cols-3 gap-2">
           <Tile
             icon="clock"
             title={isOpenNow(hours_today, now) ? "Open now" : "Closed now"}
             sub={hoursText(hours_today)}
-            className="border border-line bg-card"
+            className="raised border border-line bg-card"
           />
           <Tile
             icon="store"
             title={`${canteen.shops_total} shops`}
             sub={`${canteen.shops_open} open now`}
             to={`/food?canteen=${canteen.id}`}
-            className="border border-line bg-card"
+            className="raised border border-line bg-card"
           />
           {canteen.walk ? (
             <Tile
               icon="walk"
               title={`${canteen.walk.minutes} min`}
               sub={`from ${canteen.walk.from_name}`}
-              className="border border-line bg-card"
+              className="raised border border-line bg-card"
             />
           ) : (
             <Tile
               icon="camera"
               title={`${canteen.zones_live} of ${canteen.zones_total} zones`}
               sub="with live data"
-              className="border border-line bg-card"
+              className="raised border border-line bg-card"
             />
           )}
         </div>
-        <h2 className="m-0 mt-1 text-[17px] font-extrabold">Seats by zone</h2>
+        <div className="mt-1 flex items-baseline justify-between">
+          <h2 className="m-0 text-[22px] font-semibold">Seats by zone</h2>
+          <span className="text-[13px] text-muted">{zones.length} zones</span>
+        </div>
         {online ? (
           <ul className="m-0 flex list-none flex-col gap-3 p-0">
             {zones.map((z, i) => (
@@ -267,13 +272,15 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
   return (
     <section
       aria-labelledby="fc-title"
-      className="flex min-w-0 flex-[1.2_1_420px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5"
+      className="raised flex min-w-0 flex-[1.2_1_420px] flex-col gap-3.5 rounded-[22px] border border-line bg-card p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="fc-title" className="m-0 text-[17px] font-extrabold">
           Next hour
         </h2>
-        <span className="rounded-full bg-neutral px-[9px] py-1 text-xs font-bold text-neutral-ink">Experimental forecast</span>
+        <span className="inline-flex h-7 items-center rounded-full bg-purple-bg px-3 text-xs font-bold text-purple-ink">
+          Experimental forecast
+        </span>
       </div>
       <ul className="m-0 flex h-[140px] list-none items-end gap-3.5 p-0">
         {canteen.percent !== null ? (
@@ -294,7 +301,7 @@ function NextHour({ canteen, forecast }: { canteen: CanteenSummary; forecast: Fo
             </span>
             <div
               aria-hidden="true"
-              className="forecast-stripes w-full max-w-16 rounded-t-[10px] rounded-b"
+              className="w-full max-w-16 rounded-t-[10px] rounded-b border-[1.5px] border-dashed border-purple bg-purple-bg"
               style={{ height: Math.round(((p.low + p.high) / 2) * 1.2) }}
             />
             <span className="text-xs text-muted">{shortClock(p.at)}</span>
@@ -330,23 +337,19 @@ function CanteenWeb({ data, now, online }: ViewProps) {
         </div>
         <section
           aria-label={`${canteen.name} summary`}
-          className="flex min-w-0 flex-[1_1_420px] flex-col gap-4 rounded-[26px] border border-line bg-card p-6"
+          className="raised flex min-w-0 flex-[1_1_420px] flex-col gap-5 rounded-[26px] border border-line bg-card p-6"
         >
           <div className="flex flex-wrap items-start justify-between gap-2.5">
             <div className="flex flex-col gap-1">
-              <h1 className="m-0 text-[32px] font-extrabold tracking-[-0.03em]">{canteen.name}</h1>
-              <LiveLine freshness={canteen.freshness} text={freshnessText(canteen.freshness, canteen.updated_at, now)} />
+              <h1 className="m-0 font-display text-[44px] font-extrabold leading-none tracking-[-0.04em]">{canteen.name}</h1>
+              <div className="flex flex-wrap gap-2">
+                <StatusPill level={canteen.level} freshness={canteen.freshness} />
+                <LiveLine freshness={canteen.freshness} text={freshnessText(canteen.freshness, canteen.updated_at, now)} />
+              </div>
             </div>
-            <StatusPill level={canteen.level} freshness={canteen.freshness} size="lg" />
+            {online ? <SeatHeadline canteen={canteen} large /> : null}
           </div>
-          {online ? (
-            <div className="flex flex-wrap items-center gap-[22px]">
-              <HalfGauge percent={canteen.percent} level={canteen.level} freshness={canteen.freshness} caption="in use (est.)" />
-              <SeatHeadline canteen={canteen} large />
-            </div>
-          ) : (
-            <OfflineCard />
-          )}
+          {online ? <SeatSummary canteen={canteen} /> : <OfflineCard />}
           <div className="grid grid-cols-3 gap-2.5">
             <Tile
               icon="clock"
@@ -365,7 +368,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
           </div>
         </section>
       </div>
-      <h2 className="m-0 mt-1 text-[22px] font-extrabold tracking-[-0.02em]">Seats by zone</h2>
+      <h2 className="m-0 mt-1 text-[26px] font-semibold">Seats by zone</h2>
       {online ? (
         <div className="flex flex-wrap gap-5">
           {zones.map((z) => (
@@ -380,7 +383,7 @@ function CanteenWeb({ data, now, online }: ViewProps) {
         {online && forecast.length > 0 && canteen.freshness === "live" ? <NextHour canteen={canteen} forecast={forecast} /> : null}
         <section
           aria-labelledby="shops-title"
-          className="flex min-w-0 flex-[1_1_360px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
+          className="raised flex min-w-0 flex-[1_1_360px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
         >
           <div className="mb-1.5 flex items-center justify-between">
             <h2 id="shops-title" className="m-0 text-[17px] font-extrabold">
