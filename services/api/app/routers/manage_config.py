@@ -214,7 +214,7 @@ def _zone_thresholds(zone: models.SeatingZone, row: models.CrowdingThreshold | N
 def list_thresholds(user: StaffUser, session: SessionDep, now: NowDep) -> ThresholdList:
     zones = session.scalars(
         select(models.SeatingZone)
-        .where(models.SeatingZone.is_active)
+        .where(models.SeatingZone.is_active, models.SeatingZone.canteen_id.in_(models.campus_canteen_ids()))
         .order_by(models.SeatingZone.canteen_id, models.SeatingZone.sort_order)
     )
     rows = {t.zone_id: t for t in session.scalars(select(models.CrowdingThreshold))}

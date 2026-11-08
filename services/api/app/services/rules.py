@@ -131,14 +131,23 @@ def _crowding(
 def evaluate(session: Session, now: datetime) -> EvaluationResult:
     result = EvaluationResult()
     zones = list(
-        session.scalars(select(models.SeatingZone).where(models.SeatingZone.is_active, models.SeatingZone.is_monitored))
+        session.scalars(
+            select(models.SeatingZone).where(
+                models.SeatingZone.is_active,
+                models.SeatingZone.is_monitored,
+                models.SeatingZone.canteen_id.in_(models.campus_canteen_ids()),
+            )
+        )
     )
     readings = latest_readings(session, [z.id for z in zones])
     thresholds = {str(t.zone_id): t for t in session.scalars(select(models.CrowdingThreshold))}
     states = {str(s.zone_id): s for s in session.scalars(select(models.ZoneCrowdState))}
     alerts = _active_alerts(session)
     resolved = _last_resolved(session)
-    devices = {d.id: d for d in session.scalars(select(models.Device))}
+    devices = {
+        d.id: d
+        for d in session.scalars(select(models.Device).where(models.Device.canteen_id.in_(models.campus_canteen_ids())))
+    }
     device_of_zone = zone_devices(session)
 
     for zone in zones:

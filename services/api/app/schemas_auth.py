@@ -4,7 +4,7 @@ from pydantic import Field
 
 from app.schemas import Schema
 
-Role = Literal["shop_manager", "canteen_manager", "campus_admin", "safety_officer"]
+Role = Literal["shop_manager", "canteen_manager", "campus_admin", "safety_officer", "owner", "venue_manager"]
 
 
 class Me(Schema):

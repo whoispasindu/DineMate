@@ -14,6 +14,8 @@ ADMIN = "campus_admin"
 CANTEEN_MANAGER = "canteen_manager"
 SHOP_MANAGER = "shop_manager"
 SAFETY_OFFICER = "safety_officer"
+OWNER = "owner"
+VENUE_MANAGER = "venue_manager"
 
 
 def _unauthenticated() -> ApiError:
@@ -53,6 +55,8 @@ def require_roles(*roles: str) -> Callable[[models.User], models.User]:
 
 
 def can_manage_canteen(user: models.User, canteen_id: str) -> bool:
+    if models.is_venue_id(canteen_id):
+        return False
     return user.role == ADMIN or (user.role == CANTEEN_MANAGER and canteen_id in user.canteen_ids)
 
 

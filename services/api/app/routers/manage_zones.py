@@ -144,7 +144,11 @@ def save_version(session: SessionDep, device: models.Device, polygons: list[dict
 @router.get("/manage/devices", response_model=ManagedDeviceList, responses=RESPONSES)
 def list_managed_devices(user: StaffUser, session: SessionDep, now: NowDep) -> ManagedDeviceList:
     names = {cid: name for cid, name in session.execute(select(models.Canteen.id, models.Canteen.name))}
-    devices = session.scalars(select(models.Device).order_by(models.Device.canteen_id, models.Device.id))
+    devices = session.scalars(
+        select(models.Device)
+        .where(models.Device.canteen_id.in_(models.campus_canteen_ids()))
+        .order_by(models.Device.canteen_id, models.Device.id)
+    )
     items = []
     for d in devices:
         if not can_manage_canteen(user, d.canteen_id):

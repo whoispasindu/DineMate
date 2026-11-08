@@ -43,6 +43,8 @@ def register(session: Session, args: argparse.Namespace) -> str | None:
     _check_points(layout)
     canteen = session.get(models.Canteen, args.canteen)
     if canteen is None:
+        if models.is_venue_id(args.canteen):
+            raise ValueError(f"Venue '{args.canteen}' does not exist; create venues from the business dashboard seed.")
         if not args.canteen_name:
             raise ValueError(f"Canteen '{args.canteen}' does not exist; pass --canteen-name to create it.")
         order = session.scalar(select(func.coalesce(func.max(models.Canteen.sort_order), -1))) or 0

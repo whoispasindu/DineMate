@@ -240,6 +240,7 @@ TABLES = [
     "seating_zones",
     "canteen_hours",
     "canteens",
+    "organizations",
 ]
 
 
@@ -256,6 +257,12 @@ def _zone_polygon(index: int, count: int) -> list[list[float]]:
         [round(left + width - 0.02, 3), 0.95],
         [round(left, 3), 0.95],
     ]
+
+
+def ensure_campus_org(session: Session) -> None:
+    if session.get(models.Organization, models.CAMPUS_ORG) is None:
+        session.add(models.Organization(id=models.CAMPUS_ORG, name="Campus", kind="campus", is_sample=True))
+        session.flush()
 
 
 def _seed_canteens(session: Session, now: datetime) -> None:
@@ -382,6 +389,7 @@ def seed_demo_users(session: Session, password: str) -> None:
 
 
 def seed(session: Session, now: datetime, demo_password: str | None = None) -> None:
+    ensure_campus_org(session)
     _seed_canteens(session, now)
     _seed_shops(session, now)
     _seed_schedules(session)

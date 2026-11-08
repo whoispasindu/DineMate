@@ -40,7 +40,7 @@ def get_zone_history(
         zone = session.get(models.SeatingZone, uuid.UUID(zone_id))
     except ValueError:
         zone = None
-    if zone is None:
+    if zone is None or models.is_venue_id(zone.canteen_id):
         raise not_found("Zone", zone_id)
     end = end or now
     start = start or end - DEFAULT_RANGE
