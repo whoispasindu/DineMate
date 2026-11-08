@@ -1,5 +1,5 @@
 import type { MealStatus, MealWindow, WeekDay } from "@dinemate/api-client";
-import { cx, formatCountdown, formatRange, formatWeekday, Icon, SampleBadge } from "@dinemate/ui";
+import { cx, formatClock, formatCountdown, formatRange, formatWeekday, Icon, SampleBadge } from "@dinemate/ui";
 import { Footnote, Loading, MessageCard, Skeleton } from "../components/common";
 import { MealBadge, mealBadgeText, useMealCountdown } from "../components/meal";
 import { PERIOD_ICON, PERIOD_LABEL, startsLabel, windowProgress, windowState } from "../lib/present";
@@ -29,8 +29,8 @@ function Countdown({ data, now, remaining }: { data: MealStatus; now: number; re
               <span className="text-on-dark-faint/70">{formatCountdown(remaining).slice(5)}</span>
             </span>
             <span className="text-[13px] text-on-dark-faint">
-              {current ? "left until" : "until it starts at"} {formatRange(focus.starts, focus.ends).split(" – ")[current ? 1 : 0]} · read
-              from the campus clock
+              until {PERIOD_LABEL[focus.period].toLowerCase()} {current ? "ends" : "starts"} at{" "}
+              {formatClock(current ? focus.ends : focus.starts)} · read from the campus clock
             </span>
             {current ? (
               <div aria-hidden="true" className="mt-3 grid grid-cols-[repeat(30,minmax(0,1fr))] gap-[3px]">
