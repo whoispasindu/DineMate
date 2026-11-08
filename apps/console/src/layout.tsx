@@ -59,7 +59,7 @@ function Sidebar({ user }: { user: StaffUser }) {
   const openAlerts = useOpenAlertCount(MANAGERS.includes(user.role));
   const queryClient = useQueryClient();
   return (
-    <aside className="box-border flex flex-[1_1_248px] flex-col gap-6 bg-side px-[18px] py-7 text-sand">
+    <aside className="box-border flex flex-[1_1_248px] flex-col gap-6 bg-side px-[18px] py-7 text-sand min-[820px]:sticky min-[820px]:top-0 min-[820px]:h-dvh min-[820px]:self-start">
       <div className="flex items-center gap-2.5 px-2">
         <BrandMark tone="sand" size={34} />
         <span className="flex flex-col">
@@ -67,7 +67,7 @@ function Sidebar({ user }: { user: StaffUser }) {
           <span className="text-xs text-side-muted">Staff console</span>
         </span>
       </div>
-      <nav aria-label="Console" className="flex flex-col gap-1">
+      <nav aria-label="Console" className="scrollbar-none flex min-h-0 flex-col gap-1 overflow-y-auto">
         {items.map((item) => (
           <NavLink
             key={item.to}
