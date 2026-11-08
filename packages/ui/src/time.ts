@@ -19,6 +19,8 @@ const dateLineFormat = new Intl.DateTimeFormat("en-GB", {
 
 const weekdayFormat = new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, weekday: "long" });
 
+const stampFormat = new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, weekday: "short", day: "numeric", month: "short" });
+
 function toMs(value: TimeInput): number {
   if (typeof value === "number") return value;
   if (value instanceof Date) return value.getTime();
@@ -110,6 +112,11 @@ export function formatDateLine(value: TimeInput): string {
 
 export function formatWeekday(value: TimeInput): string {
   return weekdayFormat.format(new Date(toMs(value)));
+}
+
+export function formatDayStamp(value: TimeInput): string {
+  const parts = Object.fromEntries(stampFormat.formatToParts(new Date(toMs(value))).map((p) => [p.type, p.value]));
+  return `${parts.weekday} ${parts.day} ${parts.month} · ${formatClock(value)}`;
 }
 
 export function greeting(value: TimeInput): string {

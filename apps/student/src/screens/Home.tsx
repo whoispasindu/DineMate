@@ -1,5 +1,16 @@
 import { useAlertFeed, useServerNow, useStudentSummary, type StudentSummary } from "@dinemate/api-client";
-import { APP_NAME, BrandMark, FoodArt, formatAgo, formatClock, greeting, Icon, LiveLine, SampleBadge, shopPhotoFor } from "@dinemate/ui";
+import {
+  BrandMark,
+  FoodArt,
+  formatAgo,
+  formatClock,
+  formatDayStamp,
+  greeting,
+  Icon,
+  LiveLine,
+  SampleBadge,
+  shopPhotoFor,
+} from "@dinemate/ui";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { BestSpotMobile, BestSpotWeb, BusyTimesChart, CanteenCard, CanteenRow, NoBestSpot } from "../components/canteen";
@@ -40,28 +51,28 @@ function HomeMobile({ summary, now, online }: HomeProps) {
   const best = data ? bestCanteen(data) : null;
   return (
     <>
-      <header className="flex items-center justify-between px-5 pb-2 pt-[18px]">
+      <header className="flex items-center justify-between px-[22px] pb-1 pt-4">
         <div className="flex items-center gap-2.5">
-          <BrandMark />
-          <div className="flex flex-col">
-            <span className="text-[17px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
-            <span className="text-xs text-muted">Canteen seats, live</span>
-          </div>
+          <BrandMark size={30} />
+          <span className="text-[13px] font-medium text-muted">{formatDayStamp(now)}</span>
         </div>
         <BellLink
-          className="h-11 w-11 rounded-[14px] border border-line bg-card"
-          dotClassName="right-2.5 top-[9px] h-[9px] w-[9px] border-2 border-card"
+          className="h-10 w-10 rounded-[14px] border border-line bg-card text-ink"
+          dotClassName="right-2.5 top-[9px] h-[7px] w-[7px]"
         />
       </header>
-      <main id="main" className="flex flex-1 flex-col gap-3.5 px-4 pb-4 pt-1.5">
-        <div className="flex flex-col gap-0.5">
-          <h1 className="m-0 text-2xl font-extrabold tracking-[-0.02em]">{greeting(now)}</h1>
-          <span className="text-sm text-muted">Where will you sit today?</span>
-        </div>
+      <main id="main" className="flex flex-1 flex-col gap-4 px-4 pb-4 pt-3">
+        <h1 className="m-0 px-1.5 font-display text-[34px] font-extrabold leading-[1.02] tracking-[-0.04em]">
+          {greeting(now)}.
+          <br />
+          <span className="font-semibold text-faint">Where will you sit?</span>
+        </h1>
         <SafetySlot layout="mobile" />
-        <MealPill />
         {!online ? (
-          <OfflineCard />
+          <>
+            <OfflineCard />
+            <MealPill />
+          </>
         ) : !data ? (
           summary.isError ? (
             <MessageCard icon="wifiOff" art="offline" title="Couldn't load seat info" body="Retrying automatically…" />
@@ -75,13 +86,14 @@ function HomeMobile({ summary, now, online }: HomeProps) {
         ) : (
           <>
             {best ? <BestSpotMobile canteen={best} /> : <NoBestSpot anyLive={data.canteens.some((c) => c.freshness === "live")} />}
-            <div className="flex items-center justify-between">
-              <h2 className="m-0 text-[17px] font-extrabold">Canteens now</h2>
+            <MealPill />
+            <div className="mt-1 flex items-center justify-between px-1.5">
+              <h2 className="m-0 text-[22px] font-semibold">All canteens</h2>
               {data.canteens.some((c) => c.is_sample) ? <SampleBadge /> : null}
             </div>
-            <ul className="m-0 flex list-none flex-col gap-3.5 p-0">
-              {data.canteens.map((c) => (
-                <li key={c.id}>
+            <ul className="m-0 flex list-none flex-col px-1.5">
+              {data.canteens.map((c, i) => (
+                <li key={c.id} className={i > 0 ? "border-t border-line" : undefined}>
                   <CanteenRow canteen={c} now={now} />
                 </li>
               ))}
@@ -102,7 +114,7 @@ function HomeWeb({ summary, now, online }: HomeProps) {
     <main id="main" className="mx-auto flex max-w-[1200px] flex-col gap-6 px-6 pb-10 pt-7">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="m-0 text-[34px] font-extrabold tracking-[-0.03em]">{greeting(now)}</h1>
+          <h1 className="m-0 font-display text-[44px] font-extrabold leading-none tracking-[-0.04em]">{greeting(now)}.</h1>
           <span className="text-base text-muted">Here is where you can sit right now.</span>
         </div>
         <div className="flex items-center gap-2.5">
@@ -127,7 +139,7 @@ function HomeWeb({ summary, now, online }: HomeProps) {
       {online ? (
         <>
           <div className="flex items-center justify-between">
-            <h2 className="m-0 text-[22px] font-extrabold tracking-[-0.02em]">Canteens right now</h2>
+            <h2 className="m-0 text-[26px] font-semibold">All canteens</h2>
             <Link to="/canteens" className="inline-flex items-center gap-1 text-sm font-bold text-brand no-underline hover:text-brand-dark">
               Compare all
               <Icon name="arrowRight" size={16} strokeWidth={2.4} />
@@ -168,10 +180,10 @@ function ShopsNow({ shops }: { shops: StudentSummary["shops_now"] }) {
   return (
     <section
       aria-labelledby="shops-now-title"
-      className="flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
+      className="raised flex min-w-0 flex-[1_1_300px] flex-col gap-1 rounded-[22px] border border-line bg-card p-5"
     >
       <div className="mb-1.5 flex items-center justify-between">
-        <h2 id="shops-now-title" className="m-0 text-[17px] font-extrabold">
+        <h2 id="shops-now-title" className="m-0 text-xl font-semibold">
           Shops
         </h2>
         <Link to="/food" className="text-[13px] font-bold text-brand no-underline hover:text-brand-dark">
@@ -207,10 +219,10 @@ function LatestAlerts() {
   return (
     <section
       aria-labelledby="latest-title"
-      className="flex min-w-0 flex-[1_1_300px] flex-col gap-2.5 rounded-[22px] border border-line bg-card p-5"
+      className="raised flex min-w-0 flex-[1_1_300px] flex-col gap-2.5 rounded-[22px] border border-line bg-card p-5"
     >
       <div className="flex items-center justify-between">
-        <h2 id="latest-title" className="m-0 text-[17px] font-extrabold">
+        <h2 id="latest-title" className="m-0 text-xl font-semibold">
           Latest alerts
         </h2>
         <Link to="/alerts" className="text-[13px] font-bold text-brand no-underline hover:text-brand-dark">
@@ -227,7 +239,7 @@ function LatestAlerts() {
                 <Icon name={look.icon} size={18} strokeWidth={2.2} />
               </span>
               <span className="flex flex-col gap-0.5">
-                <span className="text-sm font-extrabold">{n.title}</span>
+                <span className="text-sm font-bold">{n.title}</span>
                 <span className="text-xs text-muted">
                   {formatClock(n.at)} · {n.context}
                 </span>

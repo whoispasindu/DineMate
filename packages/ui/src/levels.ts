@@ -5,6 +5,7 @@ export interface LevelStyle {
   label: string;
   icon: IconName;
   pill: string;
+  word: string;
   bar: string;
   mark: string;
 }
@@ -14,6 +15,7 @@ export const LEVELS: Record<CrowdLevel, LevelStyle> = {
     label: "Seats available",
     icon: "checkCircle",
     pill: "bg-ok-bg text-ok",
+    word: "text-ok",
     bar: "bg-ok-mark",
     mark: "var(--color-ok-mark)",
   },
@@ -21,6 +23,7 @@ export const LEVELS: Record<CrowdLevel, LevelStyle> = {
     label: "Busy",
     icon: "users",
     pill: "bg-busy-bg text-busy",
+    word: "text-busy",
     bar: "bg-busy-mark",
     mark: "var(--color-busy-mark)",
   },
@@ -28,6 +31,7 @@ export const LEVELS: Record<CrowdLevel, LevelStyle> = {
     label: "Crowded",
     icon: "warning",
     pill: "bg-crowd-bg text-crowd",
+    word: "text-crowd",
     bar: "bg-crowd-mark",
     mark: "var(--color-crowd-mark)",
   },
@@ -35,13 +39,15 @@ export const LEVELS: Record<CrowdLevel, LevelStyle> = {
     label: "Nearly full",
     icon: "ban",
     pill: "bg-full-bg text-full",
+    word: "text-full-mark",
     bar: "bg-full-mark",
     mark: "var(--color-full-mark)",
   },
   unknown: {
     label: "No live data",
     icon: "question",
-    pill: "bg-neutral text-neutral-ink outline outline-1 -outline-offset-1 outline-dashed outline-dash",
+    pill: "bg-chip text-neutral-ink",
+    word: "text-faint",
     bar: "bg-dash",
     mark: "var(--color-dash)",
   },

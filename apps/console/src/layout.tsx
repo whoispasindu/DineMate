@@ -1,5 +1,5 @@
 import { signOut, useConsoleOverview, type StaffRole, type StaffUser } from "@dinemate/api-client";
-import { APP_NAME, cx, Icon, type IconName } from "@dinemate/ui";
+import { APP_NAME, BrandMark, cx, Icon, type IconName } from "@dinemate/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { NavLink, Outlet } from "react-router";
 
@@ -38,6 +38,17 @@ const ROLE_LABEL: Record<StaffRole, string> = {
   safety_officer: "Safety officer",
 };
 
+function initials(name: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "?"
+  );
+}
+
 function useOpenAlertCount(enabled: boolean): number {
   const overview = useConsoleOverview(enabled);
   return overview.data?.alerts.filter((a) => a.status === "open").length ?? 0;
@@ -48,17 +59,15 @@ function Sidebar({ user }: { user: StaffUser }) {
   const openAlerts = useOpenAlertCount(MANAGERS.includes(user.role));
   const queryClient = useQueryClient();
   return (
-    <aside className="box-border flex flex-[1_1_232px] flex-col gap-6 bg-side px-4 py-6 text-white">
+    <aside className="box-border flex flex-[1_1_248px] flex-col gap-6 bg-side px-[18px] py-7 text-sand min-[820px]:sticky min-[820px]:top-0 min-[820px]:h-dvh min-[820px]:self-start">
       <div className="flex items-center gap-2.5 px-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-brand">
-          <Icon name="bench" size={20} />
-        </span>
+        <BrandMark tone="sand" size={34} />
         <span className="flex flex-col">
-          <span className="text-[17px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
+          <span className="font-display text-[19px] font-extrabold tracking-[-0.02em]">{APP_NAME}</span>
           <span className="text-xs text-side-muted">Staff console</span>
         </span>
       </div>
-      <nav aria-label="Console" className="flex flex-col gap-1">
+      <nav aria-label="Console" className="scrollbar-none flex min-h-0 flex-col gap-1 overflow-y-auto">
         {items.map((item) => (
           <NavLink
             key={item.to}
@@ -66,30 +75,44 @@ function Sidebar({ user }: { user: StaffUser }) {
             end={item.end}
             className={({ isActive }) =>
               cx(
-                "flex min-h-11 items-center gap-2.5 rounded-[10px] px-3 text-sm no-underline",
-                isActive ? "bg-side-active font-bold text-white" : "font-semibold text-side-ink hover:bg-side-card hover:text-white",
+                "group flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 text-sm no-underline",
+                isActive ? "is-active bg-white/10 font-bold text-sand" : "font-semibold text-side-muted hover:bg-white/5 hover:text-sand",
               )
             }
           >
-            <Icon name={item.icon} size={18} />
+            <Icon name={item.icon} size={19} />
             <span className="flex-1">{item.label}</span>
+            <span aria-hidden="true" className="hidden h-1.5 w-1.5 rounded-full bg-sand group-[.is-active]:block" />
             {item.badge === "alerts" && openAlerts > 0 ? (
-              <span aria-label={`${openAlerts} open`} className="rounded-full bg-crowd-mark px-[7px] py-px text-xs font-bold text-white">
+              <span
+                aria-label={`${openAlerts} open`}
+                className="rounded-full bg-crowd-mark px-[7px] py-px font-mono text-xs font-bold text-card"
+              >
                 {openAlerts}
               </span>
             ) : null}
           </NavLink>
         ))}
       </nav>
-      <div className="mt-auto flex flex-col gap-0.5 rounded-xl bg-side-card p-3">
-        <span className="text-xs text-side-muted">Signed in as · {ROLE_LABEL[user.role]}</span>
-        <span className="text-sm font-bold">{user.display_name}</span>
+      <div className="mt-auto flex flex-col gap-2 rounded-2xl bg-white/[0.08] p-3.5">
+        <div className="flex items-center gap-2.5">
+          <span
+            aria-hidden="true"
+            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] bg-sand font-display text-[13px] font-extrabold text-brand"
+          >
+            {initials(user.display_name)}
+          </span>
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate text-[13px] font-bold">{user.display_name}</span>
+            <span className="text-xs text-side-muted">{ROLE_LABEL[user.role]}</span>
+          </span>
+        </div>
         <button
           type="button"
           onClick={() => {
             void signOut().then(() => queryClient.clear());
           }}
-          className="mt-2 min-h-9 rounded-lg border border-side-active bg-transparent px-3 text-left text-[13px] font-semibold text-side-ink hover:bg-side-active hover:text-white"
+          className="min-h-9 rounded-lg border border-white/15 bg-transparent px-3 text-left text-[13px] font-semibold text-side-ink hover:bg-white/10"
         >
           Sign out
         </button>
@@ -103,7 +126,7 @@ export function ConsoleShell({ user }: { user: StaffUser }) {
     <div className="flex min-h-dvh flex-wrap bg-page">
       <a
         href="#main"
-        className="sr-only rounded-xl bg-brand px-4 py-3 font-bold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
+        className="sr-only rounded-xl bg-brand px-4 py-3 font-bold text-sand focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
       >
         Skip to content
       </a>

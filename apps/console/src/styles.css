@@ -3,44 +3,13 @@
 @source "../../../packages/ui/src";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-
-  --color-page: #f4f5f1;
-  --color-line: #dde1da;
-  --color-line-soft: #eef0ec;
-  --color-ink: #15201b;
-  --color-ink-2: #2c3631;
-  --color-muted: #55605a;
-  --color-brand: #0f6b5c;
-  --color-brand-dark: #0a4d42;
-  --color-chip: #e6e8e3;
-  --color-neutral: #e6e8e3;
-  --color-neutral-ink: #3f4743;
-  --color-dash: #a9b1ac;
-  --color-track: #e6e8e3;
-
-  --color-ok: #145c38;
-  --color-ok-bg: #e3f1e8;
-  --color-ok-mark: #1f7a4d;
-  --color-busy: #7a4500;
-  --color-busy-bg: #fcefd9;
-  --color-busy-mark: #c98a1b;
-  --color-crowd: #9a3412;
-  --color-crowd-bg: #fde3d3;
-  --color-crowd-mark: #c2410c;
-  --color-full-mark: #b42318;
-
-  --color-forecast: #8cc7b8;
-  --color-forecast-soft: #d5ebe5;
-  --color-danger-surface: #fff4f2;
-
-  --color-side: #0e2f29;
-  --color-side-active: #1c4a42;
-  --color-side-card: #163d36;
-  --color-side-ink: #d4e3df;
-  --color-side-muted: #b9cec8;
-  --color-live-dot: #5cd6b4;
-  --color-alert-line: #f3c9b1;
-  --color-alert-surface: #fff7f2;
-  --color-alert-meta: #7a3b1d;
+  --color-side: #1f3d2b;
+  --color-side-active: #2e5040;
+  --color-side-card: #284a36;
+  --color-side-ink: #e8dcc4;
+  --color-side-muted: #d2c8b1;
+  --color-live-dot: #8b5cf6;
+  --color-alert-line: #e6c3b4;
+  --color-alert-surface: #f8ece4;
+  --color-alert-meta: #7a2a17;
 }

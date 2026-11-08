@@ -164,7 +164,7 @@ function ShopCard({ shop, href, selected }: { shop: Shop; href: string; selected
       aria-current={selected ? "true" : undefined}
       className={cx(
         "flex min-w-[85%] shrink-0 snap-start items-center gap-3 rounded-[18px] border p-3.5 text-ink no-underline",
-        selected ? "border-mint-line bg-card" : "border-line bg-card opacity-80",
+        selected ? "border-brand bg-card" : "border-line bg-card",
       )}
     >
       <ShopArt shop={shop} className="h-12 w-12 shrink-0 rounded-[14px]" />
@@ -172,7 +172,7 @@ function ShopCard({ shop, href, selected }: { shop: Shop; href: string; selected
         <span className="text-base font-extrabold">{shop.name}</span>
         <ShopStatusDot status={shop.status} />
       </span>
-      {shop.is_sample ? <SampleBadge className="px-[7px] text-[10px]">SAMPLE</SampleBadge> : null}
+      {shop.is_sample ? <SampleBadge className="h-6 px-2.5">Sample</SampleBadge> : null}
     </Link>
   );
 }
@@ -204,15 +204,7 @@ function FoodMobile(props: FoodViewProps) {
             ))}
           </div>
         )}
-        <Segmented
-          label="Meal period"
-          options={PERIOD_OPTIONS}
-          value={period}
-          onChange={setPeriod}
-          panelId={panelId}
-          stretch
-          className="bg-chip"
-        />
+        <Segmented label="Meal period" options={PERIOD_OPTIONS} value={period} onChange={setPeriod} panelId={panelId} stretch />
         <div id={panelId} role="tabpanel" aria-label={`${PERIOD_LABEL[period]} menu`}>
           {props.menuLoading ? (
             <Loading label="Loading menu">
@@ -324,14 +316,7 @@ function FoodWeb(props: FoodViewProps) {
                 </span>
               ) : null}
             </div>
-            <Segmented
-              label="Meal period"
-              options={PERIOD_OPTIONS}
-              value={period}
-              onChange={setPeriod}
-              panelId={panelId}
-              className="bg-line-soft"
-            />
+            <Segmented label="Meal period" options={PERIOD_OPTIONS} value={period} onChange={setPeriod} panelId={panelId} />
           </div>
           <div id={panelId} role="tabpanel" aria-label={`${PERIOD_LABEL[period]} menu`}>
             {props.menuLoading ? (

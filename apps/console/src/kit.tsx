@@ -16,12 +16,12 @@ export function Page({
   children: ReactNode;
 }) {
   return (
-    <main id="main" className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-5 px-8 pb-10 pt-7">
+    <main id="main" className="box-border flex min-w-0 flex-[999_1_560px] flex-col gap-6 px-10 pb-10 pt-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2.5">
-            <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.02em]">{title}</h1>
-            {sample ? <SampleBadge className="font-bold">SAMPLE DATA</SampleBadge> : null}
+            <h1 className="m-0 font-display text-[40px] font-extrabold leading-none tracking-[-0.04em]">{title}</h1>
+            {sample ? <SampleBadge /> : null}
           </div>
           {sub ? <span className="text-sm text-muted">{sub}</span> : null}
         </div>
@@ -44,10 +44,10 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cx("flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-card px-5 py-[18px]", className)}>
+    <section className={cx("raised flex min-w-0 flex-col gap-3 rounded-[20px] border border-line bg-card px-[22px] py-5", className)}>
       {title ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="m-0 text-[17px] font-extrabold">{title}</h2>
+          <h2 className="m-0 text-[22px] font-semibold">{title}</h2>
           {aside}
         </div>
       ) : null}
@@ -59,8 +59,8 @@ export function Panel({
 type Tone = "primary" | "secondary" | "danger";
 
 const TONE: Record<Tone, string> = {
-  primary: "border-0 bg-brand text-white hover:bg-brand-dark",
-  secondary: "border border-line bg-card text-ink hover:bg-page",
+  primary: "edge-forest border-0 bg-brand text-sand hover:bg-brand-mid",
+  secondary: "border-[1.5px] border-brand bg-card text-ink shadow-[0_3px_0_var(--color-brand)] hover:bg-page",
   danger: "border border-crowd-mark bg-card text-crowd hover:bg-crowd-bg",
 };
 
@@ -70,7 +70,7 @@ export function Button({ tone = "secondary", className, ...props }: ButtonHTMLAt
       type="button"
       {...props}
       className={cx(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-[10px] px-3.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60",
         TONE[tone],
         className,
       )}

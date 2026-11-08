@@ -9,7 +9,7 @@ import {
   type SeatStateName,
   type ZoneSeats,
 } from "@dinemate/api-client";
-import { cx, SampleBadge } from "@dinemate/ui";
+import { ApproxNumber, cx, EmptyStrip, SampleBadge, SeatStrip, TableScene } from "@dinemate/ui";
 import { useMemo, useState } from "react";
 import { Banner, errorText, Field, Page, Panel, Select } from "../kit";
 
@@ -17,9 +17,9 @@ const HELD_LIMIT_MIN = 15;
 
 const SEAT_STYLE: Record<SeatStateName, { fill: string; label: string; swatch: string }> = {
   free: { fill: "var(--color-ok-mark)", label: "Free", swatch: "bg-ok-mark" },
-  occupied: { fill: "var(--color-crowd-mark)", label: "Taken", swatch: "bg-crowd-mark" },
-  held: { fill: "var(--color-busy-mark)", label: "Held by bags", swatch: "bg-busy-mark" },
-  unknown: { fill: "var(--color-faint)", label: "Hidden", swatch: "bg-faint" },
+  occupied: { fill: "var(--color-brand)", label: "Taken", swatch: "bg-brand" },
+  held: { fill: "var(--color-held)", label: "Held by bags", swatch: "bg-held" },
+  unknown: { fill: "var(--color-hidden)", label: "Hidden", swatch: "bg-hidden" },
 };
 
 function count(value: number | null): string {
@@ -30,27 +30,63 @@ function minutesSince(since: string | null, now: number): number | null {
   return since ? Math.max(0, Math.round((now - Date.parse(since)) / 60_000)) : null;
 }
 
-function ZoneRow({ zone }: { zone: ZoneSeats }) {
+function ZoneRow({ zone, first }: { zone: ZoneSeats; first: boolean }) {
+  const live = zone.freshness !== "unavailable" && zone.occupied !== null;
+  const word = !live ? "No live data" : zone.crowded ? "Crowded" : zone.freshness === "stale" ? "May be out of date" : "Seats available";
+  const wordTone = !live ? "text-faint" : zone.crowded ? "text-crowd-mark" : zone.freshness === "stale" ? "text-busy" : "text-ok-mark";
+  const note = !live
+    ? "Camera offline, no numbers shown"
+    : zone.crowded
+      ? `${count(zone.standing)} people standing`
+      : zone.held
+        ? `${zone.held} seats held by bags`
+        : zone.free_soon
+          ? `${zone.free_soon} likely free soon`
+          : "Nothing to flag";
   return (
-    <tr className={cx("border-b border-line-soft", zone.freshness === "stale" && "opacity-70")}>
-      <td className="py-2.5 pr-2 font-bold">{zone.name}</td>
-      <td className="py-2.5 text-right">{count(zone.free)}</td>
-      <td className="py-2.5 text-right">{count(zone.occupied)}</td>
-      <td className="py-2.5 text-right">{count(zone.held)}</td>
-      <td className="py-2.5 text-right">{count(zone.unknown)}</td>
-      <td className="py-2.5 text-right">{count(zone.free_soon)}</td>
-      <td className="py-2.5 pl-3">
-        {zone.freshness === "unavailable" ? (
-          <span className="text-muted">No live data</span>
-        ) : zone.crowded ? (
-          <span className="font-bold text-crowd">Crowded · {count(zone.standing)} standing</span>
-        ) : (
-          <span className="text-ink-2">{zone.freshness === "stale" ? "May be out of date" : "OK"}</span>
-        )}
-      </td>
-    </tr>
+    <div className={cx("flex flex-col gap-3 py-[22px]", !first && "border-t border-line", zone.freshness === "stale" && "opacity-75")}>
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-lg font-bold">{zone.name}</span>
+          <span className="text-[13px] text-muted">{note}</span>
+        </div>
+        <div className="text-right">
+          <span className="font-display text-[34px] font-extrabold leading-none tracking-[-0.04em]">
+            {live ? <ApproxNumber value={`~${count(zone.free)}`} /> : "—"}
+          </span>
+          <div className={cx("mt-0.5 text-[13px] font-semibold", wordTone)}>{word}</div>
+        </div>
+      </div>
+      {live ? (
+        <SeatStrip total={zone.seats} taken={zone.occupied ?? 0} held={zone.held ?? 0} hidden={zone.unknown ?? 0} height={14} />
+      ) : (
+        <EmptyStrip height={14} />
+      )}
+      <div className="flex flex-wrap gap-x-[22px] gap-y-1 text-[13px] text-muted">
+        <span>
+          <b className="text-ink">{count(zone.occupied)}</b> taken
+        </span>
+        <span>
+          <b className="text-busy">{count(zone.held)}</b> held by bags
+        </span>
+        <span>
+          <b className="text-ink-2">{count(zone.unknown)}</b> hidden
+        </span>
+        <span>
+          <b className="text-ink">{count(zone.free_soon)}</b> free soon
+        </span>
+        <span className="ml-auto">{zone.seats} seats</span>
+      </div>
+    </div>
   );
 }
+
+const LEGEND: { swatch: string; label: string }[] = [
+  { swatch: "bg-brand", label: "Taken" },
+  { swatch: "held-stripes", label: "Held by bags" },
+  { swatch: "bg-hidden", label: "Hidden" },
+  { swatch: "bg-card shadow-[inset_0_0_0_1.5px_var(--color-brand)]", label: "Free" },
+];
 
 function SeatMap({ zoneId, now }: { zoneId: string; now: number }) {
   const map = useZoneSeatMap(zoneId);
@@ -98,7 +134,7 @@ function StayPanel({ canteenId }: { canteenId: string }) {
   if (!stays.data) return null;
   const s = stays.data;
   return (
-    <Panel title="Stay times" aside={<SampleBadge>EXPERIMENTAL</SampleBadge>}>
+    <Panel title="Stay times" aside={<SampleBadge>Experimental</SampleBadge>}>
       {s.sessions === 0 ? (
         <span className="text-sm text-muted">No finished seat visits in the last {s.days} days yet.</span>
       ) : (
@@ -158,29 +194,34 @@ export function SeatsScreen() {
         </Select>
       </Field>
       {seats.isError ? <Banner tone="error">{errorText(seats.error)}</Banner> : null}
-      <Panel title="Seats now">
+      <Panel
+        title="By zone"
+        aside={
+          <div className="flex flex-wrap gap-4 text-[13px] text-muted">
+            {LEGEND.map((l) => (
+              <span key={l.label} className="inline-flex items-center gap-2">
+                <span className={cx("h-2 w-3.5 rounded-full", l.swatch)} />
+                {l.label}
+              </span>
+            ))}
+          </div>
+        }
+      >
         {seats.data && seats.data.zones.length > 0 ? (
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-muted">
-                <th className="py-2 pr-2 font-semibold">Zone</th>
-                <th className="py-2 text-right font-semibold">Free</th>
-                <th className="py-2 text-right font-semibold">Taken</th>
-                <th className="py-2 text-right font-semibold">Held</th>
-                <th className="py-2 text-right font-semibold">Hidden</th>
-                <th className="py-2 text-right font-semibold">Free soon</th>
-                <th className="py-2 pl-3 font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {seats.data.zones.map((z) => (
-                <ZoneRow key={z.zone_id} zone={z} />
-              ))}
-            </tbody>
-          </table>
+          <div className="flex flex-col">
+            {seats.data.zones.map((z, i) => (
+              <ZoneRow key={z.zone_id} zone={z} first={i === 0} />
+            ))}
+          </div>
         ) : (
           <span className="text-sm text-muted">No seat data for this canteen yet.</span>
         )}
+        <div className="mt-2 flex items-center gap-[18px] rounded-[18px] bg-page px-[18px] py-3">
+          <TableScene width={96} />
+          <p className="m-0 text-[13.5px] leading-[1.45] text-muted">
+            Hidden and held seats are never shown to students as free. A seat only counts as free when the camera clearly sees it empty.
+          </p>
+        </div>
       </Panel>
       {live ? (
         <>

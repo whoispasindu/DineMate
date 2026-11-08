@@ -83,3 +83,31 @@ export const NOTICE_LOOK: Record<NoticeKind, { icon: IconName; tile: string }> =
   shop_closing: { icon: "clock", tile: "bg-busy-bg text-busy" },
   meal_starting: { icon: "utensils", tile: "bg-ok-bg text-ok" },
 };
+
+export interface StripCounts {
+  total: number;
+  taken: number;
+  held: number;
+  hidden: number;
+}
+
+export function canteenStrip(
+  c: Pick<CanteenSummary, "free_about" | "free_range" | "freshness" | "monitored_capacity">,
+  held: number,
+): StripCounts | null {
+  if (!hasNumbers(c) || c.monitored_capacity <= 0) return null;
+  const total = c.monitored_capacity;
+  const free = Math.min(c.free_about, total);
+  const h = Math.min(held, total - free);
+  return { total, taken: total - free - h, held: h, hidden: 0 };
+}
+
+export function zoneStrip(z: ZoneOccupancy, seats: ZoneSeats | undefined): StripCounts | null {
+  if (!hasNumbers(z)) return null;
+  if (seats && seats.freshness !== "unavailable" && seats.occupied !== null && seats.seats > 0) {
+    return { total: seats.seats, taken: seats.occupied, held: seats.held ?? 0, hidden: seats.unknown ?? 0 };
+  }
+  if (z.capacity <= 0) return null;
+  const free = Math.min(z.free_about, z.capacity);
+  return { total: z.capacity, taken: z.capacity - free, held: 0, hidden: 0 };
+}
