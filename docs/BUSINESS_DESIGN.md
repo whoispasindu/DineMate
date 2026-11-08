@@ -1,35 +1,36 @@
 # DineMate Business — design
 
-Design for the business app (`apps/business`, Phases 8–10). Designed in Figma first; build only after the owner approves it. Figma file: page "DineMate Business v1 — for review" (campus redesign is on "Redesign v4 — final for review").
+Design for the business app (`apps/business`, Phases 8–10). Designed in Figma first; build only after the owner approves it. Figma file: page "DineMate Business v2 — for review" (campus redesign is on "Redesign v4 — final for review").
 
 ## Look
 
-Same design language as the campus apps: Bricolage Grotesque for headings and big numbers, DM Sans for everything else, JetBrains Mono for clocks and colour codes only. Raised cards and buttons (a solid darker edge under them), occupancy bars, and the small isometric table scene. Sentence-case labels, text 12 px or larger. Professional and calm: navy carries the app, coral is rare.
+Same design language as the campus apps: Bricolage Grotesque for headings and big numbers, DM Sans for everything else, JetBrains Mono for clocks and colour codes only. Raised cards and buttons (a solid darker edge under them), occupancy bars, and the small isometric table scene. Sentence-case labels, text 12 px or larger. Professional and calm: cool grey page, white cards, a graphite sidebar, and one accent (cobalt) for the thing to act on.
 
-| Token | Hex       | Use                                                           |
-| ----- | --------- | ------------------------------------------------------------- |
-| Navy  | `#14213D` | Main colour: sidebar, headings, seated tables, primary button |
-| Deep  | `#0B1528` | Raised edge under navy cards and buttons                      |
-| Cream | `#F4EDE0` | Page background                                               |
-| Card  | `#FCF8F1` | Panels and cards                                              |
-| Coral | `#FF6B5B` | Live, likely free soon, active nav, the one key action        |
-| Teal  | `#2F7D68` | Free tables, good numbers                                     |
-| Amber | `#B07A12` | Held tables (bag on a seat)                                   |
-| Brick | `#B23A2A` | Needs attention: unstaffed counter, long queue                |
-| Muted | `#555B69` | Secondary text                                                |
-| Line  | `#E4DACA` | Borders and dividers                                          |
+| Token      | Hex       | Use                                              |
+| ---------- | --------- | ------------------------------------------------ |
+| Graphite   | `#1B1F27` | Sidebar, headings, seated tables, dark buttons   |
+| Deep       | `#0F1217` | Raised edge under graphite cards and buttons     |
+| Background | `#F4F5F7` | Page background                                  |
+| Card       | `#FFFFFF` | Panels and cards                                 |
+| Line       | `#E2E5EA` | Borders and dividers                             |
+| Ink        | `#161A21` | Body text                                        |
+| Muted      | `#5E6673` | Secondary text                                   |
+| Cobalt     | `#2F5BEA` | Active page, main button, live, likely free soon |
+| Green      | `#1E8E5A` | Free tables, good numbers                        |
+| Amber      | `#B7791F` | Held tables (bag on a seat)                      |
+| Red        | `#C23B32` | Needs attention: unstaffed counter, long queue   |
 
-No purple in the business app.
+Cobalt is never a status colour, so the table states stay unambiguous. No purple, and no forest green as a brand colour, so the business app is clearly a different product from the campus app. An earlier navy, cream and coral version is archived in Figma.
 
 ## Table states
 
-| State            | Look                                    |
-| ---------------- | --------------------------------------- |
-| Free             | Teal outline on pale teal, "4 seats"    |
-| Seated           | Navy, party size and time seated        |
-| Likely free soon | Navy with a coral ring, "~5–10 min"     |
-| Held by a bag    | Amber stripes, time held                |
-| Needs clearing   | Dashed grey outline, time since leaving |
+| State            | Look                                     |
+| ---------------- | ---------------------------------------- |
+| Free             | Green outline on pale green, "4 seats"   |
+| Seated           | Graphite, party size and time seated     |
+| Likely free soon | Graphite with a cobalt ring, "~5–10 min" |
+| Held by a bag    | Amber stripes, time held                 |
+| Needs clearing   | Dashed grey outline, time since leaving  |
 
 ## Screens
 
