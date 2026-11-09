@@ -128,6 +128,10 @@ class CameraHealth(Schema):
     status: Literal["ok", "not_reporting", "offline"]
     fps: float | None
     last_seen_at: datetime | None
+    label: str | None = None
+    source_hint: str | None = None
+    has_layout: bool = False
+    waiting_for_zones: bool = False
 
 
 class VenueCameras(Timestamped):

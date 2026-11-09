@@ -59,7 +59,7 @@ def _issue(session: SessionDep, user: models.User, response: Response, settings:
         raw,
         max_age=settings.refresh_token_days * 86_400,
         httponly=True,
-        secure=settings.environment != "development",
+        secure=settings.secure_cookies,
         samesite="lax",
         path=REFRESH_COOKIE_PATH,
     )

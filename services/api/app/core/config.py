@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     refresh_token_days: int = 7
     login_attempts_per_minute: int = 5
     demo_password: str | None = None
+    cookie_secure: bool | None = None
+    max_cameras: int = 8
 
     @field_validator("demo_clock_start", mode="before")
     @classmethod
@@ -44,6 +46,15 @@ class Settings(BaseSettings):
         if self.environment != "development" and self.jwt_secret == DEV_JWT_SECRET:
             raise ValueError("Set DINEMATE_JWT_SECRET to a long random value outside development.")
         return self
+
+    @field_validator("cookie_secure", mode="before")
+    @classmethod
+    def blank_means_default(cls, value: object) -> object:
+        return None if value == "" else value
+
+    @property
+    def secure_cookies(self) -> bool:
+        return self.cookie_secure if self.cookie_secure is not None else self.environment != "development"
 
 
 @lru_cache

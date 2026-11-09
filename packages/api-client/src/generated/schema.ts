@@ -952,7 +952,8 @@ export interface paths {
         /** Get Cameras */
         get: operations["get_cameras_api_v1_business_venues__venue_id__cameras_get"];
         put?: never;
-        post?: never;
+        /** Add Camera */
+        post: operations["add_camera_api_v1_business_venues__venue_id__cameras_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1219,6 +1220,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/business/cameras/{device_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Camera */
+        delete: operations["remove_camera_api_v1_business_cameras__device_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Camera */
+        patch: operations["update_camera_api_v1_business_cameras__device_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/business/cameras/{device_id}/layout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Camera Layout */
+        get: operations["get_camera_layout_api_v1_business_cameras__device_id__layout_get"];
+        /** Put Camera Layout */
+        put: operations["put_camera_layout_api_v1_business_cameras__device_id__layout_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/areas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Area */
+        post: operations["add_area_api_v1_business_venues__venue_id__areas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/hub/cameras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hub Cameras */
+        get: operations["hub_cameras_api_v1_devices__device_id__hub_cameras_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/hub/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hub Tokens */
+        post: operations["hub_tokens_api_v1_devices__device_id__hub_tokens_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1239,6 +1327,11 @@ export interface components {
             /** Notices */
             notices: components["schemas"]["Notice"][];
         };
+        /** AreaIn */
+        AreaIn: {
+            /** Name */
+            name: string;
+        };
         /** AreaMinutes */
         AreaMinutes: {
             /** Counter */
@@ -1247,6 +1340,15 @@ export interface components {
             kitchen: number;
             /** Floor */
             floor: number;
+        };
+        /** AreaResult */
+        AreaResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            zone: components["schemas"]["EditableZone"];
         };
         /** AuditEntry */
         AuditEntry: {
@@ -1356,6 +1458,68 @@ export interface components {
             fps: number | null;
             /** Last Seen At */
             last_seen_at: string | null;
+            /** Label */
+            label: string | null;
+            /** Source Hint */
+            source_hint: string | null;
+            /**
+             * Has Layout
+             * @default false
+             */
+            has_layout: boolean;
+            /**
+             * Waiting For Zones
+             * @default false
+             */
+            waiting_for_zones: boolean;
+        };
+        /** CameraIn */
+        CameraIn: {
+            /** Label */
+            label: string;
+            /** Source */
+            source: string;
+        };
+        /** CameraOut */
+        CameraOut: {
+            /** Id */
+            id: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Label */
+            label: string;
+            /** Source Hint */
+            source_hint: string | null;
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** CameraPatch */
+        CameraPatch: {
+            /** Label */
+            label?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Enabled */
+            enabled?: boolean | null;
+        };
+        /** CameraRemoved */
+        CameraRemoved: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+        };
+        /** CameraResult */
+        CameraResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            camera: components["schemas"]["CameraOut"];
         };
         /** CanteenDetail */
         CanteenDetail: {
@@ -2007,6 +2171,53 @@ export interface components {
             closes: string | null;
             /** Reason */
             reason: string | null;
+        };
+        /** HubCamera */
+        HubCamera: {
+            /** Device Id */
+            device_id: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Label */
+            label: string;
+            /** Source */
+            source: string;
+            /** Enabled */
+            enabled: boolean;
+        };
+        /** HubCameras */
+        HubCameras: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Hub Id */
+            hub_id: string;
+            /** Cameras */
+            cameras: components["schemas"]["HubCamera"][];
+        };
+        /** HubToken */
+        HubToken: {
+            /** Device Id */
+            device_id: string;
+            /** Token */
+            token: string;
+        };
+        /** HubTokens */
+        HubTokens: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Tokens */
+            tokens: components["schemas"]["HubToken"][];
+        };
+        /** HubTokensIn */
+        HubTokensIn: {
+            /** Device Ids */
+            device_ids: string[];
         };
         /** IgnoreArea */
         IgnoreArea: {
@@ -7043,6 +7254,70 @@ export interface operations {
             };
         };
     };
+    add_camera_api_v1_business_venues__venue_id__cameras_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CameraIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CameraResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     get_tables_api_v1_business_venues__venue_id__tables_get: {
         parameters: {
             query?: never;
@@ -8227,6 +8502,433 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StaffAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_camera_api_v1_business_cameras__device_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CameraRemoved"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_camera_api_v1_business_cameras__device_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CameraPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CameraResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_camera_layout_api_v1_business_cameras__device_id__layout_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    put_camera_layout_api_v1_business_cameras__device_id__layout_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LayoutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceLayout"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_area_api_v1_business_venues__venue_id__areas_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AreaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AreaResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    hub_cameras_api_v1_devices__device_id__hub_cameras_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubCameras"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hub_tokens_api_v1_devices__device_id__hub_tokens_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HubTokensIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HubTokens"];
                 };
             };
             /** @description Unauthorized */

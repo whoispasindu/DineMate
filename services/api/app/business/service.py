@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.business import schemas as s
+from app.business.cameras import WAITING, is_removed, label_of, source_hint
 from app.business.estimate import PastVisit, remaining_range
 from app.business.models import QueueReading, StaffMember, StaffPresence, TableVisit, VenueTable
 from app.business.tables import SeatView, TableView, table_state
@@ -287,8 +288,12 @@ def cameras(session: Session, venue: models.Canteen, now: datetime) -> s.VenueCa
     names = zone_names(venue)
     items = []
     for device in session.scalars(
-        select(models.Device).where(models.Device.canteen_id == venue.id).order_by(models.Device.id)
+        select(models.Device)
+        .where(models.Device.canteen_id == venue.id, models.Device.kind != "hub")
+        .order_by(models.Device.id)
     ):
+        if is_removed(device.config):
+            continue
         last_snapshot = session.scalar(
             select(models.ZoneSeatStatus.captured_at)
             .where(models.ZoneSeatStatus.device_id == device.id)
@@ -322,6 +327,10 @@ def cameras(session: Session, venue: models.Canteen, now: datetime) -> s.VenueCa
                 status=status,  # type: ignore[arg-type]
                 fps=beat.fps if beat else None,
                 last_seen_at=seen,
+                label=label_of(device.config, device.id) if device.kind == "camera" else None,
+                source_hint=source_hint((device.config or {}).get("source")),
+                has_layout=layout is not None,
+                waiting_for_zones=status != "offline" and beat is not None and beat.message == WAITING,
             )
         )
     return s.VenueCameras(server_time=now, venue_id=venue.id, items=items)
