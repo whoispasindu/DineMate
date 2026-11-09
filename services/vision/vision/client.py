@@ -21,6 +21,7 @@ class DeviceClient:
         )
         self.etag: str | None = None
         self.queue: deque[dict[str, Any]] = deque(maxlen=MAX_QUEUED_POSTS)
+        self.staff_queue: deque[dict[str, Any]] = deque(maxlen=MAX_QUEUED_POSTS)
 
     def close(self) -> None:
         self.http.close()
@@ -45,18 +46,30 @@ class DeviceClient:
         self.etag = response.headers.get("ETag")
         return response.json()
 
-    def post_occupancy(self, readings: list[dict[str, Any]]) -> int:
-        self.queue.append({"captured_at": datetime.now(UTC).isoformat(), "readings": readings})
+    def _send_queued(self, path: str, queue: deque[dict[str, Any]]) -> int:
         sent = 0
-        while self.queue:
-            response = self.http.post(f"/devices/{self.device_id}/occupancy", json=self.queue[0])
+        while queue:
+            response = self.http.post(path, json=queue[0])
             if 400 <= response.status_code < 500:
-                self.queue.popleft()
+                queue.popleft()
             self._check(response)
             if response.status_code < 400:
-                self.queue.popleft()
+                queue.popleft()
             sent += 1
         return sent
+
+    def post_occupancy(self, readings: list[dict[str, Any]]) -> int:
+        self.queue.append({"captured_at": datetime.now(UTC).isoformat(), "readings": readings})
+        return self._send_queued(f"/devices/{self.device_id}/occupancy", self.queue)
+
+    def staff_templates(self) -> dict[str, Any] | list[dict[str, Any]]:
+        response = self.http.get(f"/devices/{self.device_id}/staff-templates")
+        self._check(response)
+        return response.json()
+
+    def post_staff(self, snapshot: dict[str, Any]) -> int:
+        self.staff_queue.append({"captured_at": datetime.now(UTC).isoformat(), **snapshot})
+        return self._send_queued(f"/devices/{self.device_id}/staff", self.staff_queue)
 
     def post_seats(self, snapshot: dict[str, Any]) -> None:
         payload = {"captured_at": datetime.now(UTC).isoformat(), **snapshot}

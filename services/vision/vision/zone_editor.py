@@ -7,6 +7,7 @@ ENTER_KEYS = {10, 13}
 BACKSPACE_KEYS = {8, 127}
 ESCAPE = 27
 AREA_KEYS = {"s": "seating", "q": "queue", "w": "walkway", "i": "ignore"}
+WORK_KEYS = {"k": "counter", "h": "kitchen", "f": "floor"}
 DEFAULT_CAPACITY = 4
 MAX_NAME = 40
 
@@ -53,7 +54,7 @@ class ZoneEditor:
 
     def prompt(self) -> str:
         if self.mode == "type":
-            return "Area type: S seating, Q queue, W walkway, I ignore (Esc cancels)"
+            return "Type: S seating, Q queue, W walkway, I ignore | Work: K counter, H kitchen, F floor | Esc cancels"
         if self.mode == "name":
             return f"Zone name: {self.text}_   (Enter to continue)"
         if self.mode == "capacity":
@@ -101,8 +102,8 @@ class ZoneEditor:
             removed = self.shapes.pop()
             self.message = f"Deleted {removed.get('name', removed['type'])}."
         elif char == "s":
-            if not any(s["type"] == "seating" for s in self.shapes):
-                self.message = "Add at least one seating zone before saving."
+            if not any(s["type"] in ("seating", "work") for s in self.shapes):
+                self.message = "Add at least one seating zone or work area before saving."
                 return None
             return "save"
         elif code == ESCAPE:
@@ -133,6 +134,10 @@ class ZoneEditor:
         return None
 
     def _type_key(self, char: str) -> None:
+        if char in WORK_KEYS:
+            self.pending = {"type": "work", "area": WORK_KEYS[char], "points": list(self.current)}
+            self._finish()
+            return
         area = AREA_KEYS.get(char)
         if area is None:
             return
@@ -165,11 +170,7 @@ class ZoneEditor:
     def _finish(self) -> None:
         shape = self.pending
         self.shapes.append(shape)
-        label = (
-            f"seating zone '{shape['name']}' ({shape['capacity']} seats)"
-            if shape["type"] == "seating"
-            else shape["type"]
-        )
+        label = shape_label(shape)
         self._reset_pending(f"Added {label}. Draw another area or press S to save.")
 
     def _reset_pending(self, message: str) -> None:
@@ -192,9 +193,16 @@ class ZoneEditor:
             }
             for z in layout.get("zones", [])
         ]
-        others = [{"type": a["type"], "points": points(a["points"])} for a in layout.get("ignore", [])]
-        self.shapes = seating + others
-        self.message = f"Loaded {len(seating)} seating zone(s). Edit, or press S to keep them."
+        others = [
+            {"type": a["type"], "points": points(a["points"])} for a in layout.get("ignore", []) if a["type"] != "work"
+        ]
+        raw_work = [*layout.get("work", []), *(a for a in layout.get("ignore", []) if a["type"] == "work")]
+        work = [{"type": "work", "area": a["area"], "points": points(a["points"])} for a in raw_work]
+        self.shapes = seating + work + others
+        loaded = f"Loaded {len(seating)} seating zone(s)"
+        if work:
+            loaded += f" and {len(work)} work area(s)"
+        self.message = f"{loaded}. Edit, or press S to keep them."
 
     def layout(self) -> dict[str, Any]:
         return {
@@ -211,6 +219,19 @@ class ZoneEditor:
             "ignore": [
                 {"type": s["type"], "points": [list(p) for p in s["points"]]}
                 for s in self.shapes
-                if s["type"] != "seating"
+                if s["type"] not in ("seating", "work")
+            ],
+            "work": [
+                {"area": s["area"], "points": [list(p) for p in s["points"]]}
+                for s in self.shapes
+                if s["type"] == "work"
             ],
         }
+
+
+def shape_label(shape: dict[str, Any]) -> str:
+    if shape["type"] == "seating":
+        return f"seating zone '{shape['name']}' ({shape['capacity']} seats)"
+    if shape["type"] == "work":
+        return f"{shape['area']} work area"
+    return shape["type"]

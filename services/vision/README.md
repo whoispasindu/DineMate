@@ -92,6 +92,24 @@ Only free seats are ever counted as free. Held and hidden seats count as taken i
 
 Seat circles in the studio and `--preview`: green free, red taken, amber held, grey hidden. The worker posts the zone readings as before plus a seat snapshot to `POST /devices/{id}/seats` (states and how long each has lasted, never images or identities).
 
+## Staff mode (DineMate Business, Phase 9)
+
+For cafés and restaurants, the worker can also time consented staff in their **work areas** and count the queue. It is on only when the layout has work areas **and** `GET /devices/{id}/staff-templates` returns enrolled staff; otherwise nothing changes.
+
+**Marking work areas.** In the zone tool or the studio, outline an area, press Enter, then **K** (counter), **H** (kitchen) or **F** (floor). Work areas are saved under `work` in the layout file and never hide anyone from seat counting. Queue areas (**Q**) are reused for queue length.
+
+**How it works** (`vision/staff.py`, unit-tested without YOLO):
+
+- Only tracks whose foot point is inside a work area are ever passed to the identity reader. Customers elsewhere are never matched or named, and a worker who steps out of every work area loses their name at once.
+- Evidence comes from an `IdentityReader` (face embedding or badge code per track). A track is named after 3 consistent matches above the face threshold (0.6 cosine) or the same badge code; a different match restarts the count, and 5 misses in a row remove the name. One worker names one track at a time.
+- A lost track forgets its identity after 3 s. Templates live in memory only and are re-read with the layout; no frames or embeddings are stored.
+- Presence: an area interval opens after 10 s in that area and closes 30 s after the worker was last seen there (the end time is the last sighting).
+- Queue: people whose feet are in a queue area, median over 15 s, named staff excluded.
+
+Every reading cycle the worker posts `POST /devices/{id}/staff` with `presence` (open intervals with `ended_at: null`, plus any that closed since the last post) and `queue` (`{"people": n}`, or `null` without a queue area). Failed posts are retried in order; on a 404 the worker turns staff mode off and carries on. Settings in the device config: `face_threshold`, `confirm_matches`, `release_misses`, `lost_after_s`, `staff_dwell_s`, `staff_absence_s`, `queue_window_s`.
+
+The face and badge readers themselves arrive in the next step; until then staff stay unnamed and only the queue is counted (the worker logs this at start).
+
 ## Checking accuracy against your own counts (plan Section 7.6)
 
 1. Draw zones for each video with the studio (names matter: they go in the CSV).

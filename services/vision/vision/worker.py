@@ -13,6 +13,7 @@ from vision.client import ApiError, DeviceClient
 from vision.counting import Assignment
 from vision.pipeline import Models, Pipeline
 from vision.source import FrameSource
+from vision.staff import staff_from_response, work_areas_from_config
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
@@ -56,6 +57,7 @@ def layout_config(path: str) -> dict[str, Any]:
     return {
         "zones": zones,
         "ignore": layout.get("ignore", []),
+        "work": layout.get("work", []),
         "settings": {**DEFAULT_SETTINGS, **layout.get("settings", {})},
     }
 
@@ -147,6 +149,8 @@ class Preview:
             self.limits,
             pipeline.seat_states(),
             pipeline.labels(),
+            pipeline.work,
+            pipeline.staff_labels(),
         )
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
@@ -155,10 +159,36 @@ class Preview:
         self.cv2.destroyAllWindows()
 
 
+def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
+    if not pipeline.work:
+        pipeline.set_staff([])
+        return True
+    was_on = pipeline.staff_mode
+    try:
+        pipeline.set_staff(staff_from_response(client.staff_templates()))
+    except ApiError as exc:
+        if exc.status == 404:
+            pipeline.set_staff([])
+            log.warning("this API has no staff endpoint yet; staff mode is off")
+            return False
+        log.warning("staff list refresh failed: %s", exc)
+    except httpx.HTTPError as exc:
+        log.warning("staff list refresh failed: %s", exc)
+    if pipeline.staff_mode and not was_on:
+        log.info(
+            "Staff mode on: %d enrolled worker(s), %d work area(s)", len(pipeline.matcher.staff), len(pipeline.work)
+        )
+        if pipeline.identity is None:
+            log.warning("no face or badge reader installed yet; workers stay unnamed, the queue is still counted")
+    elif was_on and not pipeline.staff_mode:
+        log.info("Staff mode off")
+    return True
+
+
 def run(args: argparse.Namespace) -> int:
     client = DeviceClient(args.api, args.device, args.token) if args.device and args.token else None
     config = layout_config(args.layout) if args.layout else client.config() if client else None
-    if not config or not config.get("zones"):
+    if not config or not (config.get("zones") or work_areas_from_config(config)):
         log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
         return 1
     config = apply_overrides(config, args)
@@ -177,6 +207,8 @@ def run(args: argparse.Namespace) -> int:
     preview = Preview() if args.preview else None
     posting = client is not None and not args.dry_run
     seats_endpoint = True
+    staff_endpoint = refresh_staff(client, pipeline) if client else False
+    epoch_offset = time.time() - time.monotonic()
     last_config = last_beat = time.monotonic()
     last_post: float | None = None
     fps = 0.0
@@ -196,6 +228,7 @@ def run(args: argparse.Namespace) -> int:
             if frame.at - last_post >= float(settings["post_every_s"]):
                 readings = pipeline.readings()
                 snapshot = pipeline.snapshot(frame.at)
+                staff = pipeline.staff_snapshot(epoch_offset)
                 shown = {r["zone_id"]: r for r in readings}
                 last_post = frame.at
                 summary = ", ".join(
@@ -203,11 +236,12 @@ def run(args: argparse.Namespace) -> int:
                     for z in pipeline.zones
                 )
                 if posting and client:
-                    try:
-                        client.post_occupancy(readings)
-                        log.info("posted %s (detect %d ms)", summary, latency_ms)
-                    except (ApiError, httpx.HTTPError) as exc:
-                        log.warning("post failed, will retry: %s", exc)
+                    if pipeline.zones:
+                        try:
+                            client.post_occupancy(readings)
+                            log.info("posted %s (detect %d ms)", summary, latency_ms)
+                        except (ApiError, httpx.HTTPError) as exc:
+                            log.warning("post failed, will retry: %s", exc)
                     if snapshot and seats_endpoint:
                         try:
                             client.post_seats(snapshot)
@@ -219,10 +253,24 @@ def run(args: argparse.Namespace) -> int:
                                 log.warning("seat post failed: %s", exc)
                         except httpx.HTTPError as exc:
                             log.warning("seat post failed: %s", exc)
+                    if staff and staff_endpoint:
+                        try:
+                            client.post_staff(staff)
+                        except ApiError as exc:
+                            if exc.status == 404:
+                                staff_endpoint = False
+                                pipeline.set_staff([])
+                                log.warning("this API has no staff endpoint yet; staff mode is off")
+                            else:
+                                log.warning("staff post failed, will retry: %s", exc)
+                        except httpx.HTTPError as exc:
+                            log.warning("staff post failed, will retry: %s", exc)
                 else:
                     log.info("dry run: %s", json.dumps(readings))
                     if snapshot:
                         log.info("dry run seats: %s", json.dumps(snapshot["zones"]))
+                    if staff:
+                        log.info("dry run staff: %s", json.dumps(staff))
             now = time.monotonic()
             if client and now - last_config >= CONFIG_REFRESH_S:
                 last_config = now
@@ -235,6 +283,8 @@ def run(args: argparse.Namespace) -> int:
                         log.info("layout updated to version %s", fresh.get("layout_version"))
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("config refresh failed: %s", exc)
+                if staff_endpoint:
+                    staff_endpoint = refresh_staff(client, pipeline)
             if posting and client and now - last_beat >= HEARTBEAT_S:
                 last_beat = now
                 try:

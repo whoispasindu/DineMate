@@ -149,7 +149,11 @@ def zones_from_config(config: dict[str, Any]) -> tuple[list[Zone], list[list[tup
         Zone(z["zone_id"], z["name"], int(z["capacity"]), [(float(x), float(y)) for x, y in z["points"]])
         for z in config.get("zones", [])
     ]
-    ignore = [[(float(x), float(y)) for x, y in area["points"]] for area in config.get("ignore", [])]
+    ignore = [
+        [(float(x), float(y)) for x, y in area["points"]]
+        for area in config.get("ignore", [])
+        if area.get("type") != "work"
+    ]
     s = config.get("settings", {})
     settings = CountSettings(
         dwell_s=float(s.get("dwell_s", 20)),

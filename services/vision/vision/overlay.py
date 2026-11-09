@@ -4,8 +4,9 @@ from typing import Any
 import cv2
 import numpy as np
 
-from vision.counting import Assignment, Zone
+from vision.counting import Assignment, Detection, Zone
 from vision.seats import Seat, SeatSettings
+from vision.staff import WorkArea
 
 FALLBACK_SCREEN = (1600, 900)
 SCREEN_USE = (0.92, 0.82)
@@ -26,6 +27,8 @@ SEAT_COLORS = {
     "unknown": (150, 150, 150),
 }
 OTHER_COLOR = (150, 150, 150)
+WORK_COLORS = {"counter": (200, 90, 40), "kitchen": (40, 110, 200), "floor": (180, 80, 160)}
+STAFF_COLOR = (255, 200, 60)
 
 
 def screen_limits() -> tuple[int, int]:
@@ -80,11 +83,19 @@ def draw(
     limits: tuple[int, int],
     seat_states: list[tuple[Seat, str]] | None = None,
     labels: dict[str, str] | None = None,
+    work: list[WorkArea] | None = None,
+    staff: list[tuple[Detection, str]] | None = None,
 ) -> np.ndarray:
     canvas, scale = fit(image, limits)
     height, width = canvas.shape[:2]
     for area in ignore:
         cv2.polylines(canvas, [_pixels(area, width, height)], True, IGNORE_COLOR, 1)
+    for area in work or []:
+        pts = _pixels(area.points, width, height)
+        color = WORK_COLORS.get(area.area, OTHER_COLOR)
+        cv2.polylines(canvas, [pts], True, color, 2)
+        corner = (int(pts[:, 0].min()) + 6, int(pts[:, 1].max()) - 8)
+        cv2.putText(canvas, f"work: {area.area}", corner, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
     for zone in zones:
         pts = _pixels(zone.points, width, height)
         overlay = canvas.copy()
@@ -115,6 +126,12 @@ def draw(
             1,
             cv2.LINE_AA,
         )
+    for d, text in staff or []:
+        top_left = (round(d.x1 * scale), round(d.y1 * scale))
+        bottom_right = (round(d.x2 * scale), round(d.y2 * scale))
+        cv2.rectangle(canvas, top_left, bottom_right, STAFF_COLOR, 2)
+        spot = (top_left[0], min(bottom_right[1] + 16, height - 4))
+        cv2.putText(canvas, text, spot, cv2.FONT_HERSHEY_SIMPLEX, 0.5, STAFF_COLOR, 1, cv2.LINE_AA)
     for zone in zones:
         pts = _pixels(zone.points, width, height)
         x, y = int(pts[:, 0].min()) + 6, int(pts[:, 1].min()) + 22
