@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     cafe_simulator_device: str = "sim-cafe"
     cafe_simulator_interval_s: float = 5.0
     cafe_timezone: str = "Asia/Colombo"
+    deployment: str = "local"
+    template_key: str | None = None
+    live_link_secret: str = "dev-live-link-secret"
     rules_interval_s: float = 15.0
     jwt_secret: str = DEV_JWT_SECRET
     access_token_minutes: int = 15

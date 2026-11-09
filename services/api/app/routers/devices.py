@@ -86,6 +86,7 @@ def build_config(session: SessionDep, device: models.Device) -> dict[str, Any]:
         for p in polygons
         if p.get("type") in ("queue", "walkway", "ignore")
     ]
+    work = [{"area": p["area"], "points": p["points"]} for p in polygons if p.get("type") == "work" and p.get("area")]
     settings = {**DEFAULT_SETTINGS, **{k: v for k, v in device.config.items() if k in DEFAULT_SETTINGS}}
     profiles = device.config.get("profiles") if device.kind == "simulator" else None
     return {
@@ -95,6 +96,7 @@ def build_config(session: SessionDep, device: models.Device) -> dict[str, Any]:
         "layout_version": layout.version if layout else None,
         "zones": [z.model_dump(mode="json") for z in config_zones],
         "ignore": [i.model_dump(mode="json") for i in ignore],
+        "work": work,
         "settings": WorkerSettings(**settings).model_dump(mode="json"),
         "simulation": {k: SimulationProfile(**v).model_dump(mode="json") for k, v in profiles.items()}
         if profiles

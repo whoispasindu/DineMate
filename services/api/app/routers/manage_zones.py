@@ -91,6 +91,10 @@ def validate_polygons(session: SessionDep, device: models.Device, polygons: list
     seen: set[str] = set()
     seat_ids: set[str] = set()
     for polygon in polygons:
+        if (polygon.type == "work") != (polygon.area is not None):
+            raise invalid("Work areas need an area (counter, kitchen or floor), and only work areas have one.")
+        if polygon.type == "work" and not models.is_venue_id(device.canteen_id):
+            raise invalid("Work areas are for DineMate Business venues.")
         if polygon.type != "seating":
             if polygon.zone_id is not None:
                 raise invalid("Only seating polygons can be linked to a zone.")

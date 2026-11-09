@@ -26,6 +26,11 @@ class IgnoreArea(Schema):
     points: list[Point]
 
 
+class WorkArea(Schema):
+    area: Literal["counter", "kitchen", "floor"]
+    points: list[Point]
+
+
 class WorkerSettings(Schema):
     post_every_s: float
     smoothing_s: float
@@ -57,6 +62,7 @@ class DeviceConfig(Timestamped):
     layout_version: int | None
     zones: list[ConfigZone]
     ignore: list[IgnoreArea]
+    work: list[WorkArea] = Field(default_factory=list)
     settings: WorkerSettings
     simulation: dict[str, SimulationProfile] | None
 
