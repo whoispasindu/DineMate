@@ -24,6 +24,7 @@ from app.routers.manage_zones import (
 )
 from app.schemas_config import DeviceLayout, LayoutIn
 from app.services.audit import record
+from app.testfeeds.storage import forget_video, require_video
 
 router = APIRouter(prefix="/business", tags=["business-cameras"])
 devices = APIRouter(tags=["business-cameras"])
@@ -65,11 +66,24 @@ def organization_cameras(session: SessionDep, organization_id: str) -> list[mode
     return [d for d in found if not is_removed(d.config)]
 
 
-def checked_source(source: str) -> str:
+def checked_source(settings: Settings, source: str) -> str:
     try:
-        return check_source(source)
+        value = check_source(source)
     except ValueError as exc:
         raise invalid(str(exc)) from exc
+    return require_video(settings, value)
+
+
+def scope_cameras(session: SessionDep, hub: models.Device) -> list[models.Device]:
+    if hub.kind != "hub":
+        raise not_found("Hub", hub.id)
+    if (hub.config or {}).get("scope") == "all":
+        found = session.scalars(select(models.Device).where(models.Device.kind == "camera").order_by(models.Device.id))
+        return [d for d in found if (d.config or {}).get("source") and not is_removed(d.config)]
+    venue = session.get(models.Canteen, hub.canteen_id)
+    if venue is None or venue.organization_id is None:
+        raise not_found("Hub", hub.id)
+    return organization_cameras(session, venue.organization_id)
 
 
 @router.post("/venues/{venue_id}/cameras", response_model=cs.CameraResult, responses=RESPONSES)
@@ -86,7 +100,7 @@ def add_camera(
     venue = venue_for(session, user, venue_id)
     if len(organization_cameras(session, user.organization_id)) >= settings.max_cameras:
         raise ApiError(409, "conflict", f"This computer runs up to {settings.max_cameras} cameras.")
-    source = checked_source(payload.source)
+    source = checked_source(settings, payload.source)
     device = models.Device(
         id=f"cam-{secrets.token_hex(3)}",
         canteen_id=venue.id,
@@ -115,6 +129,7 @@ def update_camera(
     payload: cs.CameraPatch,
     user: BusinessUser,
     session: SessionDep,
+    settings: SettingsDep,
     now: NowDep,
     real_now: RealNowDep,
     request: Request,
@@ -122,14 +137,18 @@ def update_camera(
     device = camera_for(session, user, device_id)
     before = camera_out(device).model_dump()
     config = dict(device.config or {})
+    old_source = config.get("source")
     if payload.label is not None:
         config["label"] = payload.label.strip()
     if payload.source is not None:
-        config["source"] = checked_source(payload.source)
+        config["source"] = checked_source(settings, payload.source)
         config.pop("stream_url", None)
     if payload.enabled is not None:
         device.is_enabled = payload.enabled
     device.config = config
+    session.flush()
+    if config.get("source") != old_source:
+        forget_video(session, settings, old_source)
     record(
         session,
         real_now,
@@ -150,15 +169,19 @@ def remove_camera(
     device_id: str,
     user: BusinessUser,
     session: SessionDep,
+    settings: SettingsDep,
     now: NowDep,
     real_now: RealNowDep,
     request: Request,
 ) -> cs.CameraRemoved:
     device = camera_for(session, user, device_id)
     before = camera_out(device).model_dump()
+    source = (device.config or {}).get("source")
     device.config = {"label": label_of(device.config, device.id), "removed": True}
     device.is_enabled = False
     device.token_hash = None
+    session.flush()
+    forget_video(session, settings, source)
     record(session, real_now, "business.camera.remove", "device", device.id, user=user, before=before, request=request)
     session.commit()
     return cs.CameraRemoved(server_time=now, device_id=device.id)
@@ -253,18 +276,9 @@ def add_area(
     return cs.AreaResult(server_time=now, zone=editable_zone(zone))
 
 
-def hub_device(device: models.Device, session: SessionDep) -> str:
-    if device.kind != "hub":
-        raise not_found("Hub", device.id)
-    venue = session.get(models.Canteen, device.canteen_id)
-    if venue is None or venue.organization_id is None:
-        raise not_found("Hub", device.id)
-    return venue.organization_id
-
-
 @devices.get("/devices/{device_id}/hub/cameras", response_model=cs.HubCameras, responses=AUTH_RESPONSES)
 def hub_cameras(device: DeviceDep, session: SessionDep, now: NowDep, real_now: RealNowDep) -> cs.HubCameras:
-    organization_id = hub_device(device, session)
+    found = scope_cameras(session, device)
     device.last_heartbeat_at = real_now
     cameras = [
         cs.HubCamera(
@@ -274,7 +288,7 @@ def hub_cameras(device: DeviceDep, session: SessionDep, now: NowDep, real_now: R
             source=str((d.config or {}).get("source") or ""),
             enabled=d.is_enabled,
         )
-        for d in organization_cameras(session, organization_id)
+        for d in found
         if (d.config or {}).get("source")
     ]
     session.commit()
@@ -285,8 +299,7 @@ def hub_cameras(device: DeviceDep, session: SessionDep, now: NowDep, real_now: R
 def hub_tokens(
     payload: cs.HubTokensIn, device: DeviceDep, session: SessionDep, now: NowDep, real_now: RealNowDep
 ) -> cs.HubTokens:
-    organization_id = hub_device(device, session)
-    mine = {d.id: d for d in organization_cameras(session, organization_id) if d.is_enabled}
+    mine = {d.id: d for d in scope_cameras(session, device) if d.is_enabled}
     unknown = [i for i in payload.device_ids if i not in mine]
     if unknown:
         raise not_found("Camera", unknown[0])

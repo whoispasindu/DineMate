@@ -11,6 +11,7 @@ import { SchedulesScreen } from "./screens/Schedules";
 import { SeatsScreen } from "./screens/Seats";
 import { ShopsScreen } from "./screens/Shops";
 import { SignInScreen } from "./screens/SignIn";
+import { TestVideosScreen } from "./screens/TestVideos";
 import { ThresholdsScreen } from "./screens/Thresholds";
 import { ZonesScreen } from "./screens/Zones";
 
@@ -22,6 +23,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/safety": SafetyScreen,
   "/occupancy": OccupancyScreen,
   "/seats": SeatsScreen,
+  "/test-videos": TestVideosScreen,
 };
 
 function BusinessAccount() {

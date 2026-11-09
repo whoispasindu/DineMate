@@ -17,7 +17,8 @@ COPY alembic.ini docker-entrypoint.sh ./
 COPY alembic ./alembic
 COPY app ./app
 
-RUN chmod +x docker-entrypoint.sh && useradd --system --no-create-home api
+RUN chmod +x docker-entrypoint.sh && useradd --system --no-create-home api \
+    && mkdir -p /data/test-videos && chown api /data/test-videos
 USER api
 
 EXPOSE 8000

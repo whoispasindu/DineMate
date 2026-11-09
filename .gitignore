@@ -33,3 +33,6 @@ services/vision/layouts/test*.json
 docs/competitionPresentation/
 
 backups/
+
+# Test videos uploaded from the dashboards (native API runs)
+services/api/test-videos/

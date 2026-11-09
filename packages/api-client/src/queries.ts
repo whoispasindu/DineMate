@@ -3,6 +3,7 @@ import { api } from "./client";
 import { serverNow } from "./clock";
 import type {
   CameraIn,
+  VideoFeedIn,
   CameraPatch,
   LayoutPolygon,
   BusinessSettingsIn,
@@ -36,6 +37,8 @@ export const queryKeys = {
   mealSchedules: (canteenId: string | null) => ["manage", "meal-schedules", canteenId ?? "campus"] as const,
   thresholds: ["manage", "thresholds"] as const,
   managedDevices: ["manage", "devices"] as const,
+  testFeeds: ["manage", "test-feeds"] as const,
+  testFeedLive: (deviceId: string) => ["manage", "test-feeds", "live", deviceId] as const,
   deviceLayout: (deviceId: string) => ["manage", "layout", deviceId] as const,
   safetyActive: ["safety", "active"] as const,
   safetyEvents: (status: string) => ["safety", "events", status] as const,
@@ -466,6 +469,51 @@ export function useLiveLink(venueId: string | undefined, deviceId: string | unde
     queryKey: queryKeys.liveLink(venueId ?? "", deviceId ?? ""),
     queryFn: () => api.liveLink(venueId ?? "", deviceId ?? ""),
     enabled: venueId !== undefined && deviceId !== undefined,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+}
+
+export function useUploadTestVideo() {
+  return useMutation({ mutationFn: (file: File) => api.uploadTestVideo(file) });
+}
+
+export function useTestFeeds(enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.testFeeds,
+    queryFn: api.testFeeds,
+    enabled,
+    refetchInterval: LIVE_POLL_MS,
+    retry: false,
+  });
+}
+
+function useTestFeedChange<A, R>(run: (args: A) => Promise<R>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: queryKeys.testFeeds });
+      void client.invalidateQueries({ queryKey: queryKeys.managedDevices });
+    },
+  });
+}
+
+export function useAddTestFeed() {
+  return useTestFeedChange(({ canteenId, body }: { canteenId: string; body: VideoFeedIn }) => api.addTestFeed(canteenId, body));
+}
+
+export function useRemoveTestFeed() {
+  return useTestFeedChange((deviceId: string) => api.removeTestFeed(deviceId));
+}
+
+export function useTestFeedLive(deviceId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.testFeedLive(deviceId ?? ""),
+    queryFn: () => api.testFeedLive(deviceId ?? ""),
+    enabled: deviceId !== undefined,
     staleTime: 0,
     gcTime: 0,
     refetchOnWindowFocus: false,

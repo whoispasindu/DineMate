@@ -22,6 +22,7 @@ export const NAV: NavItem[] = [
   { to: "/shops", label: "Shops & menus", icon: "store", roles: [...MANAGERS, "shop_manager"] },
   { to: "/schedules", label: "Meal schedules", icon: "calendar", roles: MANAGERS },
   { to: "/zones", label: "Zones", icon: "seat", roles: MANAGERS },
+  { to: "/test-videos", label: "Test videos", icon: "camera", roles: MANAGERS },
   { to: "/devices", label: "Devices", icon: "camera", roles: ["campus_admin"] },
   { to: "/safety", label: "Safety", icon: "shield", roles: ["campus_admin", "safety_officer"] },
   { to: "/config", label: "Thresholds & config", icon: "sliders", roles: MANAGERS },

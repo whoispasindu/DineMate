@@ -16,3 +16,4 @@ export {
 export * from "./time";
 export { FoodArt, type ShopArtKind } from "./food";
 export { canteenPhotoFor, emptyArtFor, foodPhotoFor, shopPhotoFor, welcomePhoto, type EmptyArt } from "./photos";
+export { reachableStream } from "./stream";

@@ -42,6 +42,7 @@ Solo developer. Work one phase at a time from docs/ROADMAP.md and tick items off
 - pnpm dev:student / pnpm dev:console / pnpm dev:business (sample data) — add `:api` (dev:student:api, dev:console:api, dev:business:api) to use the real API on :8000; business sample sign-in: owner@ or manager@dinemate.test
 - pnpm typecheck / pnpm build / pnpm lint / pnpm format
 - pnpm stack:up / pnpm stack:down — Postgres + API + simulator in Docker (API on :8000)
+- pnpm stack:cameras — the same stack plus the camera hub (live views on 8100–8107) for test videos: YouTube links or uploaded clips added on the console's Test videos page or as a Test video camera in Business. Temporary; see docs/TEST_VIDEOS.md (includes how to remove it)
 - Business local server (Windows): `powershell -ExecutionPolicy Bypass -File infra\install-business.ps1` (add `-SampleCafe` for the labelled sample), then `infra\business.ps1 start|stop|status|logs|backup|update`; dashboard on :8080
 - pnpm dev:api — API with reload against a local or Docker Postgres
 - pnpm test:api — pytest; integration tests use `dinemate_test` on localhost:5432 and skip if Postgres is down (set DINEMATE_REQUIRE_DB_TESTS=1 to fail instead)

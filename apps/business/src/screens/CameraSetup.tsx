@@ -10,11 +10,11 @@ import {
   type PolygonType,
   type WorkAreaName,
 } from "@dinemate/api-client";
-import { cx, Icon, LayoutCanvas, nextSeatId } from "@dinemate/ui";
+import { cx, Icon, LayoutCanvas, nextSeatId, reachableStream } from "@dinemate/ui";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Select, Skeleton, TextInput } from "../kit";
-import { reachableStream } from "../live";
+
 import { useVenue } from "../venue";
 
 const COLOR: Record<PolygonType, string> = {

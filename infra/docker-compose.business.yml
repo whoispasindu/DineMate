@@ -12,6 +12,7 @@ x-api-env: &api-env
   DINEMATE_LIVE_LINK_SECRET: ${DINEMATE_LIVE_LINK_SECRET:?Run infra/install-business.ps1 first}
   DINEMATE_SIMULATOR_TOKEN: ${DINEMATE_SIMULATOR_TOKEN:?Run infra/install-business.ps1 first}
   DINEMATE_MAX_CAMERAS: ${DINEMATE_MAX_CAMERAS:-8}
+  DINEMATE_TEST_VIDEOS_DIR: /data/test-videos
 
 services:
   db:
@@ -36,6 +37,8 @@ services:
       <<: *api-env
       DINEMATE_MIGRATE_ON_START: "true"
       DINEMATE_SEED_IF_EMPTY: "false"
+    volumes:
+      - test-videos:/data/test-videos
     depends_on:
       db:
         condition: service_healthy
@@ -68,10 +71,12 @@ services:
       DINEMATE_STREAM_FIRST_PORT: "8090"
       DINEMATE_MODEL: ${DINEMATE_MODEL:-models/yolo11s.pt}
       DINEMATE_POSE_MODEL: ${DINEMATE_POSE_MODEL:-models/yolo11s-pose.pt}
+      DINEMATE_TEST_VIDEOS_DIR: /data/test-videos
     ports:
       - "8090-8097:8090-8097"
     volumes:
       - hub-models:/app/models
+      - test-videos:/data/test-videos:ro
     depends_on:
       api:
         condition: service_healthy
@@ -92,3 +97,4 @@ services:
 volumes:
   business-db:
   hub-models:
+  test-videos:
