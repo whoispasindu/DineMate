@@ -421,6 +421,17 @@ def templates_for(session: Session, settings: Settings, device: models.Device, n
     }
     staff = []
     for member in members:
+        if device.kind == "simulator":
+            staff.append(
+                ss.DeviceStaff(
+                    staff_id=str(member.id),
+                    display_name=member.display_name,
+                    method=member.method,  # type: ignore[arg-type]
+                    badge_code=member.badge_code,
+                    template=None,
+                )
+            )
+            continue
         template = None
         if member.method == "face" and vault is not None and member.id in sealed:
             try:

@@ -184,10 +184,47 @@ def tables_from_config(config: dict[str, Any]) -> list[SimTable]:
     return out
 
 
+def staff_sim(client: ApiClient, device_id: str, tz: ZoneInfo, rng: random.Random, now: datetime) -> Any:
+    from app.business.staff_sim import SimWorker, StaffSim
+
+    status, body, _ = client._request("GET", f"/devices/{device_id}/staff-templates")
+    if status != 200 or not body or not body.get("staff"):
+        return None
+    shifts = {"Barista": (7, 15), "Cashier": (8, 16), "Kitchen": (7, 15), "Floor": (11, 21)}
+    workers = []
+    for index, member in enumerate(body["staff"]):
+        role = str(member["display_name"]).split(" ")[0]
+        start, end = shifts.get(role, (7, 21))
+        workers.append(SimWorker(member["staff_id"], role, (start + (index % 2) * 3, min(21, end + (index % 2) * 4))))
+    staff = StaffSim(workers, tz, rng)
+    staff.run_until(now - timedelta(minutes=30), now, sell=False)
+    staff.reported = len(staff.closed)
+    return staff
+
+
+def post_staff(client: ApiClient, device_id: str, staff: Any, offset: timedelta, rng: random.Random) -> None:
+    from app.business.staff_sim import queue_people
+
+    real = datetime.now(UTC)
+    presence = [
+        {
+            "staff_id": p.staff_id,
+            "area": p.area,
+            "started_at": (p.started_at - offset).isoformat(),
+            "ended_at": (p.ended_at - offset).isoformat() if p.ended_at else None,
+        }
+        for p in staff.drain()
+    ]
+    local = (real + offset).astimezone(staff.tz)
+    payload = {"captured_at": real.isoformat(), "presence": presence, "queue": {"people": queue_people(local, rng)}}
+    client._request("POST", f"/devices/{device_id}/staff", payload)
+
+
 def run(settings: Settings, rng: random.Random) -> None:
     client = ApiClient(settings.simulator_api_url, settings.simulator_token)
     device_id = settings.cafe_simulator_device
     sim: CafeSim | None = None
+    staff = None
     offset = timedelta(0)
     while True:
         try:
@@ -198,6 +235,7 @@ def run(settings: Settings, rng: random.Random) -> None:
                     sim = CafeSim(tables_from_config(body), ZoneInfo(settings.cafe_timezone), rng)
                     now = datetime.now(UTC) + offset
                     sim.run_until(now - timedelta(hours=2), now)
+                    staff = staff_sim(client, device_id, ZoneInfo(settings.cafe_timezone), rng, now)
             if sim is not None:
                 now = datetime.now(UTC) + offset
                 sim.step(now)
@@ -209,6 +247,9 @@ def run(settings: Settings, rng: random.Random) -> None:
                 }
                 client._request("POST", f"/devices/{device_id}/seats", payload)
                 log.info("%s: posted %d simulated seats", device_id, len(seats))
+                if staff is not None:
+                    staff.step(now)
+                    post_staff(client, device_id, staff, offset, rng)
         except (OSError, RuntimeError, KeyError) as exc:
             log.warning("%s: %s", device_id, exc)
             sim = None

@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import math
+import uuid
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from urllib.parse import parse_qs, urlparse
@@ -11,6 +12,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
+from app import models
 from app.business.models import FaceTemplate, StaffPresence, TillOrder
 from app.business.seed import DEVICE_ID, VENUE_ID
 from app.core.config import Settings, get_settings
@@ -23,6 +25,7 @@ SIM_TOKEN = "dev-simulator-token"
 DEVICE = {"Authorization": f"Device {SIM_TOKEN}"}
 BASE = "/api/v1/business"
 KEY = Fernet.generate_key().decode()
+CAMERA = {"Authorization": "Device cafe-camera-token"}
 
 
 @pytest.fixture
@@ -84,14 +87,19 @@ def test_face_enrolment_needs_consent_and_a_local_server(client: TestClient, see
     with Session(seeded) as session:
         sealed = session.scalar(select(FaceTemplate.sealed))
         assert sealed is not None and b"0.9" not in sealed
-    templates = client.get(f"/api/v1/devices/{DEVICE_ID}/staff-templates", headers=DEVICE).json()
+    with Session(seeded) as session:
+        session.add(
+            models.Device(id="cam-cafe", canteen_id=VENUE_ID, kind="camera", token_hash=hash_token("cafe-camera-token"))
+        )
+        session.commit()
+    templates = client.get("/api/v1/devices/cam-cafe/staff-templates", headers=CAMERA).json()
     faces = [s for s in templates["staff"] if s["staff_id"] == member["id"]]
     assert faces and len(faces[0]["template"]) == 128
     app.dependency_overrides[get_settings] = lambda: Settings(deployment="cloud", template_key=KEY)
     refused = client.post(f"{BASE}/staff/{member['id']}/face", headers=headers, json={"template": template()})
     assert refused.status_code == 403
     assert refused.json()["error"]["code"] == "templates_disabled"
-    cloud = client.get(f"/api/v1/devices/{DEVICE_ID}/staff-templates", headers=DEVICE).json()
+    cloud = client.get("/api/v1/devices/cam-cafe/staff-templates", headers=CAMERA).json()
     assert cloud["faces_enabled"] is False
     assert all(s["method"] == "badge" for s in cloud["staff"])
 
@@ -154,7 +162,8 @@ def test_presence_till_and_report_with_audit(client: TestClient, seeded: Engine)
     assert audit and audit[0]["action"] == "business.staff_report.view"
     client.delete(f"{BASE}/staff/{member['id']}/consent", headers=headers)
     with Session(seeded) as session:
-        assert session.scalar(select(func.count()).select_from(StaffPresence)) == 0
+        mine = select(func.count()).select_from(StaffPresence).where(StaffPresence.staff_id == uuid.UUID(member["id"]))
+        assert session.scalar(mine) == 0
     assert client.delete(f"{BASE}/staff/{member['id']}", headers=headers).status_code == 200
     with Session(seeded) as session:
         order = session.scalars(select(TillOrder).where(TillOrder.order_ref == "T1")).one()
