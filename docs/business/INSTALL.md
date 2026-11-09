@@ -60,6 +60,8 @@ cd services\vision
 uv run python -m vision.hub --api http://localhost:8080/api/v1 --token <DINEMATE_HUB_TOKEN from infra\.env.business>
 ```
 
+**Slow PC?** DineMate uses the YOLO11s model, which needs about 100 ms per frame on a recent processor. If the camera status shows a low frame rate, add `DINEMATE_MODEL=models/yolo11n.pt` and `DINEMATE_POSE_MODEL=models/yolo11n-pose.pt` to `infra\.env.business` and run `business.ps1 update`. The smaller model is twice as fast but misses more people.
+
 ## Day to day
 
 ```powershell

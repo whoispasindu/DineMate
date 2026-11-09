@@ -20,8 +20,8 @@ from vision.stream import LiveServer, blur, blur_boxes, local_address
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
-DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11n.pt"
-DEFAULT_POSE_MODEL = PROJECT_DIR / "models" / "yolo11n-pose.pt"
+DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11s.pt"
+DEFAULT_POSE_MODEL = PROJECT_DIR / "models" / "yolo11s-pose.pt"
 CONFIG_REFRESH_S = 30.0
 HEARTBEAT_S = 30.0
 WAITING = "waiting for zones"

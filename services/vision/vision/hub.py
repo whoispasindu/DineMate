@@ -19,7 +19,7 @@ from vision.envfile import load_env_file
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
-DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11n.pt"
+DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11s.pt"
 DEFAULT_API = "http://localhost:8000/api/v1"
 POLL_S = 15.0
 TICK_S = 1.0
