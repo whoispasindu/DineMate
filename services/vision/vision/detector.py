@@ -47,6 +47,9 @@ def objects_from(
 
 
 def _load(model: str) -> Any:
+    from vision.nms import ensure_nms
+
+    ensure_nms()
     from ultralytics import YOLO, settings
 
     settings.update({"sync": False})

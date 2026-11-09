@@ -95,7 +95,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Draw seating zones and work areas on one frame and save them as a layout file."
     )
-    parser.add_argument("--source", default="0", help="webcam index (0) or a video file path")
+    parser.add_argument(
+        "--source", default="0", help="webcam index (0), a video file path, or a YouTube link (needs yt-dlp)"
+    )
     parser.add_argument("--at", type=float, default=0.0, help="seconds into a video to grab the frame from")
     parser.add_argument("--out", required=True, help="where to write the layout JSON, e.g. layouts/webcam.json")
     args = parser.parse_args(argv)

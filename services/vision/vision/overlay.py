@@ -29,6 +29,14 @@ SEAT_COLORS = {
 OTHER_COLOR = (150, 150, 150)
 WORK_COLORS = {"counter": (200, 90, 40), "kitchen": (40, 110, 200), "floor": (180, 80, 160)}
 STAFF_COLOR = (255, 200, 60)
+STAY_COLOR = (90, 230, 90)
+
+
+def tag(canvas: np.ndarray, text: str, spot: tuple[int, int], color: tuple[int, int, int]) -> None:
+    (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+    x, y = spot
+    cv2.rectangle(canvas, (x - 3, y - th - 5), (x + tw + 3, y + 4), (24, 24, 24), -1)
+    cv2.putText(canvas, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2, cv2.LINE_AA)
 
 
 def screen_limits() -> tuple[int, int]:
@@ -85,6 +93,7 @@ def draw(
     labels: dict[str, str] | None = None,
     work: list[WorkArea] | None = None,
     staff: list[tuple[Detection, str]] | None = None,
+    stays: dict[int, str] | None = None,
 ) -> np.ndarray:
     canvas, scale = fit(image, limits)
     height, width = canvas.shape[:2]
@@ -116,16 +125,12 @@ def draw(
         top_left = (round(d.x1 * scale), round(d.y1 * scale))
         bottom_right = (round(d.x2 * scale), round(d.y2 * scale))
         cv2.rectangle(canvas, top_left, bottom_right, color, 2)
-        cv2.putText(
-            canvas,
-            a.reason,
-            (top_left[0], max(top_left[1] - 6, BAR_HEIGHT + 12)),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.45,
-            color,
-            1,
-            cv2.LINE_AA,
-        )
+        stay = (stays or {}).get(d.track_id) if d.track_id is not None else None
+        spot = (top_left[0], max(top_left[1] - 6, BAR_HEIGHT + 12))
+        if stay:
+            tag(canvas, stay, spot, STAY_COLOR)
+        else:
+            cv2.putText(canvas, a.reason, spot, cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 1, cv2.LINE_AA)
     for d, text in staff or []:
         top_left = (round(d.x1 * scale), round(d.y1 * scale))
         bottom_right = (round(d.x2 * scale), round(d.y2 * scale))

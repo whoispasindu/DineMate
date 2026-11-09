@@ -66,6 +66,18 @@ uv run python -m vision.worker --source ../../data/videos/lunch.mp4 --layout lay
 
 Boxes in the studio and in `--preview`: green = counted, yellow = waiting for the dwell, grey = outside zones or in a walkway. Both windows scale to fit the screen.
 
+## YouTube streams and videos (testing)
+
+Public YouTube streams and videos give extra angles, lighting and crowd sizes for testing counts, seats and queues. `--source` accepts a YouTube link. The worker resolves it with yt-dlp to a 720p (or lower) H.264 stream and reads it in memory; nothing is downloaded or saved. For a live stream it fetches a fresh link when the stream drops, up to 5 times in a row.
+
+```bash
+uv run --with yt-dlp python -m vision.worker --source "https://youtu.be/<id>" --layout layouts/test-youtube-cafe.json --dry-run
+```
+
+Draw a layout for each feed with the zone tool (`--source` takes the same link), and keep it as `layouts/test*.json`, which is git-ignored. With `--layout`, the worker keeps that layout and does not take one from the API.
+
+Use these feeds for counting only. Never enrol or recognise anyone in them, keep screenshots blurred, and don't publish anything that identifies the place or people. YouTube's terms don't allow downloading, so keep clips out of `data/videos/` unless the video's licence allows reuse.
+
 ## Seats (Phase 7)
 
 A zone can also hold **seats**: one point per chair. With seats, the worker tracks every seat instead of counting people in the zone, so it can tell sitting from standing and a bag from a person.

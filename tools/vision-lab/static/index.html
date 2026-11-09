@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vision lab</title>
+    <style>
+      :root {
+        --ink: #1b1f27;
+        --muted: #5f6673;
+        --line: #d9dde4;
+        --page: #f3f4f7;
+        --card: #ffffff;
+        --cobalt: #2f5bea;
+        --ours: #8b5cf6;
+        --yours: #1b1f27;
+        --ok: #1e8a4c;
+        --bad: #c2362b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font:
+          14px/1.45 system-ui,
+          sans-serif;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 14px 20px;
+        background: var(--ink);
+        color: #fff;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 18px;
+      }
+      header span {
+        color: #aab2c0;
+        font-size: 13px;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+        padding: 16px 20px 40px;
+      }
+      @media (max-width: 1000px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+      section {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: end;
+        margin-bottom: 8px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      input,
+      select,
+      button {
+        font: inherit;
+        min-height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        padding: 4px 10px;
+        background: #fff;
+        color: var(--ink);
+      }
+      input[type="checkbox"] {
+        min-height: auto;
+      }
+      button {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button.primary {
+        background: var(--cobalt);
+        border-color: var(--cobalt);
+        color: #fff;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .grow {
+        flex: 1 1 260px;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .error {
+        color: var(--bad);
+        font-weight: 600;
+      }
+      #stage {
+        position: relative;
+        width: 100%;
+        background: #11151b;
+        border-radius: 10px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+      }
+      #stage img,
+      #stage canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      #stage canvas {
+        cursor: crosshair;
+      }
+      .zones {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .zones li {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+        padding: 6px 0;
+        border-top: 1px solid var(--line);
+      }
+      .counter {
+        border: 2px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .counter.selected {
+        border-color: var(--cobalt);
+      }
+      .counter .nums {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .big {
+        font-size: 28px;
+        font-weight: 800;
+      }
+      .counter button {
+        min-width: 48px;
+        font-size: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: right;
+        padding: 6px 4px;
+        border-top: 1px solid var(--line);
+      }
+      th:first-child,
+      td:first-child {
+        text-align: left;
+      }
+      .chart {
+        width: 100%;
+        height: 160px;
+        margin-top: 8px;
+      }
+      .legend {
+        display: flex;
+        gap: 14px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend i {
+        display: inline-block;
+        width: 14px;
+        height: 3px;
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>DineMate vision lab</h1>
+      <span>Testing only · runs on this computer · nothing is posted to DineMate</span>
+    </header>
+    <main>
+      <div>
+        <section>
+          <h2>1. Source</h2>
+          <div class="row">
+            <label class="grow"
+              >YouTube or stream link
+              <input id="link" placeholder="https://youtu.be/…" />
+            </label>
+            <label
+              >Local video (data/videos)
+              <select id="local"></select>
+            </label>
+            <label
+              >Still at (s)
+              <input id="at" type="number" min="0" value="5" style="width: 80px" />
+            </label>
+            <button id="open" class="primary">Open</button>
+          </div>
+          <div class="row">
+            <label
+              >Add a video to data/videos
+              <input id="upload" type="file" accept="video/*" />
+            </label>
+            <span id="uploadState" class="muted"></span>
+          </div>
+          <div id="sourceInfo" class="muted">Open a link or a local video to start.</div>
+        </section>
+
+        <section>
+          <h2>2. Zones and live view</h2>
+          <div id="stage">
+            <img id="still" alt="Frame from the source" hidden />
+            <img id="live" alt="Live counting view" hidden />
+            <canvas id="draw"></canvas>
+          </div>
+          <p class="muted" id="drawHelp">
+            Click on the frame to add points. Double-click or press Enter to finish a zone. Draw where people's feet are.
+          </p>
+          <div class="row">
+            <label
+              >Kind
+              <select id="kind">
+                <option value="seating">Seating (seated people)</option>
+                <option value="queue">Queue (everyone in it)</option>
+                <option value="work:counter">Work area: counter</option>
+                <option value="work:kitchen">Work area: kitchen</option>
+                <option value="work:floor">Work area: floor</option>
+              </select>
+            </label>
+            <label
+              >Name
+              <input id="zoneName" placeholder="Window tables" style="width: 160px" />
+            </label>
+            <label
+              >Capacity
+              <input id="capacity" type="number" min="1" value="8" style="width: 80px" />
+            </label>
+            <button id="finish">Finish zone</button>
+            <button id="undo">Undo point</button>
+          </div>
+          <ul class="zones" id="zoneList"></ul>
+          <div class="row" style="margin-top: 10px">
+            <label
+              >Save zones as
+              <input id="layoutName" placeholder="cafe-video" style="width: 160px" />
+            </label>
+            <button id="saveLayout">Save</button>
+            <label
+              >Load saved zones
+              <select id="layouts"></select>
+            </label>
+            <button id="loadLayout">Load</button>
+          </div>
+        </section>
+
+        <section>
+          <h2>4. Results</h2>
+          <div class="row">
+            <label
+              >Ignore the first (s) after your first count
+              <input id="skip" type="number" min="0" value="0" style="width: 90px" />
+            </label>
+            <button id="refreshReport">Refresh</button>
+            <a id="csv" href="/api/export.csv">Download CSV</a>
+          </div>
+          <div class="legend">
+            <span><i style="background: var(--ours)"></i>Ours</span><span><i style="background: var(--yours)"></i>Yours</span>
+          </div>
+          <div id="report" class="muted">Count by hand during a run to see results.</div>
+        </section>
+      </div>
+
+      <div>
+        <section>
+          <h2>3. Run and count</h2>
+          <div class="row">
+            <label
+              >Dwell (s)
+              <input id="dwell" type="number" min="0" value="20" style="width: 70px" />
+            </label>
+            <label
+              >Smoothing (s)
+              <input id="smoothing" type="number" min="1" value="15" style="width: 70px" />
+            </label>
+            <label
+              >FPS
+              <input id="fps" type="number" min="0.5" step="0.5" value="4" style="width: 60px" />
+            </label>
+            <label
+              >Counter gap (s)
+              <input id="minGap" type="number" min="1" value="30" style="width: 70px" />
+            </label>
+            <label style="flex-direction: row; align-items: center; gap: 6px"><input id="blur" type="checkbox" checked /> Blur faces</label>
+          </div>
+          <div class="row">
+            <button id="start" class="primary">Start</button>
+            <button id="pause">Pause</button>
+            <button id="stop">Stop</button>
+          </div>
+          <div id="status" class="muted">Idle.</div>
+          <p class="muted">Keys: 1–9 pick a zone, + or ↑ adds a person, − or ↓ removes one. Your count stays until you change it.</p>
+          <div id="counters"></div>
+        </section>
+
+        <section>
+          <h2>Workers</h2>
+          <p class="muted">
+            Draw counter, kitchen or floor work areas. Everyone inside them is tracked as a worker without being identified.
+          </p>
+          <div id="coverage" class="muted">No counter area yet.</div>
+          <ul class="zones" id="workers"></ul>
+          <h2 style="margin-top: 14px">Named workers</h2>
+          <p class="muted">For this session only, kept in memory, never saved. Names show only inside work areas.</p>
+          <div class="row">
+            <label
+              >Name
+              <input id="staffName" placeholder="Barista 1" style="width: 130px" />
+            </label>
+            <label
+              >Badge code
+              <input id="badgeCode" type="number" min="0" max="249" style="width: 80px" />
+            </label>
+            <button id="addBadge">Add badge</button>
+          </div>
+          <label style="flex-direction: row; align-items: center; gap: 6px; margin: 6px 0"
+            ><input id="consent" type="checkbox" /> The people filmed agreed to face recognition</label
+          >
+          <div class="row">
+            <button id="enrol" disabled>Enrol by face: click a worker</button>
+          </div>
+          <div id="enrolNote" class="muted"></div>
+          <ul class="zones" id="staff"></ul>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const esc = (text) =>
+        String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      const state = { zones: [], current: [], selected: 0, running: false, poll: null, reportPoll: null };
+
+      async function call(path, options = {}) {
+        const response = await fetch(path, {
+          headers: options.body ? { "Content-Type": "application/json" } : {},
+          ...options,
+          body: options.body ? JSON.stringify(options.body) : undefined,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || response.statusText);
+        return data;
+      }
+
+      function show(id, text, isError = false) {
+        $(id).textContent = text;
+        $(id).className = isError ? "error" : "muted";
+      }
+
+      async function loadLists() {
+        const videos = await call("/api/videos");
+        $("local").innerHTML = '<option value="">—</option>' + videos.items.map((v) => `<option>${esc(v)}</option>`).join("");
+        const layouts = await call("/api/layouts");
+        $("layouts").innerHTML = layouts.items.map((f) => `<option>${esc(f)}</option>`).join("") || "<option value=''>none yet</option>";
+      }
+
+      $("open").onclick = async () => {
+        const source = $("link").value.trim() || $("local").value;
+        show("sourceInfo", "Opening…");
+        try {
+          const info = await call("/api/open", { method: "POST", body: { source, at_s: Number($("at").value) || 0 } });
+          show("sourceInfo", `${info.title} · ${info.is_live ? "live" : "video"} · ${info.width}×${info.height}`);
+          state.zones = [];
+          state.current = [];
+          $("still").src = `/api/still.jpg?ts=${Date.now()}`;
+          $("still").hidden = false;
+          $("live").hidden = true;
+          renderZones();
+        } catch (error) {
+          show("sourceInfo", error.message, true);
+        }
+      };
+
+      $("upload").onchange = async () => {
+        const file = $("upload").files[0];
+        if (!file) return;
+        show("uploadState", `Copying ${file.name}…`);
+        try {
+          const response = await fetch(`/api/videos/${encodeURIComponent(file.name)}`, { method: "PUT", body: file });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || response.statusText);
+          show("uploadState", `Added ${data.name}.`);
+          await loadLists();
+          $("local").value = data.name;
+          $("link").value = "";
+        } catch (error) {
+          show("uploadState", error.message, true);
+        }
+      };
+
+      const canvas = $("draw");
+      const ctx = canvas.getContext("2d");
+
+      function frameBox() {
+        const img = $("still");
+        const rect = canvas.getBoundingClientRect();
+        const ratio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 16 / 9;
+        let w = rect.width;
+        let h = w / ratio;
+        if (h > rect.height) {
+          h = rect.height;
+          w = h * ratio;
+        }
+        return { x: (rect.width - w) / 2, y: (rect.height - h) / 2, w, h, rect };
+      }
+
+      function renderZones() {
+        const box = frameBox();
+        canvas.width = box.rect.width;
+        canvas.height = box.rect.height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const toPx = ([x, y]) => [box.x + x * box.w, box.y + y * box.h];
+        if (!state.running) {
+          state.zones.forEach((z, i) => {
+            const color = z.kind === "queue" ? "#e6a23c" : z.kind === "work" ? "#5b8cff" : "#3ccf7a";
+            ctx.beginPath();
+            z.points.map(toPx).forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+            ctx.closePath();
+            ctx.fillStyle = color + "33";
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            const [lx, ly] = toPx(z.points[0]);
+            ctx.fillStyle = "#11151b";
+            ctx.fillRect(lx, ly - 18, ctx.measureText(`${i + 1}. ${z.name}`).width + 10, 18);
+            ctx.fillStyle = color;
+            ctx.font = "bold 13px system-ui";
+            ctx.fillText(`${i + 1}. ${z.name}`, lx + 5, ly - 5);
+          });
+          if (state.current.length) {
+            ctx.beginPath();
+            state.current.map(toPx).forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+            ctx.strokeStyle = "#ffffff";
+            ctx.setLineDash([6, 4]);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            state.current.map(toPx).forEach(([x, y]) => {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(x - 3, y - 3, 6, 6);
+            });
+          }
+        }
+        $("zoneList").innerHTML = state.zones
+          .map(
+            (z, i) =>
+              `<li><span><b>${i + 1}. ${esc(z.name)}</b> · ${z.kind === "work" ? `work area: ${z.area}` : z.kind}${z.kind === "seating" ? ` · capacity ${z.capacity}` : ""}</span>` +
+              `<button data-remove="${i}" ${state.running ? "disabled" : ""}>Delete</button></li>`,
+          )
+          .join("");
+        renderCounters();
+      }
+
+      canvas.addEventListener("click", (event) => {
+        const box = frameBox();
+        const x = (event.clientX - box.rect.left - box.x) / box.w;
+        const y = (event.clientY - box.rect.top - box.y) / box.h;
+        if (x < 0 || x > 1 || y < 0 || y > 1) return;
+        if (state.enrolling) {
+          enrolAt(x, y);
+          return;
+        }
+        if (state.running || !$("still").src) return;
+        state.current.push([Math.round(x * 1e4) / 1e4, Math.round(y * 1e4) / 1e4]);
+        renderZones();
+      });
+      canvas.addEventListener("dblclick", () => finishZone());
+
+      function finishZone() {
+        if (state.current.length < 3) {
+          show("drawHelp", "A zone needs at least 3 points.", true);
+          return;
+        }
+        const index = state.zones.length + 1;
+        const [kind, area] = $("kind").value.split(":");
+        state.zones.push({
+          id: `z${Date.now().toString(36)}`,
+          name: $("zoneName").value.trim() || (area ? `Work: ${area}` : `Zone ${index}`),
+          kind,
+          area: area || null,
+          capacity: Number($("capacity").value) || 8,
+          points: state.current,
+        });
+        state.current = [];
+        $("zoneName").value = "";
+        show("drawHelp", "Zone added. Draw another, or start the run.");
+        renderZones();
+      }
+
+      $("finish").onclick = finishZone;
+      $("undo").onclick = () => {
+        state.current.pop();
+        renderZones();
+      };
+      $("zoneList").onclick = (event) => {
+        const index = event.target.dataset.remove;
+        if (index === undefined) return;
+        state.zones.splice(Number(index), 1);
+        renderZones();
+      };
+      window.addEventListener("resize", renderZones);
+      $("still").onload = renderZones;
+
+      $("saveLayout").onclick = async () => {
+        try {
+          await call("/api/zones", { method: "PUT", body: { zones: state.zones } });
+          const saved = await call("/api/layouts", { method: "POST", body: { name: $("layoutName").value || "zones" } });
+          show("drawHelp", `Saved to services/vision/layouts/${saved.file} (git-ignored).`);
+          await loadLists();
+        } catch (error) {
+          show("drawHelp", error.message, true);
+        }
+      };
+      $("loadLayout").onclick = async () => {
+        if (!$("layouts").value) return;
+        try {
+          const data = await call(`/api/layouts/${encodeURIComponent($("layouts").value)}`);
+          state.zones = data.zones;
+          renderZones();
+        } catch (error) {
+          show("drawHelp", error.message, true);
+        }
+      };
+
+      function renderCounters(live = null) {
+        const zones = live ? live.zones : state.zones.map((z) => ({ ...z, ours: null, ours_now: null, yours: null }));
+        $("counters").innerHTML = zones
+          .map(
+            (z, i) => `<div class="counter ${i === state.selected ? "selected" : ""}" data-index="${i}">
+              <div class="muted"><b>${i + 1}. ${esc(z.name)}</b> · ${z.kind === "work" ? `people in ${z.area} area` : z.kind}</div>
+              <div class="nums">
+                <div><div class="muted">Ours</div><div class="big" style="color: var(--ours)">${z.ours ?? "–"}</div>
+                  <div class="muted">now ${z.ours_now ?? "–"}</div></div>
+                <button data-delta="-1" data-zone="${z.id}" aria-label="One less in ${esc(z.name)}">−</button>
+                <div><div class="muted">Yours</div><div class="big">${z.yours ?? "–"}</div></div>
+                <button data-delta="1" data-zone="${z.id}" aria-label="One more in ${esc(z.name)}">+</button>
+              </div>
+            </div>`,
+          )
+          .join("");
+      }
+
+      async function mark(zone, delta) {
+        try {
+          await call("/api/mark", { method: "POST", body: { zone, delta } });
+          await poll();
+        } catch (error) {
+          show("status", error.message, true);
+        }
+      }
+
+      $("counters").onclick = (event) => {
+        const button = event.target.closest("button[data-zone]");
+        const card = event.target.closest(".counter");
+        if (card) state.selected = Number(card.dataset.index);
+        if (button) mark(button.dataset.zone, Number(button.dataset.delta));
+        else renderCounters(state.last);
+      };
+
+      document.addEventListener("keydown", (event) => {
+        if (!state.running || ["INPUT", "SELECT"].includes(document.activeElement.tagName)) return;
+        if (/^[1-9]$/.test(event.key) && Number(event.key) <= state.zones.length) {
+          state.selected = Number(event.key) - 1;
+          renderCounters(state.last);
+          return;
+        }
+        const zone = state.zones[state.selected];
+        if (!zone) return;
+        if (["+", "=", "ArrowUp"].includes(event.key)) {
+          event.preventDefault();
+          mark(zone.id, 1);
+        }
+        if (["-", "_", "ArrowDown"].includes(event.key)) {
+          event.preventDefault();
+          mark(zone.id, -1);
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !state.running && document.activeElement.tagName !== "INPUT") finishZone();
+      });
+
+      async function poll() {
+        try {
+          const live = await call("/api/state");
+          state.last = live;
+          const running = live.status === "running" || live.status === "paused";
+          if (state.running && !running) stopped(live);
+          if (!state.running && !running && !state.zones.length && live.zones.length) {
+            state.zones = live.zones.map(({ id, name, kind, area, capacity, points }) => ({ id, name, kind, area, capacity, points }));
+            renderZones();
+          }
+          if (!state.running && running) {
+            state.zones = live.zones.map(({ id, name, kind, area, capacity, points }) => ({ id, name, kind, area, capacity, points }));
+            enterRun();
+          }
+          renderCounters(live);
+          renderWorkers(live);
+          show("status", `${live.status} · t = ${live.t} s · ${live.fps} fps${live.error ? ` · ${live.error}` : ""}`, Boolean(live.error));
+        } catch (error) {
+          show("status", error.message, true);
+        }
+      }
+
+      function enterRun() {
+        state.running = true;
+        state.current = [];
+        show("drawHelp", "Running. Stop the run to change zones.");
+        renderZones();
+        $("still").hidden = true;
+        $("live").hidden = false;
+        $("live").src = `/api/stream.mjpeg?ts=${Date.now()}`;
+        clearInterval(state.poll);
+        clearInterval(state.reportPoll);
+        state.poll = setInterval(poll, 700);
+        state.reportPoll = setInterval(report, 5000);
+      }
+
+      function stopped(live) {
+        state.running = false;
+        clearInterval(state.poll);
+        clearInterval(state.reportPoll);
+        $("live").hidden = true;
+        $("live").src = "";
+        $("still").hidden = false;
+        renderZones();
+        report();
+        show("status", `${live.status}.`);
+      }
+
+      $("start").onclick = async () => {
+        try {
+          await call("/api/zones", { method: "PUT", body: { zones: state.zones } });
+          await call("/api/run", {
+            method: "POST",
+            body: {
+              dwell_s: Number($("dwell").value),
+              smoothing_s: Number($("smoothing").value),
+              fps: Number($("fps").value),
+              blur: $("blur").checked,
+              min_gap_s: Number($("minGap").value) || 30,
+            },
+          });
+          enterRun();
+          document.activeElement.blur();
+        } catch (error) {
+          show("status", error.message, true);
+        }
+      };
+
+      $("pause").onclick = async () => {
+        const paused = state.last && state.last.status === "paused";
+        try {
+          await call(paused ? "/api/resume" : "/api/pause", { method: "POST" });
+          $("pause").textContent = paused ? "Pause" : "Resume";
+          await poll();
+        } catch (error) {
+          show("status", error.message, true);
+        }
+      };
+
+      $("stop").onclick = async () => {
+        try {
+          const live = await call("/api/stop", { method: "POST" });
+          $("pause").textContent = "Pause";
+          stopped(live);
+        } catch (error) {
+          show("status", error.message, true);
+        }
+      };
+
+      function percent(value) {
+        return value === null ? "–" : `${Math.round(value * 100)}%`;
+      }
+
+      function number(value) {
+        return value === null ? "–" : value.toFixed(2);
+      }
+
+      function chart(points) {
+        if (points.length < 2) return "";
+        const w = 600;
+        const h = 160;
+        const t0 = points[0][0];
+        const t1 = points[points.length - 1][0] || t0 + 1;
+        const top = Math.max(1, ...points.map((p) => Math.max(p[1], p[2])));
+        const x = (t) => 30 + ((t - t0) / Math.max(1, t1 - t0)) * (w - 40);
+        const y = (v) => h - 20 - (v / top) * (h - 30);
+        const line = (i) => points.map((p, j) => `${j ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[i]).toFixed(1)}`).join(" ");
+        return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Ours and yours over time">
+          <line x1="30" y1="${h - 20}" x2="${w - 10}" y2="${h - 20}" stroke="#d9dde4" />
+          <text x="0" y="${y(top) + 4}" font-size="11" fill="#5f6673">${top}</text>
+          <text x="0" y="${h - 16}" font-size="11" fill="#5f6673">0</text>
+          <text x="${w - 60}" y="${h - 4}" font-size="11" fill="#5f6673">${Math.round(t1)} s</text>
+          <path d="${line(2)}" fill="none" stroke="var(--yours)" stroke-width="2" />
+          <path d="${line(1)}" fill="none" stroke="var(--ours)" stroke-width="2" />
+        </svg>`;
+      }
+
+      function clock(seconds) {
+        const s = Math.max(0, Math.round(seconds));
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+      }
+
+      function minutes(seconds) {
+        return seconds >= 60 ? `${Math.floor(seconds / 60)} min ${Math.round(seconds % 60)} s` : `${Math.round(seconds)} s`;
+      }
+
+      function coverageText(coverage) {
+        if (!coverage) return "No counter area yet.";
+        const gaps = coverage.gaps.map(([a, b]) => `${clock(a)}–${clock(b)}`).join(", ");
+        return `Counter staffed ${percent(coverage.share)} of ${minutes(coverage.open_s)}${gaps ? ` · gaps over ${coverage.min_gap_s} s: ${gaps}` : " · no gaps"}`;
+      }
+
+      function renderWorkers(live) {
+        $("coverage").textContent = coverageText(live.coverage);
+        $("workers").innerHTML =
+          live.workers.map((w) => `<li><span><b>${esc(w.label)}</b> · ${w.area}</span><span>${minutes(w.total)}</span></li>`).join("") ||
+          '<li class="muted">Nobody in a work area right now.</li>';
+        $("staff").innerHTML = live.staff
+          .map(
+            (s) =>
+              `<li><span><b>${esc(s.name)}</b> · ${s.method === "badge" ? `badge ${s.badge_code}` : "face"}</span>` +
+              `<button data-staff="${esc(s.id)}">Remove</button></li>`,
+          )
+          .join("");
+        if (live.enrol) $("enrolNote").textContent = live.enrol;
+        $("enrol").disabled = !$("consent").checked || !live.faces_ready || !state.running;
+        $("enrol").title = live.faces_ready ? "" : "Face models missing: uv run python -m vision.fetch_models";
+      }
+
+      $("consent").onchange = () => {
+        $("enrol").disabled = !$("consent").checked || !(state.last && state.last.faces_ready) || !state.running;
+      };
+
+      $("addBadge").onclick = async () => {
+        try {
+          await call("/api/staff/badge", {
+            method: "POST",
+            body: { name: $("staffName").value.trim() || "Worker", code: Number($("badgeCode").value) },
+          });
+          $("staffName").value = "";
+          $("badgeCode").value = "";
+          await poll();
+        } catch (error) {
+          show("enrolNote", error.message, true);
+        }
+      };
+
+      $("enrol").onclick = () => {
+        if (!$("staffName").value.trim()) {
+          show("enrolNote", "Type the worker's name first.", true);
+          return;
+        }
+        state.enrolling = true;
+        show("enrolNote", "Now click the worker in the live view. Pause first if they move a lot.");
+      };
+
+      async function enrolAt(x, y) {
+        state.enrolling = false;
+        try {
+          const data = await call("/api/staff/enrol", {
+            method: "POST",
+            body: { name: $("staffName").value.trim(), x, y, consent: $("consent").checked },
+          });
+          show("enrolNote", data.note);
+          $("staffName").value = "";
+        } catch (error) {
+          show("enrolNote", error.message, true);
+        }
+      }
+
+      $("staff").onclick = async (event) => {
+        const id = event.target.dataset.staff;
+        if (!id) return;
+        try {
+          await call(`/api/staff/${encodeURIComponent(id)}`, { method: "DELETE" });
+          await poll();
+        } catch (error) {
+          show("enrolNote", error.message, true);
+        }
+      };
+
+      function workerResults(workers) {
+        if (!workers || !workers.workers.length) return "";
+        const rows = workers.workers
+          .map(
+            (w) =>
+              `<tr><td>${esc(w.name || w.label)}${w.name ? ` <span class="muted">(${esc(w.label)})</span>` : ""}</td>` +
+              `<td>${minutes(w.seconds.counter)}</td><td>${minutes(w.seconds.kitchen)}</td><td>${minutes(w.seconds.floor)}</td>` +
+              `<td>${clock(w.first)}–${clock(w.last)}</td></tr>`,
+          )
+          .join("");
+        return (
+          `<h2 style="margin-top: 16px">Workers</h2><p>${esc(coverageText(workers.coverage.open_s > 0 ? workers.coverage : null))}</p>` +
+          `<table><thead><tr><th>Worker</th><th>Counter</th><th>Kitchen</th><th>Floor</th><th>Seen</th></tr></thead><tbody>${rows}</tbody></table>` +
+          `<p class="muted">${workers.brief ? `${workers.brief} brief sightings under 3 s hidden. ` : ""}A worker who leaves view for more than 15 s, or whose track jumps far, may come back as a new worker.</p>`
+        );
+      }
+
+      async function report() {
+        try {
+          const data = await call(`/api/report?skip_s=${Number($("skip").value) || 0}`);
+          if (!data.marks) {
+            $("report").innerHTML = "Count by hand during a run to compare counts." + workerResults(data.workers);
+            return;
+          }
+          $("report").innerHTML =
+            `<table><thead><tr><th>Zone</th><th>Samples</th><th>Avg error</th><th>Bias</th><th>Within ±1</th><th>Exact</th></tr></thead><tbody>` +
+            data.zones
+              .map(
+                (z) =>
+                  `<tr><td>${esc(z.name)}</td><td>${z.samples}</td><td>${number(z.mae)}</td><td>${number(z.bias)}</td><td>${percent(z.within_one)}</td><td>${percent(z.exact)}</td></tr>`,
+              )
+              .join("") +
+            `</tbody></table>` +
+            data.zones
+              .filter((z) => z.points.length > 1)
+              .map((z) => `<div style="margin-top: 12px"><b>${esc(z.name)}</b>${chart(z.points)}</div>`)
+              .join("") +
+            `<p class="muted">Bias above 0 means we count too many. One sample per second, from your first count in each zone. Ours lags behind a change by about the dwell plus half the smoothing, so set “Ignore the first” to skip the warm-up.</p>` +
+            workerResults(data.workers);
+        } catch (error) {
+          show("report", error.message, true);
+        }
+      }
+      $("refreshReport").onclick = report;
+
+      loadLists().catch((error) => show("sourceInfo", error.message, true));
+      $("still").onerror = () => {
+        $("still").hidden = true;
+      };
+      $("still").addEventListener("load", () => {
+        if (!state.running) $("still").hidden = false;
+      });
+      $("still").src = `/api/still.jpg?ts=${Date.now()}`;
+      poll();
+    </script>
+  </body>
+</html>

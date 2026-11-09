@@ -83,7 +83,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
         description="Count seated people per zone and post counts to DineMate. Frames never leave memory."
     )
     parser.add_argument(
-        "--source", default=os.environ.get("DINEMATE_SOURCE", "0"), help="webcam index (0) or a video file path"
+        "--source",
+        default=os.environ.get("DINEMATE_SOURCE", "0"),
+        help="webcam index (0), a video file path, or a YouTube link (needs yt-dlp)",
     )
     parser.add_argument("--api", default=os.environ.get("DINEMATE_API_URL", "http://localhost:8000/api/v1"))
     parser.add_argument("--device", default=os.environ.get("DINEMATE_DEVICE_ID"))
@@ -162,9 +164,13 @@ class Preview:
             pipeline.labels(),
             pipeline.work,
             pipeline.staff_labels(),
+            pipeline.stay_labels(),
         )
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
+
+    def close(self) -> None:
+        self.cv2.destroyAllWindows()
 
 
 def live_canvas(image: Any, pipeline: Pipeline, assignments: list[Assignment], shown: dict[str, Any]) -> Any:
@@ -184,6 +190,7 @@ def live_canvas(image: Any, pipeline: Pipeline, assignments: list[Assignment], s
         pipeline.labels(),
         pipeline.work,
         pipeline.staff_labels(),
+        pipeline.stay_labels(),
     )
 
 
@@ -205,9 +212,6 @@ def start_live(args: argparse.Namespace) -> tuple[LiveServer | None, str | None]
     server = LiveServer(args.stream_port, args.device, args.token)
     server.start()
     return server, f"http://{args.stream_host or local_address()}:{server.port}/live"
-
-    def close(self) -> None:
-        self.cv2.destroyAllWindows()
 
 
 def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
@@ -326,7 +330,7 @@ def run(args: argparse.Namespace) -> int:
                     if staff:
                         log.info("dry run staff: %s", json.dumps(staff))
             now = time.monotonic()
-            if client and now - last_config >= CONFIG_REFRESH_S:
+            if client and not args.layout and now - last_config >= CONFIG_REFRESH_S:
                 last_config = now
                 try:
                     fresh = client.config()
