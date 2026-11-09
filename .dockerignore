@@ -1,0 +1,17 @@
+.git
+.github
+.claude
+**/node_modules
+**/dist
+**/dev-dist
+**/.venv
+**/__pycache__
+data
+docs
+services
+tools
+backups
+e2e/test-results
+e2e/playwright-report
+e2e/screenshots
+infra/.env*

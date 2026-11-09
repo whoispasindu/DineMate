@@ -1,0 +1,92 @@
+name: dinemate-business
+
+x-api-env: &api-env
+  DINEMATE_ENVIRONMENT: production
+  DINEMATE_DATABASE_URL: postgresql+psycopg://dinemate:${POSTGRES_PASSWORD:?Run infra/install-business.ps1 first}@db:5432/dinemate
+  DINEMATE_CORS_ORIGINS: "[]"
+  DINEMATE_SIMULATION_MODE: "false"
+  DINEMATE_JWT_SECRET: ${DINEMATE_JWT_SECRET:?Run infra/install-business.ps1 first}
+  DINEMATE_COOKIE_SECURE: "false"
+  DINEMATE_DEPLOYMENT: local
+  DINEMATE_TEMPLATE_KEY: ${DINEMATE_TEMPLATE_KEY:?Run infra/install-business.ps1 first}
+  DINEMATE_LIVE_LINK_SECRET: ${DINEMATE_LIVE_LINK_SECRET:?Run infra/install-business.ps1 first}
+  DINEMATE_SIMULATOR_TOKEN: ${DINEMATE_SIMULATOR_TOKEN:?Run infra/install-business.ps1 first}
+  DINEMATE_MAX_CAMERAS: ${DINEMATE_MAX_CAMERAS:-8}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dinemate
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run infra/install-business.ps1 first}
+      POSTGRES_DB: dinemate
+    volumes:
+      - business-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dinemate -d dinemate"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build: ../services/api
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+    environment:
+      <<: *api-env
+      DINEMATE_MIGRATE_ON_START: "true"
+      DINEMATE_SEED_IF_EMPTY: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/business-web/Dockerfile
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  hub:
+    profiles: ["cameras"]
+    build: ../services/vision
+    environment:
+      DINEMATE_API_URL: http://api:8000/api/v1
+      DINEMATE_HUB_ID: hub-local
+      DINEMATE_HUB_TOKEN: ${DINEMATE_HUB_TOKEN:?Run infra/install-business.ps1 first}
+      DINEMATE_STREAM_HOST: ${DINEMATE_STREAM_HOST:-localhost}
+      DINEMATE_STREAM_FIRST_PORT: "8090"
+    ports:
+      - "8090-8097:8090-8097"
+    volumes:
+      - hub-models:/home/vision/.cache
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cafe-simulator:
+    profiles: ["demo"]
+    build: ../services/api
+    command: ["python", "-m", "app.business.sim"]
+    environment:
+      <<: *api-env
+      DINEMATE_SIMULATOR_API_URL: http://api:8000/api/v1
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  business-db:
+  hub-models:
