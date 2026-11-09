@@ -168,6 +168,9 @@ class Preview:
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
 
+    def close(self) -> None:
+        self.cv2.destroyAllWindows()
+
 
 def live_canvas(image: Any, pipeline: Pipeline, assignments: list[Assignment], shown: dict[str, Any]) -> Any:
     from vision.overlay import draw
@@ -207,9 +210,6 @@ def start_live(args: argparse.Namespace) -> tuple[LiveServer | None, str | None]
     server = LiveServer(args.stream_port, args.device, args.token)
     server.start()
     return server, f"http://{args.stream_host or local_address()}:{server.port}/live"
-
-    def close(self) -> None:
-        self.cv2.destroyAllWindows()
 
 
 def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
