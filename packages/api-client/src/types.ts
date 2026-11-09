@@ -662,6 +662,8 @@ export interface FloorTotals {
   visits_today: number;
   avg_stay_today_min: number | null;
   turns_today: number;
+  counter_staff?: number | null;
+  queue_people?: number | null;
 }
 
 export interface VenueFloor extends Timestamped {
@@ -779,4 +781,179 @@ export interface BusinessSettings extends Timestamped {
   organization_id: string;
   organization_name: string;
   retention_days: number;
+  staff_retention_days: number;
+  deployment: "local" | "cloud";
+  faces_enabled: boolean;
+}
+
+export interface BusinessSettingsIn {
+  retention_days?: number;
+  staff_retention_days?: number;
+}
+
+export type StaffMethod = "face" | "badge";
+
+export interface StaffMember {
+  id: string;
+  display_name: string;
+  role_label: string;
+  method: StaffMethod;
+  badge_code: number | null;
+  till_code: string | null;
+  consent_at: string | null;
+  consent_version: string | null;
+  has_template: boolean;
+  active: boolean;
+  is_sample: boolean;
+}
+
+export interface StaffList extends Timestamped {
+  venue_id: string;
+  items: StaffMember[];
+}
+
+export interface StaffResult extends Timestamped {
+  staff: StaffMember;
+}
+
+export interface StaffIn {
+  display_name: string;
+  role_label?: string;
+  method?: StaffMethod;
+  badge_code?: number | null;
+  till_code?: string | null;
+}
+
+export interface StaffPatch extends Partial<StaffIn> {
+  active?: boolean;
+}
+
+export interface ConsentIn {
+  version: string;
+  signed_on: string;
+}
+
+export interface StaffRemoved extends Timestamped {
+  staff_id: string;
+}
+
+export interface TimeSpan {
+  start: string;
+  end: string;
+}
+
+export interface CoverageGap extends TimeSpan {
+  minutes: number;
+}
+
+export interface QueueAlert extends TimeSpan {
+  peak: number;
+}
+
+export interface CounterCoverage {
+  open_min: number;
+  covered_min: number;
+  share: number | null;
+  gaps: CoverageGap[];
+}
+
+export interface AreaMinutes {
+  counter: number;
+  kitchen: number;
+  floor: number;
+}
+
+export interface ItemCount {
+  name: string;
+  qty: number;
+}
+
+export interface WorkerDay {
+  staff_id: string;
+  display_name: string;
+  role_label: string;
+  method: StaffMethod;
+  first_seen: string | null;
+  last_seen: string | null;
+  minutes: AreaMinutes;
+  orders: number;
+  items: ItemCount[];
+  total_items: number;
+}
+
+export interface StaffReport extends Timestamped {
+  venue_id: string;
+  day: string;
+  is_sample: boolean;
+  coverage: CounterCoverage;
+  queue_alerts: QueueAlert[];
+  workers: WorkerDay[];
+}
+
+export interface SheetDay {
+  day: string;
+  minutes: AreaMinutes;
+  items: number;
+}
+
+export interface StaffSheet extends Timestamped {
+  staff: StaffMember;
+  venue_name: string;
+  days: SheetDay[];
+  kept_days: number;
+}
+
+export interface TillImportResult extends Timestamped {
+  rows: number;
+  orders: number;
+  new_orders: number;
+  duplicates: number;
+  errors: string[];
+  matched_cashiers: string[];
+  unmatched_cashiers: string[];
+  saved: boolean;
+}
+
+export interface CashierItems {
+  cashier: string;
+  staff_id: string | null;
+  staff_name: string | null;
+  items: ItemCount[];
+  total_items: number;
+  orders: number;
+}
+
+export interface HourOrders {
+  hour: number;
+  orders: number;
+}
+
+export interface SalesDay extends Timestamped {
+  venue_id: string;
+  day: string;
+  is_sample: boolean;
+  orders: number;
+  items: number;
+  revenue: number;
+  average_order: number | null;
+  by_hour: HourOrders[];
+  by_cashier: CashierItems[];
+  top_items: ItemCount[];
+}
+
+export interface LiveLink extends Timestamped {
+  device_id: string;
+  url: string;
+  expires_at: string;
+}
+
+export interface AuditEntry {
+  at: string;
+  actor: string;
+  action: string;
+  entity_id: string;
+}
+
+export interface AuditList extends Timestamped {
+  items: AuditEntry[];
 }

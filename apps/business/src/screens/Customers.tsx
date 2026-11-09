@@ -106,7 +106,7 @@ export function CustomersScreen() {
               <StayByTable data={data} />
               <Panel title="Stay after paying">
                 <p className="m-0 text-sm text-muted">
-                  Needs till data. Matching visits to till orders by time arrives with the till connection in Phase 9.
+                  Matching visits to till orders needs a live till connection. Till files already feed Sales and Staff.
                 </p>
               </Panel>
             </div>

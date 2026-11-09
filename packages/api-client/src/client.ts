@@ -15,9 +15,23 @@ import {
   sampleTableLayout,
   sampleVenues,
 } from "./sample/business";
+import { sampleAudit, sampleSales, sampleStaff, sampleStaffReport, sampleStaffSheet } from "./sample/staff";
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
+  AuditList,
+  BusinessSettingsIn,
+  ConsentIn,
+  LiveLink,
+  SalesDay,
+  StaffIn,
+  StaffList,
+  StaffPatch,
+  StaffRemoved,
+  StaffReport,
+  StaffResult,
+  StaffSheet,
+  TillImportResult,
   BusinessSettings,
   CustomerDay,
   ReportRange,
@@ -346,6 +360,36 @@ export const api = {
       method: "POST",
     }),
   businessSettings: (): Promise<BusinessSettings> => staffEither("/business/settings", sampleBusinessSettings, "No settings"),
-  saveBusinessSettings: (retentionDays: number): Promise<BusinessSettings> =>
-    staffOnly("/business/settings", { method: "PATCH", body: { retention_days: retentionDays } }),
+  saveBusinessSettings: (body: BusinessSettingsIn): Promise<BusinessSettings> => staffOnly("/business/settings", { method: "PATCH", body }),
+  businessStaff: (venueId: string): Promise<StaffList> =>
+    staffEither(`/business/venues/${enc(venueId)}/staff`, (now) => sampleStaff(venueId, now), "Venue not found"),
+  createStaff: (venueId: string, body: StaffIn): Promise<StaffResult> =>
+    staffOnly(`/business/venues/${enc(venueId)}/staff`, { method: "POST", body }),
+  updateStaff: (staffId: string, body: StaffPatch): Promise<StaffResult> =>
+    staffOnly(`/business/staff/${enc(staffId)}`, { method: "PATCH", body }),
+  recordConsent: (staffId: string, body: ConsentIn): Promise<StaffResult> =>
+    staffOnly(`/business/staff/${enc(staffId)}/consent`, { method: "POST", body }),
+  withdrawConsent: (staffId: string): Promise<StaffResult> => staffOnly(`/business/staff/${enc(staffId)}/consent`, { method: "DELETE" }),
+  removeStaff: (staffId: string): Promise<StaffRemoved> => staffOnly(`/business/staff/${enc(staffId)}`, { method: "DELETE" }),
+  staffReport: (venueId: string, day?: string): Promise<StaffReport> =>
+    staffEither(
+      `/business/venues/${enc(venueId)}/staff-report${day ? `?day=${enc(day)}` : ""}`,
+      (now) => sampleStaffReport(venueId, now),
+      "Venue not found",
+    ),
+  staffSheet: (staffId: string): Promise<StaffSheet> =>
+    staffEither(`/business/staff/${enc(staffId)}/sheet`, (now) => sampleStaffSheet(staffId, now), "Worker not found"),
+  staffAudit: (): Promise<AuditList> => staffEither("/business/audit", sampleAudit, "No audit"),
+  importTill: (venueId: string, csv: string, dryRun: boolean): Promise<TillImportResult> =>
+    staffOnly(`/business/venues/${enc(venueId)}/till/import`, { method: "POST", body: { csv, dry_run: dryRun } }),
+  sales: (venueId: string, day?: string): Promise<SalesDay> =>
+    staffEither(
+      `/business/venues/${enc(venueId)}/sales${day ? `?day=${enc(day)}` : ""}`,
+      (now) => sampleSales(venueId, now),
+      "Venue not found",
+    ),
+  liveLink: (venueId: string, deviceId: string): Promise<LiveLink> =>
+    baseUrl === null
+      ? Promise.reject(new ApiError(409, "not_streaming", "Sample data has no real camera stream. Live view needs the café computer."))
+      : fromApi<LiveLink>(`/business/venues/${enc(venueId)}/cameras/${enc(deviceId)}/live`, { staff: true }),
 };
