@@ -67,6 +67,7 @@ class Pipeline:
         self.queue = QueueCounter([], self.matcher.settings)
         self.named: dict[int, tuple[str, Area]] = {}
         self.workers_seen: list[WorkerView] = []
+        self.people_seen: list[Detection] = []
         self.configure(config)
 
     @property
@@ -115,6 +116,7 @@ class Pipeline:
         if self.people is None:
             raise RuntimeError("No people detector loaded")
         detections = self.people.detect(image)
+        self.people_seen = detections
         height, width = image.shape[:2]
         assignments = self.counter.update(detections, width, height, at) if self.counter.zones else []
         if self.staff_mode:
@@ -146,6 +148,9 @@ class Pipeline:
         self.workers_seen = workers
         self.presence.update(list(named.values()), at)
         self.queue.update(detections, width, height, at, set(named))
+
+    def staff_tracks(self) -> set[int]:
+        return set(self.named) if self.staff_mode else set()
 
     def staff_snapshot(self, epoch_offset: float) -> dict[str, Any] | None:
         if not self.staff_mode:

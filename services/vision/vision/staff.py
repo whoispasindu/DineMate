@@ -42,7 +42,7 @@ class Evidence:
 
 @dataclass(frozen=True)
 class StaffSettings:
-    face_threshold: float = 0.6
+    face_threshold: float = 0.45
     confirm_matches: int = 3
     release_misses: int = 5
     lost_after_s: float = 3.0

@@ -76,7 +76,15 @@ class DeviceClient:
         self._check(self.http.post(f"/devices/{self.device_id}/seats", json=payload))
 
     def heartbeat(
-        self, status: str, fps: float | None, latency_ms: int | None, stream_ok: bool, message: str | None
+        self,
+        status: str,
+        fps: float | None,
+        latency_ms: int | None,
+        stream_ok: bool,
+        message: str | None,
+        stream_url: str | None = None,
     ) -> None:
         payload = {"status": status, "fps": fps, "latency_ms": latency_ms, "stream_ok": stream_ok, "message": message}
+        if stream_url:
+            payload["stream_url"] = stream_url
         self._check(self.http.post(f"/devices/{self.device_id}/heartbeat", json=payload))

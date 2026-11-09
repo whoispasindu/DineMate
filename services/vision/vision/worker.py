@@ -14,6 +14,7 @@ from vision.counting import Assignment
 from vision.pipeline import Models, Pipeline
 from vision.source import FrameSource
 from vision.staff import staff_from_response, work_areas_from_config
+from vision.stream import LiveServer, blur, blur_boxes, local_address
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
@@ -21,6 +22,7 @@ DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11n.pt"
 DEFAULT_POSE_MODEL = PROJECT_DIR / "models" / "yolo11n-pose.pt"
 CONFIG_REFRESH_S = 30.0
 HEARTBEAT_S = 30.0
+LIVE_LIMITS = (1280, 720)
 DEFAULT_SETTINGS = {
     "post_every_s": 15.0,
     "smoothing_s": 60.0,
@@ -109,6 +111,15 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--dwell-s", type=float, help="seconds someone must stay in a zone before counting")
     parser.add_argument("--smoothing-s", type=float, help="length of the median window in seconds")
     parser.add_argument("--post-every-s", type=float, help="seconds between readings")
+    parser.add_argument("--no-faces", action="store_true", help="name staff by badge only")
+    parser.add_argument("--no-badges", action="store_true", help="name staff by face only")
+    parser.add_argument(
+        "--stream-port",
+        type=int,
+        default=int(os.environ.get("DINEMATE_STREAM_PORT", "0")) or None,
+        help="serve a signed live view on this port, café network only (customer faces blurred, nothing saved)",
+    )
+    parser.add_argument("--stream-host", help="address owners' browsers use to reach this computer (default: auto)")
     args = parser.parse_args(argv)
     if args.dry_run and not args.layout and not (args.device and args.token):
         parser.error("--dry-run needs --layout, or --device and --token to read the layout from the API")
@@ -155,6 +166,46 @@ class Preview:
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
 
+
+def live_canvas(image: Any, pipeline: Pipeline, assignments: list[Assignment], shown: dict[str, Any]) -> Any:
+    from vision.overlay import draw
+
+    height, width = image.shape[:2]
+    private = blur(image, blur_boxes(pipeline.people_seen, pipeline.staff_tracks(), width, height))
+    return draw(
+        private,
+        pipeline.zones,
+        pipeline.ignore,
+        assignments,
+        shown,
+        "DineMate live - customer faces blurred, nothing saved",
+        LIVE_LIMITS,
+        pipeline.seat_states(),
+        pipeline.labels(),
+        pipeline.work,
+        pipeline.staff_labels(),
+    )
+
+
+def identity_reader(args: argparse.Namespace, config: dict[str, Any]) -> Any:
+    if not work_areas_from_config(config):
+        return None
+    from vision.faces import MODELS_DIR
+    from vision.identity import build_reader
+
+    return build_reader(MODELS_DIR, faces=not args.no_faces, badges=not args.no_badges)
+
+
+def start_live(args: argparse.Namespace) -> tuple[LiveServer | None, str | None]:
+    if not args.stream_port:
+        return None, None
+    if not (args.device and args.token):
+        log.warning("--stream-port needs --device and --token to check live links; live view is off")
+        return None, None
+    server = LiveServer(args.stream_port, args.device, args.token)
+    server.start()
+    return server, f"http://{args.stream_host or local_address()}:{server.port}/live"
+
     def close(self) -> None:
         self.cv2.destroyAllWindows()
 
@@ -192,7 +243,7 @@ def run(args: argparse.Namespace) -> int:
         log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
         return 1
     config = apply_overrides(config, args)
-    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz))
+    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz), identity=identity_reader(args, config))
     settings = config["settings"]
     log.info("Counting %d zone(s): %s", len(pipeline.zones), ", ".join(z.name for z in pipeline.zones))
     if pipeline.seat_mode:
@@ -208,8 +259,11 @@ def run(args: argparse.Namespace) -> int:
     posting = client is not None and not args.dry_run
     seats_endpoint = True
     staff_endpoint = refresh_staff(client, pipeline) if client else False
+    live, stream_url = start_live(args)
     epoch_offset = time.time() - time.monotonic()
     last_config = last_beat = time.monotonic()
+    if stream_url:
+        last_beat -= HEARTBEAT_S
     last_post: float | None = None
     fps = 0.0
     latency_ms = 0
@@ -289,10 +343,17 @@ def run(args: argparse.Namespace) -> int:
                 last_beat = now
                 try:
                     client.heartbeat(
-                        "ok" if source.stream_ok else "degraded", round(fps, 1), latency_ms, source.stream_ok, None
+                        "ok" if source.stream_ok else "degraded",
+                        round(fps, 1),
+                        latency_ms,
+                        source.stream_ok,
+                        None,
+                        stream_url,
                     )
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("heartbeat failed: %s", exc)
+            if live is not None:
+                live.offer(live_canvas(frame.image, pipeline, assignments, shown), now)
             if preview and not preview.show(
                 frame.image, pipeline, assignments, shown, "Live preview - Q to quit (nothing is saved)"
             ):
@@ -301,6 +362,8 @@ def run(args: argparse.Namespace) -> int:
         log.info("stopping")
     finally:
         source.close()
+        if live is not None:
+            live.close()
         if preview:
             preview.close()
         if client:

@@ -101,14 +101,35 @@ For cafés and restaurants, the worker can also time consented staff in their **
 **How it works** (`vision/staff.py`, unit-tested without YOLO):
 
 - Only tracks whose foot point is inside a work area are ever passed to the identity reader. Customers elsewhere are never matched or named, and a worker who steps out of every work area loses their name at once.
-- Evidence comes from an `IdentityReader` (face embedding or badge code per track). A track is named after 3 consistent matches above the face threshold (0.6 cosine) or the same badge code; a different match restarts the count, and 5 misses in a row remove the name. One worker names one track at a time.
+- Evidence comes from an `IdentityReader` (face embedding or badge code per track). A track is named after 3 consistent matches above the face threshold (0.45 cosine, SFace) or the same badge code; a different match restarts the count, and 5 misses in a row remove the name. One worker names one track at a time.
 - A lost track forgets its identity after 3 s. Templates live in memory only and are re-read with the layout; no frames or embeddings are stored.
 - Presence: an area interval opens after 10 s in that area and closes 30 s after the worker was last seen there (the end time is the last sighting).
 - Queue: people whose feet are in a queue area, median over 15 s, named staff excluded.
 
 Every reading cycle the worker posts `POST /devices/{id}/staff` with `presence` (open intervals with `ended_at: null`, plus any that closed since the last post) and `queue` (`{"people": n}`, or `null` without a queue area). Failed posts are retried in order; on a 404 the worker turns staff mode off and carries on. Settings in the device config: `face_threshold`, `confirm_matches`, `release_misses`, `lost_after_s`, `staff_dwell_s`, `staff_absence_s`, `queue_window_s`.
 
-The face and badge readers themselves arrive in the next step; until then staff stay unnamed and only the queue is counted (the worker logs this at start).
+**Naming staff: badges or faces.** Each worker uses one method, set by the owner in Privacy & consent after recording consent.
+
+- **Badge** (`vision/badges.py`): an ArUco 4x4 marker (codes 0–249) worn on the chest. Print one with `uv run python -m vision.badges 11` (writes `badge-11.png`; print at about 6 cm). Only the person crop of a worker inside a work area is searched, once a second; two different codes in one crop count as no read.
+- **Face** (`vision/faces.py`): OpenCV Zoo YuNet (detector) and SFace (128-number embedding), Apache-2.0. Fetch them once into the git-ignored `models/` folder (about 39 MB, checked against pinned SHA-256 sums):
+
+  ```bash
+  uv run python -m vision.fetch_models
+  ```
+
+  Only the head area of workers inside work areas is embedded, every 2 s per track. Embeddings are compared in memory and dropped. Face templates are only accepted by a server running with `DINEMATE_DEPLOYMENT=local` and `DINEMATE_TEMPLATE_KEY`; in cloud mode the worker gets badges only.
+
+The worker loads whichever readers are available (`--no-faces` or `--no-badges` to turn one off). Without the face models it logs how to fetch them and uses badges only.
+
+**Enrolling a face** (`vision/enrol.py`, run by the owner on the café computer, after consent is recorded):
+
+```bash
+uv run python -m vision.enrol --email owner@example.com --camera 0
+```
+
+It asks for the owner's password, lists consented workers set to Face, and takes 5 shots of one person (it waits while more than one face is in view). If the shots agree it averages them into one template and sends only those 128 numbers to `POST /business/staff/{id}/face`. No photo is saved or sent; Esc cancels and sends nothing.
+
+**Live view** (`vision/stream.py`): start the worker with `--stream-port 8090` (or `DINEMATE_STREAM_PORT`). It serves `http://<this computer>:8090/live` on the café network and reports that URL in its heartbeat (`--stream-host` sets the address if the automatic one is wrong). The Cameras page asks the API for a link signed with the device token that is valid for 60 s; the worker checks the signature and expiry before streaming, and one viewing lasts at most 10 minutes. Frames are drawn with zones, tables and named staff, every other person's face is pixelated before encoding, frames are only encoded while someone is watching, and nothing is written to disk. Browsers block an `http` stream inside an `https` page, so open the business app over `http` on the café network or put the worker behind a local TLS proxy.
 
 ## Checking accuracy against your own counts (plan Section 7.6)
 
