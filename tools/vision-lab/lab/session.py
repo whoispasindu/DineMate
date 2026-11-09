@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from lab.appearance import Gallery, LookEnrolment, ReIdentifier, signature
 from lab.compare import Mark, Sample, compare, csv_rows
 from lab.workers import AREAS, Coverage, Enrolment, WorkerBook
 
@@ -17,6 +18,11 @@ LAYOUTS = VISION / "layouts"
 VIDEO_TYPES = {".mp4", ".mov", ".mkv", ".avi", ".webm", ".m4v"}
 SAMPLE_EVERY_S = 1.0
 ENROL_EVERY_S = 0.5
+LOOK_EVERY_S = 0.3
+REID_EVERY_S = 0.5
+REFRESH_EVERY_S = 3.0
+PHOTO_HEIGHT = 160
+LOOK_PREFIX = "look:"
 COUNTED_KINDS = ("queue", "work")
 PREVIEW_LIMITS = (1280, 720)
 
@@ -112,6 +118,32 @@ def check_zones(raw: Any) -> list[dict[str, Any]]:
 
 
 FOOT_IN = (0, 140, 255)
+
+
+def look_at(image: Any, people: dict[int, Any], track: int) -> tuple[Any, Any]:
+    from vision.identity import crop, person_box
+
+    person = people.get(track)
+    height, width = image.shape[:2]
+    box = person_box(person, width, height) if person is not None else None
+    if box is None:
+        return None, None
+    region = crop(image, box)
+    return signature(region), region
+
+
+def photo_of(region: Any) -> bytes | None:
+    import cv2
+
+    height, width = region.shape[:2]
+    if height < 8 or width < 4:
+        return None
+    scale = PHOTO_HEIGHT / height
+    small = cv2.resize(region, (max(1, round(width * scale)), PHOTO_HEIGHT), interpolation=cv2.INTER_AREA)
+    ok, jpeg = cv2.imencode(".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, 80])
+    return jpeg.tobytes() if ok else None
+
+
 FOOT_OUT = (160, 160, 160)
 
 
@@ -161,6 +193,9 @@ class Lab:
         self.last_people: list[Any] = []
         self.last_size = (1, 1)
         self.book: WorkerBook | None = None
+        self.gallery = Gallery()
+        self.photos: dict[str, bytes] = {}
+        self.look_enrolment: LookEnrolment | None = None
 
     def open(self, spec: str, at_s: float = 5.0) -> dict[str, Any]:
         import cv2
@@ -184,6 +219,7 @@ class Lab:
             self.size = (int(image.shape[1]), int(image.shape[0]))
             self.zones, self.status, self.error = [], "ready", None
             self.staff, self.staff_version, self.enrolment, self.enrol_note = [], self.staff_version + 1, None, None
+            self.gallery, self.photos, self.look_enrolment = Gallery(), {}, None
             self._reset_counts()
         return self.info()
 
@@ -218,32 +254,59 @@ class Lab:
 
     def remove_staff(self, staff_id: str) -> None:
         with self.lock:
-            self.staff = [s for s in self.staff if s.staff_id != staff_id]
+            if staff_id.startswith(LOOK_PREFIX):
+                name = staff_id[len(LOOK_PREFIX) :]
+                self.gallery.looks.pop(name, None)
+                self.photos.pop(name, None)
+                self.staff = [s for s in self.staff if not (s.method == "face" and s.display_name == name)]
+            else:
+                self.staff = [s for s in self.staff if s.staff_id != staff_id]
             self.staff_version += 1
 
-    def request_enrol(self, name: str, x: float, y: float, consent: bool) -> str:
+    def name_worker(self, label: str, name: str, consent: bool) -> str:
         if not consent:
-            raise LabError("Only enrol people who agreed to be recognised. Tick the consent box first.")
-        if not self.faces_ready():
-            raise LabError("Face models are missing. Run: uv run python -m vision.fetch_models")
+            raise LabError("Only name people who agreed to be recognised. Tick the consent box first.")
+        name = name.strip()[:40]
+        if not name:
+            raise LabError("Type a name.")
+        faces = self.faces_ready()
         with self.lock:
-            if self.status not in ("running", "paused"):
-                raise LabError("Start the run, then click a worker.")
-            width, height = self.last_size
-            px, py = x * width, y * height
-            hits = [d for d in self.last_people if d.track_id is not None and d.x1 <= px <= d.x2 and d.y1 <= py <= d.y2]
-            if not hits:
-                raise LabError("No tracked person there. Click inside a box.")
-            target = min(hits, key=lambda d: (d.x2 - d.x1) * (d.y2 - d.y1))
-            self.enrolment = Enrolment(name, target.track_id, self.t)
-            self.enrol_note = f"Enrolling {name}: hold on while they face the camera."
+            if self.status not in ("running", "paused") or self.book is None:
+                raise LabError("Start the run first.")
+            if name in self.gallery.looks or any(s.display_name == name for s in self.staff):
+                raise LabError(f"{name} is already named. Remove them first to name someone else.")
+            if self.look_enrolment is not None:
+                raise LabError(f"Still learning {self.look_enrolment.name}. Wait a few seconds.")
+            track = self.book.worker_on(label)
+            if track is None:
+                raise LabError(f"{label} is not in a work area right now.")
+            self.look_enrolment = LookEnrolment(name, track, self.t)
+            self.enrolment = Enrolment(name, track, self.t) if faces else None
+            self.enrol_note = f"Learning {name}'s look. Keep them in view for a few seconds."
             return self.enrol_note
 
+    def photo(self, staff_id: str) -> bytes | None:
+        with self.lock:
+            return self.photos.get(staff_id[len(LOOK_PREFIX) :]) if staff_id.startswith(LOOK_PREFIX) else None
+
     def staff_view(self) -> list[dict[str, Any]]:
-        return [
-            {"id": s.staff_id, "name": s.display_name, "method": s.method, "badge_code": s.badge_code}
-            for s in self.staff
+        faces = {s.display_name for s in self.staff if s.method == "face"}
+        looks = [
+            {
+                "id": f"{LOOK_PREFIX}{name}",
+                "name": name,
+                "method": "look + face" if name in faces else "look",
+                "badge_code": None,
+                "photo": name in self.photos,
+            }
+            for name in self.gallery.looks
         ]
+        badges = [
+            {"id": s.staff_id, "name": s.display_name, "method": "badge", "badge_code": s.badge_code, "photo": False}
+            for s in self.staff
+            if s.method == "badge"
+        ]
+        return looks + badges
 
     def set_zones(self, raw: Any) -> list[dict[str, Any]]:
         zones = check_zones(raw)
@@ -321,7 +384,13 @@ class Lab:
                 "t": round(self.t, 1),
                 "fps": round(self.fps_seen, 1),
                 "workers": [
-                    {"label": w.shown, "area": w.area, "total": round(sum(w.seconds.values()), 1)}
+                    {
+                        "label": w.label,
+                        "name": w.name,
+                        "shown": w.shown,
+                        "area": w.area,
+                        "total": round(sum(w.seconds.values()), 1),
+                    }
                     for w in (book.tracks.values() if book and self.status in ("running", "paused") else [])
                 ],
                 "coverage": book.coverage.summary(self.t) if book and book.coverage.open_s > 0 else None,
@@ -403,7 +472,8 @@ class Lab:
         with self.lock:
             self.book = book
         embedder: Any = None
-        last_embed = -ENROL_EVERY_S
+        last_embed = last_look = last_reid = last_refresh = -10.0
+        reid = ReIdentifier(self.gallery)
         source = FrameSource(spec, fps=settings.fps, realtime=True)
         first: float | None = None
         last_sample = -SAMPLE_EVERY_S
@@ -445,10 +515,38 @@ class Lab:
                         has_counter,
                     )
                     worker_labels = book.labels()
-                    enrolment = self.enrolment
+                    enrolment, look_enrolment = self.enrolment, self.look_enrolment
+                    reid.gallery = self.gallery
+                by_track = {d.track_id: d for d in pipeline.people_seen if d.track_id is not None}
+
+                if look_enrolment is not None and t - last_look >= LOOK_EVERY_S:
+                    last_look = t
+                    sig, region = look_at(frame.image, by_track, look_enrolment.track)
+                    if sig is not None:
+                        look_enrolment.add(sig)
+                        if look_enrolment.photo is None and len(look_enrolment.samples) >= 2:
+                            look_enrolment.photo = photo_of(region)
+                    with self.lock:
+                        name = look_enrolment.name
+                        self.enrol_note = (
+                            f"Learning {name}'s look: {len(look_enrolment.samples)}/{look_enrolment.needed}"
+                        )
+                        if look_enrolment.done(t):
+                            self.look_enrolment = None
+                            learned = look_enrolment.look()
+                            if learned is None:
+                                self.enrol_note = f"Could not learn {name}'s look: keep them in view and try again."
+                            else:
+                                self.gallery.looks[name] = learned
+                                if look_enrolment.photo:
+                                    self.photos[name] = look_enrolment.photo
+                                book.assign(look_enrolment.track, name)
+                                self.enrol_note = (
+                                    f"Named {name}. They keep this name when they come back into a work area."
+                                )
                 if enrolment is not None and t - last_embed >= ENROL_EVERY_S:
                     last_embed = t
-                    target = next((d for d in pipeline.people_seen if d.track_id == enrolment.track), None)
+                    target = by_track.get(enrolment.track)
                     box = head_box(target, width, height) if target is not None else None
                     if box is not None:
                         embedder = embedder or FaceEmbedder(MODELS_DIR)
@@ -457,21 +555,37 @@ class Lab:
                         if face is not None:
                             enrolment.add(embedder.embed(region, face))
                     with self.lock:
-                        self.enrol_note = (
-                            f"Enrolling {enrolment.name}: {len(enrolment.samples)}/{enrolment.needed} shots"
-                        )
                         if enrolment.done(t):
                             template = enrolment.template()
                             self.enrolment = None
-                            if template is None:
-                                self.enrol_note = (
-                                    f"Could not enrol {enrolment.name}: not enough clear face shots. Try again."
-                                )
-                            else:
+                            if template is not None:
                                 member_id = f"lab-face-{len(self.staff) + 1}-{int(t)}"
                                 self.staff.append(StaffMember(member_id, enrolment.name, "face", None, tuple(template)))
                                 self.staff_version += 1
-                                self.enrol_note = f"Enrolled {enrolment.name} for this session (memory only)."
+                if self.gallery.looks and t - last_reid >= REID_EVERY_S:
+                    last_reid = t
+                    with self.lock:
+                        busy = look_enrolment.track if look_enrolment is not None else None
+                        unnamed = [k for k, w in book.tracks.items() if w.name is None and k != busy]
+                        named_here = [(k, w.name) for k, w in book.tracks.items() if w.name in self.gallery.looks]
+                    for track in unnamed:
+                        sig, _ = look_at(frame.image, by_track, track)
+                        if sig is None:
+                            continue
+                        with self.lock:
+                            match = reid.observe(track, sig, book.named_on_screen(besides=track))
+                            if match:
+                                book.assign(track, match)
+                    if t - last_refresh >= REFRESH_EVERY_S:
+                        last_refresh = t
+                        for track, name in named_here:
+                            sig, _ = look_at(frame.image, by_track, track)
+                            if sig is not None and name:
+                                with self.lock:
+                                    self.gallery.refresh(name, sig)
+                    reid.keep(set(by_track))
+                with self.lock:
+                    worker_labels = book.labels()
 
                 ours: dict[str, float] = {r["zone_id"]: r["estimated_occupied"] for r in pipeline.readings()}
                 now_counts = {z["id"]: 0 for z in zones}

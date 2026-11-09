@@ -25,6 +25,8 @@ RUN mkdir -p models "$YOLO_CONFIG_DIR" \
 
 USER vision
 
+RUN python -c "from ultralytics import YOLO; YOLO('models/yolo11s.pt'); YOLO('models/yolo11s-pose.pt')"
+
 EXPOSE 8090-8097
 
 CMD ["python", "-m", "vision.hub"]

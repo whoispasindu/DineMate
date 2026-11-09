@@ -79,6 +79,7 @@ class WorkerBook:
     lost: dict[int, Worker] = field(default_factory=dict)
     everyone: list[Worker] = field(default_factory=list)
     last_t: float | None = None
+    numbered: int = 0
 
     def _rejoin(self, track: int, x: float, y: float) -> Worker | None:
         if track in self.lost:
@@ -98,10 +99,9 @@ class WorkerBook:
         for track, area, x, y in views:
             worker = self.tracks.get(track) or self._rejoin(track, x, y)
             if worker is None:
-                worker = Worker(f"Worker {len(self.everyone) + 1}", t, t, x, y, area)
+                self.numbered += 1
+                worker = Worker(f"Worker {self.numbered}", t, t, x, y, area)
                 self.everyone.append(worker)
-            if named.get(track):
-                worker.name = named[track]
             worker.seconds[area] = worker.seconds.get(area, 0.0) + dt
             worker.last, worker.x, worker.y, worker.area = t, x, y, area
             self.tracks[track] = worker
@@ -109,8 +109,38 @@ class WorkerBook:
             staffed = staffed or area == "counter"
         for track in [k for k in self.tracks if k not in seen]:
             self.lost[track] = self.tracks.pop(track)
+        for track, name in named.items():
+            if name and track in self.tracks:
+                self.assign(track, name)
         if has_counter:
             self.coverage.update(staffed, t, dt)
+
+    def named_on_screen(self, besides: int | None = None) -> set[str]:
+        return {w.name for k, w in self.tracks.items() if w.name and k != besides}
+
+    def worker_on(self, label: str) -> int | None:
+        return next((k for k, w in self.tracks.items() if w.label == label), None)
+
+    def assign(self, track: int, name: str) -> bool:
+        current = self.tracks.get(track)
+        if current is None or current.name == name:
+            return False
+        if current.name is not None:
+            return False
+        target = next((w for w in self.everyone if w.name == name), None)
+        if target is None:
+            current.name = name
+            return True
+        if any(w is target for k, w in self.tracks.items() if k != track):
+            return False
+        for area, seconds in current.seconds.items():
+            target.seconds[area] = target.seconds.get(area, 0.0) + seconds
+        target.first, target.last = min(target.first, current.first), max(target.last, current.last)
+        target.x, target.y, target.area = current.x, current.y, current.area
+        self.tracks[track] = target
+        self.lost = {k: w for k, w in self.lost.items() if w is not target and w is not current}
+        self.everyone = [w for w in self.everyone if w is not current]
+        return True
 
     def labels(self) -> dict[int, str]:
         return {

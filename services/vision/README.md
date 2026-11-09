@@ -2,7 +2,7 @@
 
 Counts seated people per seating zone from a webcam or a video file and posts **counts only** to the API. Frames stay in memory and are never written to disk; the optional preview window is local and saves nothing.
 
-With seats placed, the worker tracks each seat instead (see Seats below). Without seats, the pipeline (plan Section 7.3) is: YOLO11n person detection → ByteTrack IDs → torso point inside a zone polygon → walkway/queue areas dropped → optional seated filter → dwell (default 20 s) → 60 s median → uncertainty band → `POST /devices/{id}/occupancy` every 15 s, heartbeat every 30 s, layout re-read every 30 s.
+With seats placed, the worker tracks each seat instead (see Seats below). Without seats, the pipeline (plan Section 7.3) is: YOLO11s person detection → ByteTrack IDs → torso point inside a zone polygon → walkway/queue areas dropped → optional seated filter → dwell (default 20 s) → 60 s median → uncertainty band → `POST /devices/{id}/occupancy` every 15 s, heartbeat every 30 s, layout re-read every 30 s.
 
 ## Webcam demo (about 10 minutes)
 
@@ -95,7 +95,7 @@ Only free seats are ever counted as free. Held and hidden seats count as taken i
 
 **How a seat is decided** (`vision/posture.py`, `vision/seats.py`, both unit-tested without YOLO):
 
-- People come from the pose model (`--pose-model`, default `models/yolo11n-pose.pt`, downloaded on first use). Bent knees mean sitting, straight legs mean standing, and hips well above the seat point mean standing. When legs are hidden the height calibration is used; conflicting signals are "unsure".
+- People come from the pose model (`--pose-model`, default `models/yolo11s-pose.pt`, downloaded on first use). Bent knees mean sitting, straight legs mean standing, and hips well above the seat point mean standing. When legs are hidden the height calibration is used; conflicting signals are "unsure".
 - Belongings and table items (backpack, handbag, suitcase, laptop, book, cup, bowl, bottle, cutlery, food) come from the normal model every `objects_every_s` (5 s).
 - A person who leaves a bag behind turns the seat **held** straight away; it turns **occupied** again within 3 s when they come back. A bag on an empty seat holds it after 20 s.
 - A seat hidden by standing people keeps its last state for up to 2 minutes, so a crowd walking past never creates a free seat. A free seat that stays hidden for 10 s turns **unknown**.
@@ -154,7 +154,7 @@ It asks for the owner's password, lists consented workers set to Face, and takes
 | `DINEMATE_HUB_TOKEN` | (required) | the hub's device token |
 | `DINEMATE_STREAM_HOST` | `localhost` | address owners' browsers use to reach the live views |
 | `DINEMATE_STREAM_FIRST_PORT` | `8090` | first live-view port |
-| `DINEMATE_MODEL` | `models/yolo11n.pt` | detector; downloaded on first run if missing |
+| `DINEMATE_MODEL` | `models/yolo11s.pt` | detector; downloaded on first run if missing. On a café video at 640 px on a 12-core CPU, YOLO11s took about 104 ms a frame and found about 30% more people than YOLO11n (49 ms). Use `models/yolo11n.pt` on slow PCs or with many cameras |
 
 In Docker the image (`services/vision/Dockerfile`) starts the hub by default. USB webcams cannot reach a Docker container on Windows, so for a webcam run the hub natively on the café PC instead (stop the Docker hub first so the ports are free):
 

@@ -25,7 +25,7 @@
 | Meal countdown on the server clock; experimental **next hour** forecast | **Occupancy** history; **Safety** desk with a labelled simulator                        | **Settings**: group camera seats into tables, data retention                                               |
 | Safety banner; "status unknown" if the connection drops                 | Roles: admin, canteen manager, shop manager, safety officer                             | Roles: owner and venue manager; Staff, Sales, Privacy & consent; cameras added and set up in the dashboard |
 
-Seats are counted by a small vision worker (YOLO11n + ByteTrack, plus pose for sitting vs standing). It runs on a laptop with a webcam or a recorded video and **posts numbers only**: no frames are stored and customers are never identified. Places without a camera are fed by labelled simulators.
+Seats are counted by a small vision worker (YOLO11s + ByteTrack, plus pose for sitting vs standing). It runs on a laptop with a webcam or a recorded video and **posts numbers only**: no frames are stored and customers are never identified. Places without a camera are fed by labelled simulators.
 
 ## Screenshots
 

@@ -42,10 +42,9 @@ class BadgeIn(BaseModel):
     code: int = Field(ge=0, le=249)
 
 
-class EnrolIn(BaseModel):
+class NameIn(BaseModel):
+    label: str = Field(min_length=1, max_length=40)
     name: str = Field(min_length=1, max_length=40)
-    x: float = Field(ge=0, le=1)
-    y: float = Field(ge=0, le=1)
     consent: bool = False
 
 
@@ -147,9 +146,16 @@ def create_app(lab: Lab) -> FastAPI:
         lab.add_badge(body.name, body.code)
         return {"staff": lab.staff_view()}
 
-    @app.post("/api/staff/enrol")
-    def enrol(body: EnrolIn) -> dict[str, Any]:
-        return {"note": lab.request_enrol(body.name, body.x, body.y, body.consent)}
+    @app.post("/api/workers/name")
+    def name_worker(body: NameIn) -> dict[str, Any]:
+        return {"note": lab.name_worker(body.label, body.name, body.consent)}
+
+    @app.get("/api/staff/{staff_id}/photo.jpg")
+    def staff_photo(staff_id: str) -> Response:
+        photo = lab.photo(staff_id)
+        if photo is None:
+            raise HTTPException(404, "No photo.")
+        return Response(photo, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
 
     @app.delete("/api/staff/{staff_id}")
     def remove_staff(staff_id: str) -> dict[str, Any]:
