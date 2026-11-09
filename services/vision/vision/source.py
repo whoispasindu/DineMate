@@ -6,7 +6,10 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
+from vision.youtube import RemoteStream, is_youtube, resolve
+
 WEBCAM_WARMUP_FRAMES = 10
+LIVE_REOPENS = 5
 
 
 @dataclass
@@ -31,6 +34,9 @@ def open_capture(spec: str) -> cv2.VideoCapture:
 
 
 def grab_still(spec: str, at_seconds: float = 0.0) -> np.ndarray:
+    if is_youtube(spec):
+        remote = resolve(spec)
+        spec, at_seconds = remote.url, 0.0 if remote.is_live else at_seconds
     capture = open_capture(spec)
     try:
         if is_camera(spec):
@@ -52,7 +58,8 @@ class FrameSource:
         self.fps = fps
         self.loop = loop
         self.realtime = realtime
-        self.capture = open_capture(spec)
+        self.remote: RemoteStream | None = resolve(spec) if is_youtube(spec) else None
+        self.capture = open_capture(self.remote.url if self.remote else spec)
         self.stream_ok = True
         self._pace_start = time.monotonic()
 
@@ -62,20 +69,35 @@ class FrameSource:
     def resume_after_pause(self, paused_s: float) -> None:
         self._pace_start += paused_s
 
+    @property
+    def live(self) -> bool:
+        return is_camera(self.spec) or (self.remote is not None and self.remote.is_live)
+
+    def _reopen(self) -> None:
+        self.capture.release()
+        self.remote = resolve(self.spec)
+        self.capture = open_capture(self.remote.url)
+
     def _camera_frames(self) -> Iterator[Frame]:
         interval = 1.0 / self.fps
         last = 0.0
         failures = 0
+        reopens = 0
         while True:
             ok, image = self.capture.read()
             if not ok:
                 failures += 1
                 self.stream_ok = False
                 if failures > 50:
-                    raise OSError("Camera stopped delivering frames.")
+                    if self.remote is None or reopens >= LIVE_REOPENS:
+                        raise OSError("Camera stopped delivering frames.")
+                    reopens += 1
+                    failures = 0
+                    self._reopen()
                 time.sleep(0.1)
                 continue
             failures = 0
+            reopens = 0
             self.stream_ok = True
             now = time.monotonic()
             if now - last >= interval:
@@ -109,4 +131,4 @@ class FrameSource:
             yield Frame(image, origin + video_time)
 
     def frames(self) -> Iterator[Frame]:
-        return self._camera_frames() if is_camera(self.spec) else self._file_frames()
+        return self._camera_frames() if self.live else self._file_frames()
