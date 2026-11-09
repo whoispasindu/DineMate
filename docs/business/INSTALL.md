@@ -43,7 +43,7 @@ If phones can't open the dashboard, Windows Firewall is blocking it. Allow inbou
 2. Within a minute the camera service starts the camera, and its status changes to **Waiting for zones**.
 3. Press **Set up zones**. On top of the live picture, add and drag shapes:
    - **Seating** for each area with tables. Pick or create the area, then **Place seats** and click every chair.
-   - **Counter**, **Kitchen** or **Staff floor** where staff work.
+   - **Counter**, **Kitchen** or **Staff floor** where staff stand. If this camera looks across the counter at customers, the counter hides their legs, so their feet seem to be on the counter top. Draw the counter area only on the floor where staff stand, usually along the bottom of the picture, never over the counter top.
    - **Queue** where customers wait, and **Ignore** for TV screens, mirrors or doors.
 4. Press **Save layout**, then group the seats into tables in **Settings → Tables**. Live floor starts showing tables as soon as the camera reports.
 
