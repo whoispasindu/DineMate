@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from vision.youtube import RemoteStream, is_youtube, resolve
+from vision.youtube import RemoteStream, is_network_stream, is_youtube, resolve
 
 WEBCAM_WARMUP_FRAMES = 10
 LIVE_REOPENS = 5
@@ -71,7 +71,7 @@ class FrameSource:
 
     @property
     def live(self) -> bool:
-        return is_camera(self.spec) or (self.remote is not None and self.remote.is_live)
+        return is_camera(self.spec) or is_network_stream(self.spec) or (self.remote is not None and self.remote.is_live)
 
     def _reopen(self) -> None:
         self.capture.release()

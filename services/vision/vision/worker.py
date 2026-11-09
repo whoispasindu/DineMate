@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -11,6 +12,7 @@ import httpx
 
 from vision.client import ApiError, DeviceClient
 from vision.counting import Assignment
+from vision.envfile import load_env_file
 from vision.pipeline import Models, Pipeline
 from vision.source import FrameSource
 from vision.staff import staff_from_response, work_areas_from_config
@@ -22,6 +24,7 @@ DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11n.pt"
 DEFAULT_POSE_MODEL = PROJECT_DIR / "models" / "yolo11n-pose.pt"
 CONFIG_REFRESH_S = 30.0
 HEARTBEAT_S = 30.0
+WAITING = "waiting for zones"
 LIVE_LIMITS = (1280, 720)
 DEFAULT_SETTINGS = {
     "post_every_s": 15.0,
@@ -33,15 +36,6 @@ DEFAULT_SETTINGS = {
 }
 
 log = logging.getLogger("dinemate.vision")
-
-
-def load_env_file(path: Path) -> None:
-    if not path.exists():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        key, sep, value = line.strip().partition("=")
-        if sep and key and not key.startswith("#"):
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
 def layout_config(path: str) -> dict[str, Any]:
@@ -240,15 +234,11 @@ def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
     return True
 
 
-def run(args: argparse.Namespace) -> int:
-    client = DeviceClient(args.api, args.device, args.token) if args.device and args.token else None
-    config = layout_config(args.layout) if args.layout else client.config() if client else None
-    if not config or not (config.get("zones") or work_areas_from_config(config)):
-        log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
-        return 1
-    config = apply_overrides(config, args)
-    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz), identity=identity_reader(args, config))
-    settings = config["settings"]
+def has_areas(config: dict[str, Any] | None) -> bool:
+    return bool(config and (config.get("zones") or work_areas_from_config(config)))
+
+
+def describe(pipeline: Pipeline, settings: dict[str, Any]) -> None:
     log.info("Counting %d zone(s): %s", len(pipeline.zones), ", ".join(z.name for z in pipeline.zones))
     if pipeline.seat_mode:
         log.info("Tracking %d seat(s) with pose keypoints and belongings", len(pipeline.tracker.seats))
@@ -258,6 +248,22 @@ def run(args: argparse.Namespace) -> int:
         settings["smoothing_s"],
         settings["post_every_s"],
     )
+
+
+def run(args: argparse.Namespace) -> int:
+    client = DeviceClient(args.api, args.device, args.token) if args.device and args.token else None
+    config = layout_config(args.layout) if args.layout else client.config() if client else None
+    if not has_areas(config) and (args.layout or args.dry_run or client is None):
+        log.error("No zones to count. Register the device with a layout first (see services/vision/README.md).")
+        return 1
+    config = apply_overrides(config or {}, args)
+    pipeline = Pipeline(config, Models(args.model, args.pose_model, args.imgsz), identity=identity_reader(args, config))
+    settings = config["settings"]
+    waiting = not has_areas(config)
+    if waiting:
+        log.info("No zones yet, %s: live view and heartbeats only, nothing is posted", WAITING)
+    else:
+        describe(pipeline, settings)
     source = FrameSource(args.source, fps=float(settings["fps"]), loop=args.loop, realtime=not args.fast)
     preview = Preview() if args.preview else None
     posting = client is not None and not args.dry_run
@@ -266,24 +272,31 @@ def run(args: argparse.Namespace) -> int:
     live, stream_url = start_live(args)
     epoch_offset = time.time() - time.monotonic()
     last_config = last_beat = time.monotonic()
-    if stream_url:
+    if stream_url or waiting:
         last_beat -= HEARTBEAT_S
     last_post: float | None = None
+    sized = False
     fps = 0.0
     latency_ms = 0
     shown: dict[str, dict[str, Any]] = {}
     try:
         for frame in source.frames():
-            started = time.perf_counter()
-            assignments = pipeline.process(frame.image, frame.at)
-            latency_ms = round((time.perf_counter() - started) * 1000)
-            fps = 0.9 * fps + 0.1 * (1000 / max(latency_ms, 1)) if fps else 1000 / max(latency_ms, 1)
+            watched = live is not None and live.hub.wanted(time.monotonic())
+            if waiting and not watched:
+                assignments: list[Assignment] = []
+            else:
+                started = time.perf_counter()
+                assignments = pipeline.process(frame.image, frame.at)
+                latency_ms = round((time.perf_counter() - started) * 1000)
+                fps = 0.9 * fps + 0.1 * (1000 / max(latency_ms, 1)) if fps else 1000 / max(latency_ms, 1)
             height, width = frame.image.shape[:2]
             if last_post is None:
                 last_post = frame.at
+            if not sized and pipeline.imgsz is not None:
+                sized = True
                 chosen = "set by --imgsz" if args.imgsz else f"auto for a {width}px-wide source"
                 log.info("Source is %dx%d; detecting at %s px (%s)", width, height, pipeline.imgsz, chosen)
-            if frame.at - last_post >= float(settings["post_every_s"]):
+            if not waiting and frame.at - last_post >= float(settings["post_every_s"]):
                 readings = pipeline.readings()
                 snapshot = pipeline.snapshot(frame.at)
                 staff = pipeline.staff_snapshot(epoch_offset)
@@ -339,6 +352,15 @@ def run(args: argparse.Namespace) -> int:
                         pipeline.configure(fresh)
                         settings = fresh["settings"]
                         log.info("layout updated to version %s", fresh.get("layout_version"))
+                        ready = has_areas(fresh)
+                        if waiting and ready:
+                            if pipeline.identity is None:
+                                pipeline.identity = identity_reader(args, fresh)
+                            describe(pipeline, settings)
+                            last_post = frame.at
+                        elif not waiting and not ready:
+                            log.info("No zones left, %s: nothing is posted", WAITING)
+                        waiting = not ready
                 except (ApiError, httpx.HTTPError) as exc:
                     log.warning("config refresh failed: %s", exc)
                 if staff_endpoint:
@@ -348,10 +370,10 @@ def run(args: argparse.Namespace) -> int:
                 try:
                     client.heartbeat(
                         "ok" if source.stream_ok else "degraded",
-                        round(fps, 1),
-                        latency_ms,
+                        None if waiting else round(fps, 1),
+                        None if waiting else latency_ms,
                         source.stream_ok,
-                        None,
+                        WAITING if waiting else None,
                         stream_url,
                     )
                 except (ApiError, httpx.HTTPError) as exc:
@@ -375,7 +397,12 @@ def run(args: argparse.Namespace) -> int:
     return 0
 
 
+def interrupt(signum: int, frame: Any) -> None:
+    raise KeyboardInterrupt
+
+
 def main(argv: list[str] | None = None) -> int:
+    signal.signal(signal.SIGTERM, interrupt)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     load_env_file(ENV_FILE)
