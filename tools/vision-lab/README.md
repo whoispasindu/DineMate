@@ -44,12 +44,13 @@ Everyone whose feet are inside a work area is tracked as **Worker 1**, **Worker 
 
 The results list time per area for each worker. Sightings under 3 s are hidden, because they are usually a track that broke for a moment.
 
-**Named workers** are optional and last for this session only. Nothing is written to disk.
+**Named workers** are optional, only for footage where the people filmed agreed to be recognised, and last for this session only. Nothing is written to disk.
 
-- **Badge:** type a name and an ArUco badge code (print one with `uv run python -m vision.badges 11` in services/vision). The worker is named when the badge is seen inside a work area.
-- **Face:** only for footage where the people filmed agreed to be recognised. Tick the consent box, type a name, press **Enrol by face**, then click that worker in the live view (pause first if they move a lot). The lab takes 5 shots of their face over a few seconds and averages them. It needs the face models: `uv run python -m vision.fetch_models` in services/vision.
+- **Name:** tick "The people filmed agreed to be recognised", then press **Name** next to a worker in the Workers list and type a name. For a few seconds the lab learns how they look: the colours of their clothes and body, plus their face when the face models are installed (`uv run python -m vision.fetch_models` in services/vision). It keeps a small photo for the list, in memory only.
+- **Coming back:** when someone new steps into a work area, the lab compares their look with the named workers who are not on screen. After 3 matching checks in a row, they get that name and their time continues on the same worker, even after a long break. The look is refreshed every few seconds while they are on screen, so light changes during the day are followed.
+- **Badge:** open "Name by badge instead", type a name and an ArUco badge code (print one with `uv run python -m vision.badges 11` in services/vision). The worker is named when the badge is seen inside a work area.
 
-Never enrol customers or people in public footage. Keep "Blur faces" on; named workers are the only faces left unblurred.
+Clothes-based matching struggles when workers wear identical uniforms. Install the face models in that case, or use badges. Never name customers or people in public footage. Keep "Blur faces" on.
 
 ## Tests
 

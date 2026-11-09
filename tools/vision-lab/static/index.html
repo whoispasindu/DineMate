@@ -346,31 +346,35 @@
           </p>
           <div id="coverage" class="muted">No counter area yet.</div>
           <ul class="zones" id="workers"></ul>
-          <h2 style="margin-top: 14px">Named workers</h2>
-          <p class="muted">For this session only, kept in memory, never saved. Names show only inside work areas.</p>
-          <div class="row">
-            <label
-              >Name
-              <input id="staffName" placeholder="Barista 1" style="width: 130px" />
-            </label>
-            <label
-              >Badge code
-              <input id="badgeCode" type="number" min="0" max="249" style="width: 80px" />
-            </label>
-            <button id="addBadge">Add badge</button>
-          </div>
-          <label style="flex-direction: row; align-items: center; gap: 6px; margin: 6px 0"
-            ><input id="consent" type="checkbox" /> The people filmed agreed to face recognition</label
+          <label style="flex-direction: row; align-items: center; gap: 6px; margin: 8px 0"
+            ><input id="consent" type="checkbox" /> The people filmed agreed to be recognised</label
           >
-          <div class="row">
-            <button id="enrol" disabled>Enrol by face: click a worker</button>
-          </div>
-          <p id="facesMissing" class="error" hidden>
-            Face models are not installed, so Enrol by face is off. In services/vision run:
-            <code>uv run python -m vision.fetch_models</code> (about 39 MB), then restart the lab.
+          <p class="muted">
+            Tick this, then press <b>Name</b> next to a worker above. The lab learns how they look (clothes and body, plus their face when
+            the face models are installed) and keeps the name when they leave a work area and come back.
           </p>
           <div id="enrolNote" class="muted"></div>
+          <h2 style="margin-top: 14px">Named workers</h2>
+          <p class="muted">This session only. Looks and photos are kept in memory and never saved.</p>
           <ul class="zones" id="staff"></ul>
+          <p id="facesMissing" class="muted" hidden>
+            Face models are not installed, so names use clothes and body only; workers in identical uniforms may be confused. To add faces,
+            run <code>uv run python -m vision.fetch_models</code> in services/vision and restart the lab.
+          </p>
+          <details style="margin-top: 8px">
+            <summary class="muted">Name by badge instead</summary>
+            <div class="row" style="margin-top: 8px">
+              <label
+                >Name
+                <input id="staffName" placeholder="Barista 1" style="width: 130px" />
+              </label>
+              <label
+                >Badge code
+                <input id="badgeCode" type="number" min="0" max="249" style="width: 80px" />
+              </label>
+              <button id="addBadge">Add badge</button>
+            </div>
+          </details>
         </section>
       </div>
     </main>
@@ -507,10 +511,6 @@
         const x = (event.clientX - box.rect.left - box.x) / box.w;
         const y = (event.clientY - box.rect.top - box.y) / box.h;
         if (x < 0 || x > 1 || y < 0 || y > 1) return;
-        if (state.enrolling) {
-          enrolAt(x, y);
-          return;
-        }
         if (state.running || !$("still").src) return;
         state.current.push([Math.round(x * 1e4) / 1e4, Math.round(y * 1e4) / 1e4]);
         renderZones();
@@ -765,24 +765,52 @@
 
       function renderWorkers(live) {
         $("coverage").textContent = coverageText(live.coverage);
+        const canName = $("consent").checked;
         $("workers").innerHTML =
-          live.workers.map((w) => `<li><span><b>${esc(w.label)}</b> · ${w.area}</span><span>${minutes(w.total)}</span></li>`).join("") ||
-          '<li class="muted">Nobody in a work area right now.</li>';
-        $("staff").innerHTML = live.staff
-          .map(
-            (s) =>
-              `<li><span><b>${esc(s.name)}</b> · ${s.method === "badge" ? `badge ${s.badge_code}` : "face"}</span>` +
-              `<button data-staff="${esc(s.id)}">Remove</button></li>`,
-          )
-          .join("");
+          live.workers
+            .map(
+              (w) =>
+                `<li><span><b>${esc(w.shown)}</b> · ${w.area} · ${minutes(w.total)}</span>` +
+                (w.name
+                  ? '<span class="muted">named</span>'
+                  : `<button data-name="${esc(w.label)}" ${canName ? "" : "disabled"} aria-label="Name ${esc(w.label)}">Name</button>`) +
+                "</li>",
+            )
+            .join("") || '<li class="muted">Nobody in a work area right now.</li>';
+        $("staff").innerHTML =
+          live.staff
+            .map(
+              (s) =>
+                `<li><span style="display: flex; align-items: center; gap: 10px">` +
+                (s.photo
+                  ? `<img src="/api/staff/${encodeURIComponent(s.id)}/photo.jpg" alt="${esc(s.name)}" style="height: 56px; border-radius: 6px" />`
+                  : "") +
+                `<span><b>${esc(s.name)}</b><br /><span class="muted">${s.method === "badge" ? `badge ${s.badge_code}` : `by ${s.method}`}</span></span></span>` +
+                `<button data-staff="${esc(s.id)}" aria-label="Remove ${esc(s.name)}">Remove</button></li>`,
+            )
+            .join("") || '<li class="muted">Nobody named yet.</li>';
         if (live.enrol) $("enrolNote").textContent = live.enrol;
-        $("enrol").disabled = !$("consent").checked || !live.faces_ready || !state.running;
-        $("enrol").title = live.faces_ready ? "" : "Face models missing: uv run python -m vision.fetch_models";
         $("facesMissing").hidden = live.faces_ready;
       }
 
       $("consent").onchange = () => {
-        $("enrol").disabled = !$("consent").checked || !(state.last && state.last.faces_ready) || !state.running;
+        if (state.last) renderWorkers(state.last);
+      };
+
+      $("workers").onclick = async (event) => {
+        const label = event.target.dataset.name;
+        if (!label) return;
+        const name = window.prompt(`Name for ${label}?`, "");
+        if (!name || !name.trim()) return;
+        try {
+          const data = await call("/api/workers/name", {
+            method: "POST",
+            body: { label, name: name.trim(), consent: $("consent").checked },
+          });
+          show("enrolNote", data.note);
+        } catch (error) {
+          show("enrolNote", error.message, true);
+        }
       };
 
       $("addBadge").onclick = async () => {
@@ -798,29 +826,6 @@
           show("enrolNote", error.message, true);
         }
       };
-
-      $("enrol").onclick = () => {
-        if (!$("staffName").value.trim()) {
-          show("enrolNote", "Type the worker's name first.", true);
-          return;
-        }
-        state.enrolling = true;
-        show("enrolNote", "Now click the worker in the live view. Pause first if they move a lot.");
-      };
-
-      async function enrolAt(x, y) {
-        state.enrolling = false;
-        try {
-          const data = await call("/api/staff/enrol", {
-            method: "POST",
-            body: { name: $("staffName").value.trim(), x, y, consent: $("consent").checked },
-          });
-          show("enrolNote", data.note);
-          $("staffName").value = "";
-        } catch (error) {
-          show("enrolNote", error.message, true);
-        }
-      }
 
       $("staff").onclick = async (event) => {
         const id = event.target.dataset.staff;

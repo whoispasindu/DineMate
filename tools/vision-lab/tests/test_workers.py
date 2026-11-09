@@ -68,3 +68,33 @@ def test_enrolment_needs_consistent_shots() -> None:
     mixed.add([0.0, 1.0, 0.0])
     assert mixed.template() is None
     assert not mixed.done(5.0) and mixed.done(25.0)
+
+
+def test_a_returning_worker_is_merged_into_their_name() -> None:
+    book = WorkerBook(rejoin_s=5)
+    book.update([(1, "kitchen", 0.5, 0.8)], {}, 0.0, False)
+    book.update([(1, "kitchen", 0.5, 0.8)], {}, 2.0, False)
+    assert book.assign(1, "Barista 1")
+    book.update([], {}, 3.0, False)
+    book.update([], {}, 59.0, False)
+    book.update([(9, "counter", 0.2, 0.8)], {}, 60.0, False)
+    book.update([(9, "counter", 0.2, 0.8)], {}, 61.0, False)
+    assert book.labels() == {9: "Worker 2 · counter · 0 min"}
+    assert book.assign(9, "Barista 1")
+    assert book.labels() == {9: "Barista 1 · counter · 0 min"}
+    (worker,) = book.summary(61.0, min_seconds=0)["workers"]
+    assert worker["name"] == "Barista 1" and worker["seconds"]["kitchen"] == 2.0 and worker["seconds"]["counter"] == 2.0
+    assert worker["first"] == 0.0 and worker["last"] == 61.0
+
+
+def test_assign_never_steals_a_name_on_screen_or_renames_a_named_worker() -> None:
+    book = WorkerBook()
+    book.update([(1, "counter", 0.2, 0.8), (2, "counter", 0.6, 0.8)], {}, 0.0, False)
+    assert book.assign(1, "Barista 1")
+    assert not book.assign(2, "Barista 1")
+    assert not book.assign(1, "Barista 2")
+    assert book.named_on_screen() == {"Barista 1"}
+    assert book.named_on_screen(besides=1) == set()
+    assert book.worker_on("Worker 2") == 2 and book.worker_on("Worker 9") is None
+    book.update([(3, "floor", 0.9, 0.9)], {}, 1.0, False)
+    assert book.labels()[3].startswith("Worker 3")
