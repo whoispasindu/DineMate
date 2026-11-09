@@ -141,8 +141,9 @@ function Editor({ layout, venueId }: { layout: DeviceLayout; venueId: string }) 
           />
         </div>
         <p className="m-0 text-[13px] text-muted">
-          Drag the corners so each shape covers where people's feet are. Select a seating shape and press Place seats, then click each
-          chair.
+          Drag the corners so each shape covers where people's feet are. If the camera looks across the counter, draw the counter area only
+          on the floor behind it, not over the counter top: customers' legs are hidden there, so their feet seem to be on it. Select a
+          seating shape and press Place seats, then click each chair.
         </p>
       </Panel>
       <div className="flex min-w-[300px] flex-[1_1_320px] flex-col gap-4">

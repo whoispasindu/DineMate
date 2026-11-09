@@ -111,6 +111,24 @@ def check_zones(raw: Any) -> list[dict[str, Any]]:
     return zones
 
 
+FOOT_IN = (0, 140, 255)
+FOOT_OUT = (160, 160, 160)
+
+
+def mark_feet(
+    canvas: Any, people: list[Any], work: list[Any], width: int, height: int, area_of: Any, foot: Any
+) -> None:
+    import cv2
+
+    scale_x, scale_y = canvas.shape[1] / width, canvas.shape[0] / height
+    for person in people:
+        x, y = foot(person, width, height)
+        centre = (round(x * width * scale_x), round(y * height * scale_y))
+        inside = area_of(work, x, y) is not None
+        cv2.circle(canvas, centre, 7, FOOT_IN if inside else FOOT_OUT, -1, cv2.LINE_AA)
+        cv2.circle(canvas, centre, 7, (255, 255, 255), 1, cv2.LINE_AA)
+
+
 class Lab:
     def __init__(self, model: Path, pose_model: Path) -> None:
         from vision.stream import FrameHub
@@ -361,7 +379,7 @@ class Lab:
         from vision.overlay import draw
         from vision.pipeline import Models, Pipeline
         from vision.source import FrameSource
-        from vision.staff import QueueCounter, StaffMember, StaffSettings, foot_point
+        from vision.staff import QueueCounter, StaffMember, StaffSettings, area_of, foot_point
         from vision.stream import blur, blur_boxes
 
         has_work = any(z["kind"] == "work" for z in zones)
@@ -496,6 +514,8 @@ class Lab:
                         [(d, worker_labels[d.track_id]) for d in pipeline.people_seen if d.track_id in worker_labels],
                         pipeline.stay_labels(),
                     )
+                    if has_work:
+                        mark_feet(canvas, pipeline.people_seen, pipeline.work, width, height, area_of, foot_point)
                     ok, jpeg = cv2.imencode(".jpg", canvas, [cv2.IMWRITE_JPEG_QUALITY, 75])
                     if ok:
                         self.hub.publish(jpeg.tobytes(), time.monotonic())

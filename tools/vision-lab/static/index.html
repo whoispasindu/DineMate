@@ -341,7 +341,8 @@
         <section>
           <h2>Workers</h2>
           <p class="muted">
-            Draw counter, kitchen or floor work areas. Everyone inside them is tracked as a worker without being identified.
+            Draw counter, kitchen or floor work areas. Everyone inside them is tracked as a worker without being identified. The dot under
+            each person is the point that is checked: orange inside a work area, grey outside.
           </p>
           <div id="coverage" class="muted">No counter area yet.</div>
           <ul class="zones" id="workers"></ul>
@@ -364,6 +365,10 @@
           <div class="row">
             <button id="enrol" disabled>Enrol by face: click a worker</button>
           </div>
+          <p id="facesMissing" class="error" hidden>
+            Face models are not installed, so Enrol by face is off. In services/vision run:
+            <code>uv run python -m vision.fetch_models</code> (about 39 MB), then restart the lab.
+          </p>
           <div id="enrolNote" class="muted"></div>
           <ul class="zones" id="staff"></ul>
         </section>
@@ -773,6 +778,7 @@
         if (live.enrol) $("enrolNote").textContent = live.enrol;
         $("enrol").disabled = !$("consent").checked || !live.faces_ready || !state.running;
         $("enrol").title = live.faces_ready ? "" : "Face models missing: uv run python -m vision.fetch_models";
+        $("facesMissing").hidden = live.faces_ready;
       }
 
       $("consent").onchange = () => {

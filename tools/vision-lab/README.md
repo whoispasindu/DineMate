@@ -36,7 +36,7 @@ It opens http://127.0.0.1:8765 in your browser and listens on this computer only
 
 ## Workers
 
-Everyone whose feet are inside a work area is tracked as **Worker 1**, **Worker 2** and so on, without being identified. The live view shows each worker's area and time. The Workers panel shows:
+Everyone whose feet are inside a work area is tracked as **Worker 1**, **Worker 2** and so on, without being identified. The live view puts a dot at each person's feet point: orange inside a work area, grey outside. If the camera looks across the counter at customers, the counter hides their legs, so their feet seem to be on the counter top. Draw the counter area only on the floor where staff stand, usually along the bottom of the picture, never over the counter top. The live view shows each worker's area and time. The Workers panel shows:
 
 - who is in a work area now
 - how much of the run the counter was staffed
