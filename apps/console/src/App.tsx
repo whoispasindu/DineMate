@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { Button } from "./kit";
 import { ConsoleShell, navFor } from "./layout";
+import { DevicesScreen } from "./screens/Devices";
 import { OverviewScreen } from "./screens/Overview";
 import { OccupancyScreen } from "./screens/Occupancy";
 import { PlannedScreen } from "./screens/Planned";
@@ -11,7 +12,6 @@ import { SchedulesScreen } from "./screens/Schedules";
 import { SeatsScreen } from "./screens/Seats";
 import { ShopsScreen } from "./screens/Shops";
 import { SignInScreen } from "./screens/SignIn";
-import { TestVideosScreen } from "./screens/TestVideos";
 import { ThresholdsScreen } from "./screens/Thresholds";
 import { ZonesScreen } from "./screens/Zones";
 
@@ -23,7 +23,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/safety": SafetyScreen,
   "/occupancy": OccupancyScreen,
   "/seats": SeatsScreen,
-  "/test-videos": TestVideosScreen,
+  "/devices": DevicesScreen,
 };
 
 function BusinessAccount() {

@@ -1,6 +1,6 @@
 import { useTestFeedLive, useUploadTestVideo } from "@dinemate/api-client";
 import { Icon, reachableStream } from "@dinemate/ui";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Field, TextInput } from "./kit";
 
 export interface TestVideoChoice {
@@ -60,6 +60,15 @@ export function TestVideoInput({ value, onChange }: { value: TestVideoChoice; on
 export function LiveBackdrop({ deviceId }: { deviceId: string }) {
   const link = useTestFeedLive(deviceId);
   const [broken, setBroken] = useState(false);
+  const { isError, refetch } = link;
+  useEffect(() => {
+    if (!isError && !broken) return;
+    const timer = window.setInterval(() => {
+      setBroken(false);
+      void refetch();
+    }, 10_000);
+    return () => window.clearInterval(timer);
+  }, [isError, broken, refetch]);
   if (link.data && !broken) {
     return (
       <img
@@ -76,7 +85,7 @@ export function LiveBackdrop({ deviceId }: { deviceId: string }) {
         <Icon name="camera" size={26} />
         {link.isPending
           ? "Connecting to the test video…"
-          : "No picture yet. You can still draw; the picture appears when the video starts."}
+          : "No picture yet. It appears by itself once the video starts, usually within a minute. You can draw already."}
         {!link.isPending ? (
           <Button
             className="min-h-8"
