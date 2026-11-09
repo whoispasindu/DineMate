@@ -20,8 +20,21 @@ import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput, useUn
 const W = 1600;
 const H = 900;
 const NUDGE = 0.005;
-const TYPE_LABEL: Record<PolygonType, string> = { seating: "Seating", queue: "Queue", walkway: "Walkway", ignore: "Ignore" };
-const TYPE_COLOR: Record<PolygonType, string> = { seating: "#1f7a4d", queue: "#1e6fc2", walkway: "#7c8580", ignore: "#c2410c" };
+const TYPE_LABEL: Record<PolygonType, string> = {
+  seating: "Seating",
+  queue: "Queue",
+  walkway: "Walkway",
+  ignore: "Ignore",
+  work: "Work area",
+};
+const CAMPUS_TYPES: PolygonType[] = ["seating", "queue", "walkway", "ignore"];
+const TYPE_COLOR: Record<PolygonType, string> = {
+  seating: "#1f7a4d",
+  queue: "#1e6fc2",
+  walkway: "#7c8580",
+  ignore: "#c2410c",
+  work: "#5b34c9",
+};
 
 type Point = [number, number];
 
@@ -198,7 +211,7 @@ function ShapeTools({
             onChange({ ...polygon, type, zone_id: type === "seating" ? (polygon.zone_id ?? zones[0]?.id ?? null) : null });
           }}
         >
-          {(Object.keys(TYPE_LABEL) as PolygonType[]).map((t) => (
+          {CAMPUS_TYPES.map((t) => (
             <option key={t} value={t}>
               {TYPE_LABEL[t]}
             </option>

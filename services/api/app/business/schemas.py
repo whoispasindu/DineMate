@@ -59,6 +59,8 @@ class FloorTotals(Schema):
     visits_today: int
     avg_stay_today_min: int | None
     turns_today: float
+    counter_staff: int | None = None
+    queue_people: int | None = None
 
 
 class VenueFloor(Timestamped):
@@ -183,7 +185,11 @@ class BusinessSettings(Timestamped):
     organization_id: str
     organization_name: str
     retention_days: int
+    staff_retention_days: int
+    deployment: Literal["local", "cloud"]
+    faces_enabled: bool
 
 
 class SettingsIn(Schema):
-    retention_days: int = Field(ge=7, le=730)
+    retention_days: int | None = Field(default=None, ge=7, le=730)
+    staff_retention_days: int | None = Field(default=None, ge=7, le=365)

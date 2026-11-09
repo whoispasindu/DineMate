@@ -193,6 +193,8 @@ def post_heartbeat(payload: HeartbeatIn, device: DeviceDep, session: SessionDep,
             message=payload.message,
         )
     )
+    if payload.stream_url and (device.config or {}).get("stream_url") != payload.stream_url:
+        device.config = {**(device.config or {}), "stream_url": payload.stream_url}
     device.last_heartbeat_at = now
     session.commit()
     return HeartbeatAccepted(server_time=now, device_id=device.id)

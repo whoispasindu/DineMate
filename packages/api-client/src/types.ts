@@ -380,7 +380,8 @@ export interface ThresholdResult extends Timestamped {
   item: ZoneThresholds;
 }
 
-export type PolygonType = "seating" | "queue" | "walkway" | "ignore";
+export type PolygonType = "seating" | "queue" | "walkway" | "ignore" | "work";
+export type WorkAreaName = "counter" | "kitchen" | "floor";
 
 export interface LayoutSeat {
   seat_id: string;
@@ -391,6 +392,7 @@ export interface LayoutSeat {
 export interface LayoutPolygon {
   type: PolygonType;
   zone_id: string | null;
+  area?: WorkAreaName | null;
   points: [number, number][];
   seats?: LayoutSeat[];
 }

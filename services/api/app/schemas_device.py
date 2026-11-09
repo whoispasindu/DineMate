@@ -92,6 +92,7 @@ class HeartbeatIn(Schema):
     latency_ms: int | None = Field(default=None, ge=0)
     stream_ok: bool = True
     message: str | None = Field(default=None, max_length=500)
+    stream_url: str | None = Field(default=None, max_length=200, pattern=r"^https?://")
 
 
 class HeartbeatAccepted(Timestamped):

@@ -5086,6 +5086,1406 @@
           }
         }
       }
+    },
+    "/api/v1/business/venues/{venue_id}/staff": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "List Staff",
+        "operationId": "list_staff_api_v1_business_venues__venue_id__staff_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffList"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Create Staff",
+        "operationId": "create_staff_api_v1_business_venues__venue_id__staff_post",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/staff/{staff_id}": {
+      "patch": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Patch Staff",
+        "operationId": "patch_staff_api_v1_business_staff__staff_id__patch",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Remove Staff",
+        "operationId": "remove_staff_api_v1_business_staff__staff_id__delete",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Removed"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/staff/{staff_id}/consent": {
+      "post": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Record Consent",
+        "operationId": "record_consent_api_v1_business_staff__staff_id__consent_post",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Withdraw Consent",
+        "operationId": "withdraw_consent_api_v1_business_staff__staff_id__consent_delete",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/staff/{staff_id}/face": {
+      "post": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Enrol Face",
+        "operationId": "enrol_face_api_v1_business_staff__staff_id__face_post",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FaceIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/staff-report": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Staff Report",
+        "operationId": "staff_report_api_v1_business_venues__venue_id__staff_report_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/staff/{staff_id}/sheet": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Staff Sheet",
+        "operationId": "staff_sheet_api_v1_business_staff__staff_id__sheet_get",
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffSheet"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/audit": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Audit",
+        "operationId": "audit_api_v1_business_audit_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditList"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/till/import": {
+      "post": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Import Till",
+        "operationId": "import_till_api_v1_business_venues__venue_id__till_import_post",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TillImportIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TillImportResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/sales": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Get Sales",
+        "operationId": "get_sales_api_v1_business_venues__venue_id__sales_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesDay"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/business/venues/{venue_id}/cameras/{device_id}/live": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Live Link",
+        "operationId": "live_link_api_v1_business_venues__venue_id__cameras__device_id__live_get",
+        "parameters": [
+          {
+            "name": "venue_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Venue Id"
+            }
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveLink"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{device_id}/staff-templates": {
+      "get": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Staff Templates",
+        "operationId": "staff_templates_api_v1_devices__device_id__staff_templates_get",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffTemplates"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{device_id}/staff": {
+      "post": {
+        "tags": [
+          "business-staff"
+        ],
+        "summary": "Post Staff",
+        "operationId": "post_staff_api_v1_devices__device_id__staff_post",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffSnapshotIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5133,6 +6533,80 @@
           "notices"
         ],
         "title": "AlertFeed"
+      },
+      "AreaMinutes": {
+        "properties": {
+          "counter": {
+            "type": "integer",
+            "title": "Counter"
+          },
+          "kitchen": {
+            "type": "integer",
+            "title": "Kitchen"
+          },
+          "floor": {
+            "type": "integer",
+            "title": "Floor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "counter",
+          "kitchen",
+          "floor"
+        ],
+        "title": "AreaMinutes"
+      },
+      "AuditEntry": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "actor": {
+            "type": "string",
+            "title": "Actor"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "entity_id": {
+            "type": "string",
+            "title": "Entity Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "actor",
+          "action",
+          "entity_id"
+        ],
+        "title": "AuditEntry"
+      },
+      "AuditList": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEntry"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "items"
+        ],
+        "title": "AuditList"
       },
       "AvailabilityIn": {
         "properties": {
@@ -5201,6 +6675,22 @@
           "retention_days": {
             "type": "integer",
             "title": "Retention Days"
+          },
+          "staff_retention_days": {
+            "type": "integer",
+            "title": "Staff Retention Days"
+          },
+          "deployment": {
+            "type": "string",
+            "enum": [
+              "local",
+              "cloud"
+            ],
+            "title": "Deployment"
+          },
+          "faces_enabled": {
+            "type": "boolean",
+            "title": "Faces Enabled"
           }
         },
         "type": "object",
@@ -5208,7 +6698,10 @@
           "server_time",
           "organization_id",
           "organization_name",
-          "retention_days"
+          "retention_days",
+          "staff_retention_days",
+          "deployment",
+          "faces_enabled"
         ],
         "title": "BusinessSettings"
       },
@@ -5618,6 +7111,61 @@
         ],
         "title": "CanteenSummary"
       },
+      "CashierItems": {
+        "properties": {
+          "cashier": {
+            "type": "string",
+            "title": "Cashier"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemCount"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cashier",
+          "staff_id",
+          "staff_name",
+          "items",
+          "total_items",
+          "orders"
+        ],
+        "title": "CashierItems"
+      },
       "ClosureIn": {
         "properties": {
           "until": {
@@ -5722,6 +7270,27 @@
           "seats"
         ],
         "title": "ConfigZone"
+      },
+      "ConsentIn": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Version"
+          },
+          "signed_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Signed On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "signed_on"
+        ],
+        "title": "ConsentIn"
       },
       "ConsoleOverview": {
         "properties": {
@@ -5901,6 +7470,44 @@
         ],
         "title": "ConsoleZone"
       },
+      "CoverageOut": {
+        "properties": {
+          "open_min": {
+            "type": "integer",
+            "title": "Open Min"
+          },
+          "covered_min": {
+            "type": "integer",
+            "title": "Covered Min"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/GapOut"
+            },
+            "type": "array",
+            "title": "Gaps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "open_min",
+          "covered_min",
+          "share",
+          "gaps"
+        ],
+        "title": "CoverageOut"
+      },
       "CustomerDay": {
         "properties": {
           "server_time": {
@@ -6075,6 +7682,13 @@
             "type": "array",
             "title": "Ignore"
           },
+          "work": {
+            "items": {
+              "$ref": "#/components/schemas/WorkArea"
+            },
+            "type": "array",
+            "title": "Work"
+          },
           "settings": {
             "$ref": "#/components/schemas/WorkerSettings"
           },
@@ -6102,6 +7716,7 @@
           "layout_version",
           "zones",
           "ignore",
+          "work",
           "settings",
           "simulation"
         ],
@@ -6245,6 +7860,60 @@
           "history"
         ],
         "title": "DeviceLayout"
+      },
+      "DeviceStaff": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "face",
+              "badge"
+            ],
+            "title": "Method"
+          },
+          "badge_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Badge Code"
+          },
+          "template": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "method",
+          "badge_code",
+          "template"
+        ],
+        "title": "DeviceStaff"
       },
       "EditableMenuItem": {
         "properties": {
@@ -6439,6 +8108,24 @@
         ],
         "title": "Excluded"
       },
+      "FaceIn": {
+        "properties": {
+          "template": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 128,
+            "minItems": 128,
+            "title": "Template"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template"
+        ],
+        "title": "FaceIn"
+      },
       "FloorTable": {
         "properties": {
           "id": {
@@ -6591,6 +8278,28 @@
           "turns_today": {
             "type": "number",
             "title": "Turns Today"
+          },
+          "counter_staff": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counter Staff"
+          },
+          "queue_people": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue People"
           }
         },
         "type": "object",
@@ -6600,7 +8309,9 @@
           "guests_seated",
           "visits_today",
           "avg_stay_today_min",
-          "turns_today"
+          "turns_today",
+          "counter_staff",
+          "queue_people"
         ],
         "title": "FloorTotals"
       },
@@ -6627,6 +8338,31 @@
           "high"
         ],
         "title": "ForecastPoint"
+      },
+      "GapOut": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "minutes": {
+            "type": "integer",
+            "title": "Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "minutes"
+        ],
+        "title": "GapOut"
       },
       "HTTPValidationError": {
         "properties": {
@@ -6753,6 +8489,19 @@
               }
             ],
             "title": "Message"
+          },
+          "stream_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "pattern": "^https?://"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream Url"
           }
         },
         "type": "object",
@@ -6835,6 +8584,24 @@
           "visits"
         ],
         "title": "HourCount"
+      },
+      "HourOrders": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hour",
+          "orders"
+        ],
+        "title": "HourOrders"
       },
       "HoursException-Input": {
         "properties": {
@@ -6985,6 +8752,24 @@
         ],
         "title": "IgnoreArea"
       },
+      "ItemCount": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "qty"
+        ],
+        "title": "ItemCount"
+      },
       "LayoutIn": {
         "properties": {
           "base_version": {
@@ -7022,7 +8807,8 @@
               "seating",
               "queue",
               "walkway",
-              "ignore"
+              "ignore",
+              "work"
             ],
             "title": "Type"
           },
@@ -7036,6 +8822,22 @@
               }
             ],
             "title": "Zone Id"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "counter",
+                  "kitchen",
+                  "floor"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
           },
           "points": {
             "items": {
@@ -7084,7 +8886,8 @@
               "seating",
               "queue",
               "walkway",
-              "ignore"
+              "ignore",
+              "work"
             ],
             "title": "Type"
           },
@@ -7098,6 +8901,22 @@
               }
             ],
             "title": "Zone Id"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "counter",
+                  "kitchen",
+                  "floor"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
           },
           "points": {
             "items": {
@@ -7135,6 +8954,7 @@
         "required": [
           "type",
           "zone_id",
+          "area",
           "points",
           "seats"
         ],
@@ -7240,6 +9060,36 @@
           "high_min"
         ],
         "title": "LeaveEstimate"
+      },
+      "LiveLink": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "url",
+          "expires_at"
+        ],
+        "title": "LiveLink"
       },
       "LoginIn": {
         "properties": {
@@ -8325,6 +10175,87 @@
         ],
         "title": "OpeningHours"
       },
+      "PresenceIn": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "area": {
+            "type": "string",
+            "enum": [
+              "counter",
+              "kitchen",
+              "floor"
+            ],
+            "title": "Area"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "area",
+          "started_at"
+        ],
+        "title": "PresenceIn"
+      },
+      "QueueAlertOut": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "peak": {
+            "type": "integer",
+            "title": "Peak"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "peak"
+        ],
+        "title": "QueueAlertOut"
+      },
+      "QueueIn": {
+        "properties": {
+          "people": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 0.0,
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "people"
+        ],
+        "title": "QueueIn"
+      },
       "Recommendation": {
         "properties": {
           "canteen_id": {
@@ -8473,6 +10404,25 @@
           "name"
         ],
         "title": "RelatedCanteen"
+      },
+      "Removed": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "staff_id"
+        ],
+        "title": "Removed"
       },
       "ResolveIn": {
         "properties": {
@@ -8861,6 +10811,87 @@
         ],
         "title": "SafetyStatus"
       },
+      "SalesDay": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          },
+          "items": {
+            "type": "integer",
+            "title": "Items"
+          },
+          "revenue": {
+            "type": "number",
+            "title": "Revenue"
+          },
+          "average_order": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Order"
+          },
+          "by_hour": {
+            "items": {
+              "$ref": "#/components/schemas/HourOrders"
+            },
+            "type": "array",
+            "title": "By Hour"
+          },
+          "by_cashier": {
+            "items": {
+              "$ref": "#/components/schemas/CashierItems"
+            },
+            "type": "array",
+            "title": "By Cashier"
+          },
+          "top_items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemCount"
+            },
+            "type": "array",
+            "title": "Top Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "day",
+          "is_sample",
+          "orders",
+          "items",
+          "revenue",
+          "average_order",
+          "by_hour",
+          "by_cashier",
+          "top_items"
+        ],
+        "title": "SalesDay"
+      },
       "SeatDetail": {
         "properties": {
           "seat_id": {
@@ -9098,17 +11129,57 @@
       "SettingsIn": {
         "properties": {
           "retention_days": {
-            "type": "integer",
-            "maximum": 730.0,
-            "minimum": 7.0,
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 730.0,
+                "minimum": 7.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Retention Days"
+          },
+          "staff_retention_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 365.0,
+                "minimum": 7.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Retention Days"
+          }
+        },
+        "type": "object",
+        "title": "SettingsIn"
+      },
+      "SheetDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "minutes": {
+            "$ref": "#/components/schemas/AreaMinutes"
+          },
+          "items": {
+            "type": "integer",
+            "title": "Items"
           }
         },
         "type": "object",
         "required": [
-          "retention_days"
+          "day",
+          "minutes",
+          "items"
         ],
-        "title": "SettingsIn"
+        "title": "SheetDay"
       },
       "Shop": {
         "properties": {
@@ -9479,6 +11550,35 @@
         "type": "object",
         "title": "SourceHeartbeatIn"
       },
+      "StaffAccepted": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "presence": {
+            "type": "integer",
+            "title": "Presence"
+          },
+          "queue": {
+            "type": "boolean",
+            "title": "Queue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "presence",
+          "queue"
+        ],
+        "title": "StaffAccepted"
+      },
       "StaffAlert": {
         "properties": {
           "id": {
@@ -9708,6 +11808,335 @@
           "server_time"
         ],
         "title": "StaffAlertResult"
+      },
+      "StaffIn": {
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Display Name"
+          },
+          "role_label": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Role Label",
+            "default": ""
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "face",
+              "badge"
+            ],
+            "title": "Method",
+            "default": "badge"
+          },
+          "badge_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 249.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Badge Code"
+          },
+          "till_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Till Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "display_name"
+        ],
+        "title": "StaffIn"
+      },
+      "StaffList": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StaffOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "items"
+        ],
+        "title": "StaffList"
+      },
+      "StaffOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role_label": {
+            "type": "string",
+            "title": "Role Label"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "face",
+              "badge"
+            ],
+            "title": "Method"
+          },
+          "badge_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Badge Code"
+          },
+          "till_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Till Code"
+          },
+          "consent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent At"
+          },
+          "consent_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Version"
+          },
+          "has_template": {
+            "type": "boolean",
+            "title": "Has Template"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "role_label",
+          "method",
+          "badge_code",
+          "till_code",
+          "consent_at",
+          "consent_version",
+          "has_template",
+          "active",
+          "is_sample"
+        ],
+        "title": "StaffOut"
+      },
+      "StaffPatch": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "role_label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Label"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "face",
+                  "badge"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "badge_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 249.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Badge Code"
+          },
+          "till_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Till Code"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "title": "StaffPatch"
+      },
+      "StaffReport": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "venue_id": {
+            "type": "string",
+            "title": "Venue Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "is_sample": {
+            "type": "boolean",
+            "title": "Is Sample"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/CoverageOut"
+          },
+          "queue_alerts": {
+            "items": {
+              "$ref": "#/components/schemas/QueueAlertOut"
+            },
+            "type": "array",
+            "title": "Queue Alerts"
+          },
+          "workers": {
+            "items": {
+              "$ref": "#/components/schemas/WorkerDay"
+            },
+            "type": "array",
+            "title": "Workers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "venue_id",
+          "day",
+          "is_sample",
+          "coverage",
+          "queue_alerts",
+          "workers"
+        ],
+        "title": "StaffReport"
+      },
+      "StaffResult": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "staff": {
+            "$ref": "#/components/schemas/StaffOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "staff"
+        ],
+        "title": "StaffResult"
       },
       "StaffSafetyEvent": {
         "properties": {
@@ -9959,6 +12388,106 @@
           "event"
         ],
         "title": "StaffSafetyEventResult"
+      },
+      "StaffSheet": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "staff": {
+            "$ref": "#/components/schemas/StaffOut"
+          },
+          "venue_name": {
+            "type": "string",
+            "title": "Venue Name"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/SheetDay"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "kept_days": {
+            "type": "integer",
+            "title": "Kept Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "staff",
+          "venue_name",
+          "days",
+          "kept_days"
+        ],
+        "title": "StaffSheet"
+      },
+      "StaffSnapshotIn": {
+        "properties": {
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          },
+          "presence": {
+            "items": {
+              "$ref": "#/components/schemas/PresenceIn"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Presence"
+          },
+          "queue": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QueueIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "captured_at"
+        ],
+        "title": "StaffSnapshotIn"
+      },
+      "StaffTemplates": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          },
+          "faces_enabled": {
+            "type": "boolean",
+            "title": "Faces Enabled"
+          },
+          "staff": {
+            "items": {
+              "$ref": "#/components/schemas/DeviceStaff"
+            },
+            "type": "array",
+            "title": "Staff"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "device_id",
+          "faces_enabled",
+          "staff"
+        ],
+        "title": "StaffTemplates"
       },
       "StayHour": {
         "properties": {
@@ -10437,6 +12966,89 @@
         ],
         "title": "ThresholdValues"
       },
+      "TillImportIn": {
+        "properties": {
+          "csv": {
+            "type": "string",
+            "maxLength": 5000000,
+            "minLength": 1,
+            "title": "Csv"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "csv"
+        ],
+        "title": "TillImportIn"
+      },
+      "TillImportResult": {
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          },
+          "new_orders": {
+            "type": "integer",
+            "title": "New Orders"
+          },
+          "duplicates": {
+            "type": "integer",
+            "title": "Duplicates"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "matched_cashiers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Matched Cashiers"
+          },
+          "unmatched_cashiers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unmatched Cashiers"
+          },
+          "saved": {
+            "type": "boolean",
+            "title": "Saved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_time",
+          "rows",
+          "orders",
+          "new_orders",
+          "duplicates",
+          "errors",
+          "matched_cashiers",
+          "unmatched_cashiers",
+          "saved"
+        ],
+        "title": "TillImportResult"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -10787,6 +13399,122 @@
           "closes"
         ],
         "title": "WeeklyHours"
+      },
+      "WorkArea": {
+        "properties": {
+          "area": {
+            "type": "string",
+            "enum": [
+              "counter",
+              "kitchen",
+              "floor"
+            ],
+            "title": "Area"
+          },
+          "points": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "area",
+          "points"
+        ],
+        "title": "WorkArea"
+      },
+      "WorkerDay": {
+        "properties": {
+          "staff_id": {
+            "type": "string",
+            "title": "Staff Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role_label": {
+            "type": "string",
+            "title": "Role Label"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "face",
+              "badge"
+            ],
+            "title": "Method"
+          },
+          "first_seen": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Seen"
+          },
+          "last_seen": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen"
+          },
+          "minutes": {
+            "$ref": "#/components/schemas/AreaMinutes"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemCount"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total_items": {
+            "type": "integer",
+            "title": "Total Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "staff_id",
+          "display_name",
+          "role_label",
+          "method",
+          "first_seen",
+          "last_seen",
+          "minutes",
+          "orders",
+          "items",
+          "total_items"
+        ],
+        "title": "WorkerDay"
       },
       "WorkerSettings": {
         "properties": {
