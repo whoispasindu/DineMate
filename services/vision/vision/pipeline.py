@@ -19,6 +19,7 @@ from vision.staff import (
     staff_settings_from_config,
     work_areas_from_config,
 )
+from vision.stays import StayClock, stay_text
 
 OBJECTS_EVERY_S = 5.0
 
@@ -68,6 +69,8 @@ class Pipeline:
         self.named: dict[int, tuple[str, Area]] = {}
         self.workers_seen: list[WorkerView] = []
         self.people_seen: list[Detection] = []
+        self.stays = StayClock()
+        self.stay_times: dict[int, float] = {}
         self.configure(config)
 
     @property
@@ -122,6 +125,7 @@ class Pipeline:
         if self.staff_mode:
             self._track_staff(image, detections, width, height, at)
         if not self.seat_mode:
+            self._time_stays(assignments, width, height, at)
             return assignments
         every = float(self.settings.get("objects_every_s", OBJECTS_EVERY_S))
         if self.objects is not None and (self.objects_at is None or at - self.objects_at >= every):
@@ -133,7 +137,23 @@ class Pipeline:
                 continue
             reason = "seated" if view.seat_id else view.posture
             assignments.append(Assignment(view.detection, view.zone_id, view.seat_id is not None, reason))
+        self._time_stays(assignments, width, height, at)
         return assignments
+
+    def _time_stays(self, assignments: list[Assignment], width: int, height: int, at: float) -> None:
+        staff = self.staff_tracks()
+        seated = [
+            (d.track_id, (d.x1 + d.x2) / 2 / width, d.y2 / height)
+            for a in assignments
+            if (d := a.detection).track_id is not None
+            and d.track_id not in staff
+            and a.zone_id is not None
+            and a.reason != "standing"
+        ]
+        self.stay_times = self.stays.update(seated, at)
+
+    def stay_labels(self) -> dict[int, str]:
+        return {track: stay_text(seconds) for track, seconds in self.stay_times.items()}
 
     def _track_staff(self, image: np.ndarray, detections: list[Detection], width: int, height: int, at: float) -> None:
         workers = self.matcher.workers(detections, self.work, width, height)

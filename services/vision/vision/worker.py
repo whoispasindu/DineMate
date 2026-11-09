@@ -164,6 +164,7 @@ class Preview:
             pipeline.labels(),
             pipeline.work,
             pipeline.staff_labels(),
+            pipeline.stay_labels(),
         )
         self.cv2.imshow(self.WINDOW, canvas)
         return self.cv2.waitKey(1) & 0xFF not in (ord("q"), 27)
@@ -189,6 +190,7 @@ def live_canvas(image: Any, pipeline: Pipeline, assignments: list[Assignment], s
         pipeline.labels(),
         pipeline.work,
         pipeline.staff_labels(),
+        pipeline.stay_labels(),
     )
 
 

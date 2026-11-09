@@ -144,6 +144,7 @@ class Player:
                     self.pipeline.labels(),
                     self.pipeline.work,
                     self.pipeline.staff_labels(),
+                    self.pipeline.stay_labels(),
                 )
                 cv2.imshow(WINDOW, canvas)
                 key = cv2.waitKey(1) & 0xFF
