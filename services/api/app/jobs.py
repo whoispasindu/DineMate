@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.business.service import purge_expired
+from app.business.staff_service import purge_staff_data
 from app.core import clock
 from app.core.config import get_settings
 from app.core.db import get_engine
@@ -22,6 +23,7 @@ def run_rules_once() -> None:
         result = evaluate(session, clock.now())
         offline = check_sources(session, clock.now())
         purge_expired(session, clock.now())
+        purge_staff_data(session, clock.now())
         session.commit()
     if offline:
         log.info("safety sources changed state: %s", len(offline))

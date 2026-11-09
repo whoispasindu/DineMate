@@ -1012,6 +1012,213 @@ export interface paths {
         patch: operations["patch_settings_api_v1_business_settings_patch"];
         trace?: never;
     };
+    "/api/v1/business/venues/{venue_id}/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Staff */
+        get: operations["list_staff_api_v1_business_venues__venue_id__staff_get"];
+        put?: never;
+        /** Create Staff */
+        post: operations["create_staff_api_v1_business_venues__venue_id__staff_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/staff/{staff_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Staff */
+        delete: operations["remove_staff_api_v1_business_staff__staff_id__delete"];
+        options?: never;
+        head?: never;
+        /** Patch Staff */
+        patch: operations["patch_staff_api_v1_business_staff__staff_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/business/staff/{staff_id}/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Consent */
+        post: operations["record_consent_api_v1_business_staff__staff_id__consent_post"];
+        /** Withdraw Consent */
+        delete: operations["withdraw_consent_api_v1_business_staff__staff_id__consent_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/staff/{staff_id}/face": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enrol Face */
+        post: operations["enrol_face_api_v1_business_staff__staff_id__face_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/staff-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Report */
+        get: operations["staff_report_api_v1_business_venues__venue_id__staff_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/staff/{staff_id}/sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Sheet */
+        get: operations["staff_sheet_api_v1_business_staff__staff_id__sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Audit */
+        get: operations["audit_api_v1_business_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/till/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Till */
+        post: operations["import_till_api_v1_business_venues__venue_id__till_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Sales */
+        get: operations["get_sales_api_v1_business_venues__venue_id__sales_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/business/venues/{venue_id}/cameras/{device_id}/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Live Link */
+        get: operations["live_link_api_v1_business_venues__venue_id__cameras__device_id__live_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/staff-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Templates */
+        get: operations["staff_templates_api_v1_devices__device_id__staff_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/devices/{device_id}/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Staff */
+        post: operations["post_staff_api_v1_devices__device_id__staff_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1031,6 +1238,39 @@ export interface components {
             safety: components["schemas"]["SafetyStatus"];
             /** Notices */
             notices: components["schemas"]["Notice"][];
+        };
+        /** AreaMinutes */
+        AreaMinutes: {
+            /** Counter */
+            counter: number;
+            /** Kitchen */
+            kitchen: number;
+            /** Floor */
+            floor: number;
+        };
+        /** AuditEntry */
+        AuditEntry: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor */
+            actor: string;
+            /** Action */
+            action: string;
+            /** Entity Id */
+            entity_id: string;
+        };
+        /** AuditList */
+        AuditList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Items */
+            items: components["schemas"]["AuditEntry"][];
         };
         /** AvailabilityIn */
         AvailabilityIn: {
@@ -1066,6 +1306,15 @@ export interface components {
             organization_name: string;
             /** Retention Days */
             retention_days: number;
+            /** Staff Retention Days */
+            staff_retention_days: number;
+            /**
+             * Deployment
+             * @enum {string}
+             */
+            deployment: "local" | "cloud";
+            /** Faces Enabled */
+            faces_enabled: boolean;
         };
         /** BusyPoint */
         BusyPoint: {
@@ -1207,6 +1456,21 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
         };
+        /** CashierItems */
+        CashierItems: {
+            /** Cashier */
+            cashier: string;
+            /** Staff Id */
+            staff_id: string | null;
+            /** Staff Name */
+            staff_name: string | null;
+            /** Items */
+            items: components["schemas"]["ItemCount"][];
+            /** Total Items */
+            total_items: number;
+            /** Orders */
+            orders: number;
+        };
         /** ClosureIn */
         ClosureIn: {
             /** Until */
@@ -1238,6 +1502,16 @@ export interface components {
             ][];
             /** Seats */
             seats: components["schemas"]["ConfigSeat"][];
+        };
+        /** ConsentIn */
+        ConsentIn: {
+            /** Version */
+            version: string;
+            /**
+             * Signed On
+             * Format: date
+             */
+            signed_on: string;
         };
         /** ConsoleOverview */
         ConsoleOverview: {
@@ -1296,6 +1570,17 @@ export interface components {
             ] | null;
             /** Updated At */
             updated_at: string | null;
+        };
+        /** CoverageOut */
+        CoverageOut: {
+            /** Open Min */
+            open_min: number;
+            /** Covered Min */
+            covered_min: number;
+            /** Share */
+            share: number | null;
+            /** Gaps */
+            gaps: components["schemas"]["GapOut"][];
         };
         /** CustomerDay */
         CustomerDay: {
@@ -1366,6 +1651,8 @@ export interface components {
             zones: components["schemas"]["ConfigZone"][];
             /** Ignore */
             ignore: components["schemas"]["IgnoreArea"][];
+            /** Work */
+            work: components["schemas"]["WorkArea"][];
             settings: components["schemas"]["WorkerSettings"];
             /** Simulation */
             simulation: {
@@ -1416,6 +1703,22 @@ export interface components {
             zones: components["schemas"]["EditableZone"][];
             /** History */
             history: components["schemas"]["LayoutVersion"][];
+        };
+        /** DeviceStaff */
+        DeviceStaff: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "face" | "badge";
+            /** Badge Code */
+            badge_code: number | null;
+            /** Template */
+            template: number[] | null;
         };
         /** EditableMenuItem */
         EditableMenuItem: {
@@ -1485,6 +1788,11 @@ export interface components {
              */
             reason: "no_live_data" | "too_crowded";
         };
+        /** FaceIn */
+        FaceIn: {
+            /** Template */
+            template: number[];
+        };
         /** FloorTable */
         FloorTable: {
             /** Id */
@@ -1539,6 +1847,10 @@ export interface components {
             avg_stay_today_min: number | null;
             /** Turns Today */
             turns_today: number;
+            /** Counter Staff */
+            counter_staff: number | null;
+            /** Queue People */
+            queue_people: number | null;
         };
         /** ForecastPoint */
         ForecastPoint: {
@@ -1551,6 +1863,21 @@ export interface components {
             low: number;
             /** High */
             high: number;
+        };
+        /** GapOut */
+        GapOut: {
+            /**
+             * Start
+             * Format: date-time
+             */
+            start: string;
+            /**
+             * End
+             * Format: date-time
+             */
+            end: string;
+            /** Minutes */
+            minutes: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1607,6 +1934,8 @@ export interface components {
             stream_ok: boolean;
             /** Message */
             message?: string | null;
+            /** Stream Url */
+            stream_url?: string | null;
         };
         /** HeatCell */
         HeatCell: {
@@ -1639,6 +1968,13 @@ export interface components {
             hour: number;
             /** Visits */
             visits: number;
+        };
+        /** HourOrders */
+        HourOrders: {
+            /** Hour */
+            hour: number;
+            /** Orders */
+            orders: number;
         };
         /** HoursException */
         "HoursException-Input": {
@@ -1685,6 +2021,13 @@ export interface components {
                 number
             ][];
         };
+        /** ItemCount */
+        ItemCount: {
+            /** Name */
+            name: string;
+            /** Qty */
+            qty: number;
+        };
         /** LayoutIn */
         LayoutIn: {
             /** Base Version */
@@ -1698,9 +2041,11 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "seating" | "queue" | "walkway" | "ignore";
+            type: "seating" | "queue" | "walkway" | "ignore" | "work";
             /** Zone Id */
             zone_id?: string | null;
+            /** Area */
+            area?: ("counter" | "kitchen" | "floor") | null;
             /** Points */
             points: [
                 number,
@@ -1715,9 +2060,11 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "seating" | "queue" | "walkway" | "ignore";
+            type: "seating" | "queue" | "walkway" | "ignore" | "work";
             /** Zone Id */
             zone_id: string | null;
+            /** Area */
+            area: ("counter" | "kitchen" | "floor") | null;
             /** Points */
             points: [
                 number,
@@ -1764,6 +2111,23 @@ export interface components {
             low_min: number;
             /** High Min */
             high_min: number;
+        };
+        /** LiveLink */
+        LiveLink: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Url */
+            url: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
         };
         /** LoginIn */
         LoginIn: {
@@ -2113,6 +2477,43 @@ export interface components {
             /** Closes */
             closes: string;
         };
+        /** PresenceIn */
+        PresenceIn: {
+            /** Staff Id */
+            staff_id: string;
+            /**
+             * Area
+             * @enum {string}
+             */
+            area: "counter" | "kitchen" | "floor";
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at?: string | null;
+        };
+        /** QueueAlertOut */
+        QueueAlertOut: {
+            /**
+             * Start
+             * Format: date-time
+             */
+            start: string;
+            /**
+             * End
+             * Format: date-time
+             */
+            end: string;
+            /** Peak */
+            peak: number;
+        };
+        /** QueueIn */
+        QueueIn: {
+            /** People */
+            people: number;
+        };
         /** Recommendation */
         Recommendation: {
             /** Canteen Id */
@@ -2157,6 +2558,16 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /** Removed */
+        Removed: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Staff Id */
+            staff_id: string;
         };
         /** ResolveIn */
         ResolveIn: {
@@ -2312,6 +2723,37 @@ export interface components {
             /** Events */
             events: components["schemas"]["SafetyEvent"][];
         };
+        /** SalesDay */
+        SalesDay: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Is Sample */
+            is_sample: boolean;
+            /** Orders */
+            orders: number;
+            /** Items */
+            items: number;
+            /** Revenue */
+            revenue: number;
+            /** Average Order */
+            average_order: number | null;
+            /** By Hour */
+            by_hour: components["schemas"]["HourOrders"][];
+            /** By Cashier */
+            by_cashier: components["schemas"]["CashierItems"][];
+            /** Top Items */
+            top_items: components["schemas"]["ItemCount"][];
+        };
         /** SeatDetail */
         SeatDetail: {
             /** Seat Id */
@@ -2412,7 +2854,20 @@ export interface components {
         /** SettingsIn */
         SettingsIn: {
             /** Retention Days */
-            retention_days: number;
+            retention_days?: number | null;
+            /** Staff Retention Days */
+            staff_retention_days?: number | null;
+        };
+        /** SheetDay */
+        SheetDay: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            minutes: components["schemas"]["AreaMinutes"];
+            /** Items */
+            items: number;
         };
         /** Shop */
         Shop: {
@@ -2536,6 +2991,20 @@ export interface components {
             /** Message */
             message?: string | null;
         };
+        /** StaffAccepted */
+        StaffAccepted: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Presence */
+            presence: number;
+            /** Queue */
+            queue: boolean;
+        };
         /** StaffAlert */
         StaffAlert: {
             /** Id */
@@ -2610,6 +3079,112 @@ export interface components {
              * Format: date-time
              */
             server_time: string;
+        };
+        /** StaffIn */
+        StaffIn: {
+            /** Display Name */
+            display_name: string;
+            /**
+             * Role Label
+             * @default
+             */
+            role_label: string;
+            /**
+             * Method
+             * @default badge
+             * @enum {string}
+             */
+            method: "face" | "badge";
+            /** Badge Code */
+            badge_code?: number | null;
+            /** Till Code */
+            till_code?: string | null;
+        };
+        /** StaffList */
+        StaffList: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /** Items */
+            items: components["schemas"]["StaffOut"][];
+        };
+        /** StaffOut */
+        StaffOut: {
+            /** Id */
+            id: string;
+            /** Display Name */
+            display_name: string;
+            /** Role Label */
+            role_label: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "face" | "badge";
+            /** Badge Code */
+            badge_code: number | null;
+            /** Till Code */
+            till_code: string | null;
+            /** Consent At */
+            consent_at: string | null;
+            /** Consent Version */
+            consent_version: string | null;
+            /** Has Template */
+            has_template: boolean;
+            /** Active */
+            active: boolean;
+            /** Is Sample */
+            is_sample: boolean;
+        };
+        /** StaffPatch */
+        StaffPatch: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Role Label */
+            role_label?: string | null;
+            /** Method */
+            method?: ("face" | "badge") | null;
+            /** Badge Code */
+            badge_code?: number | null;
+            /** Till Code */
+            till_code?: string | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** StaffReport */
+        StaffReport: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Venue Id */
+            venue_id: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Is Sample */
+            is_sample: boolean;
+            coverage: components["schemas"]["CoverageOut"];
+            /** Queue Alerts */
+            queue_alerts: components["schemas"]["QueueAlertOut"][];
+            /** Workers */
+            workers: components["schemas"]["WorkerDay"][];
+        };
+        /** StaffResult */
+        StaffResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            staff: components["schemas"]["StaffOut"];
         };
         /** StaffSafetyEvent */
         StaffSafetyEvent: {
@@ -2701,6 +3276,46 @@ export interface components {
              */
             server_time: string;
             event: components["schemas"]["StaffSafetyEvent"];
+        };
+        /** StaffSheet */
+        StaffSheet: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            staff: components["schemas"]["StaffOut"];
+            /** Venue Name */
+            venue_name: string;
+            /** Days */
+            days: components["schemas"]["SheetDay"][];
+            /** Kept Days */
+            kept_days: number;
+        };
+        /** StaffSnapshotIn */
+        StaffSnapshotIn: {
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Presence */
+            presence?: components["schemas"]["PresenceIn"][];
+            queue?: components["schemas"]["QueueIn"] | null;
+        };
+        /** StaffTemplates */
+        StaffTemplates: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Device Id */
+            device_id: string;
+            /** Faces Enabled */
+            faces_enabled: boolean;
+            /** Staff */
+            staff: components["schemas"]["DeviceStaff"][];
         };
         /** StayHour */
         StayHour: {
@@ -2869,6 +3484,40 @@ export interface components {
              */
             alert_from: "busy" | "crowded" | "near_capacity";
         };
+        /** TillImportIn */
+        TillImportIn: {
+            /** Csv */
+            csv: string;
+            /**
+             * Dry Run
+             * @default false
+             */
+            dry_run: boolean;
+        };
+        /** TillImportResult */
+        TillImportResult: {
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Rows */
+            rows: number;
+            /** Orders */
+            orders: number;
+            /** New Orders */
+            new_orders: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Errors */
+            errors: string[];
+            /** Matched Cashiers */
+            matched_cashiers: string[];
+            /** Unmatched Cashiers */
+            unmatched_cashiers: string[];
+            /** Saved */
+            saved: boolean;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -3007,6 +3656,44 @@ export interface components {
              * Format: time
              */
             closes: string;
+        };
+        /** WorkArea */
+        WorkArea: {
+            /**
+             * Area
+             * @enum {string}
+             */
+            area: "counter" | "kitchen" | "floor";
+            /** Points */
+            points: [
+                number,
+                number
+            ][];
+        };
+        /** WorkerDay */
+        WorkerDay: {
+            /** Staff Id */
+            staff_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Role Label */
+            role_label: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "face" | "badge";
+            /** First Seen */
+            first_seen: string | null;
+            /** Last Seen */
+            last_seen: string | null;
+            minutes: components["schemas"]["AreaMinutes"];
+            /** Orders */
+            orders: number;
+            /** Items */
+            items: components["schemas"]["ItemCount"][];
+            /** Total Items */
+            total_items: number;
         };
         /** WorkerSettings */
         WorkerSettings: {
@@ -6656,6 +7343,917 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_staff_api_v1_business_venues__venue_id__staff_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_staff_api_v1_business_venues__venue_id__staff_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    remove_staff_api_v1_business_staff__staff_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Removed"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    patch_staff_api_v1_business_staff__staff_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    record_consent_api_v1_business_staff__staff_id__consent_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    withdraw_consent_api_v1_business_staff__staff_id__consent_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    enrol_face_api_v1_business_staff__staff_id__face_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FaceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    staff_report_api_v1_business_venues__venue_id__staff_report_get: {
+        parameters: {
+            query?: {
+                day?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffReport"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    staff_sheet_api_v1_business_staff__staff_id__sheet_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSheet"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    audit_api_v1_business_audit_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    import_till_api_v1_business_venues__venue_id__till_import_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TillImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TillImportResult"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_sales_api_v1_business_venues__venue_id__sales_get: {
+        parameters: {
+            query?: {
+                day?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalesDay"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    live_link_api_v1_business_venues__venue_id__cameras__device_id__live_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                venue_id: string;
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiveLink"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    staff_templates_api_v1_devices__device_id__staff_templates_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTemplates"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_staff_api_v1_devices__device_id__staff_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffSnapshotIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffAccepted"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

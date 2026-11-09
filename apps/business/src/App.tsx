@@ -6,10 +6,14 @@ import { BusinessShell } from "./layout";
 import { CamerasScreen } from "./screens/Cameras";
 import { CustomersScreen } from "./screens/Customers";
 import { LiveFloorScreen } from "./screens/LiveFloor";
-import { LaterScreen } from "./screens/Later";
+import { NotFoundScreen } from "./screens/NotFound";
+import { PrivacyScreen } from "./screens/Privacy";
 import { ReportsScreen } from "./screens/Reports";
+import { SalesScreen } from "./screens/Sales";
 import { SettingsScreen } from "./screens/Settings";
 import { SignInScreen } from "./screens/SignIn";
+import { StaffScreen } from "./screens/Staff";
+import { StaffSheetScreen } from "./screens/StaffSheet";
 import { VenueProvider } from "./venue";
 
 function CampusAccount() {
@@ -39,10 +43,14 @@ export function App() {
         <Route element={<BusinessShell user={user} />}>
           <Route index element={<LiveFloorScreen />} />
           <Route path="customers" element={<CustomersScreen />} />
+          <Route path="staff" element={<StaffScreen user={user} />} />
+          <Route path="staff/:staffId/sheet" element={<StaffSheetScreen user={user} />} />
+          <Route path="sales" element={<SalesScreen />} />
+          <Route path="privacy" element={<PrivacyScreen user={user} />} />
           <Route path="reports" element={<ReportsScreen />} />
           <Route path="cameras" element={<CamerasScreen />} />
           <Route path="settings" element={<SettingsScreen user={user} />} />
-          <Route path="*" element={<LaterScreen />} />
+          <Route path="*" element={<NotFoundScreen />} />
         </Route>
       </Routes>
     </VenueProvider>

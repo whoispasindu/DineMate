@@ -43,4 +43,6 @@ Left navigation on laptop and tablet: Live floor, Customers, Staff, Sales, Repor
 - **Cameras:** live video from one camera at a time with tracking drawn on it: green boxes on customers with time seated, cobalt boxes on staff with role and items served, staff paths, table outlines with their state, the counter area, and the queue. Switches turn each layer on or off; customer faces are blurred by default. Beside it: what the camera sees now, camera health, and a note that video is live only and never saved. Live floor has a Watch live button. Staff are labelled by role (Barista 1), never by real name in sample screens.
 - **Manager phone:** tables free, a "Needs you" list ordered by urgency, bottom tab bar.
 
+Built in Phase 9: Staff, Sales (with till CSV import), Privacy & consent, a printable worker sheet, and the Cameras live view (signed stream from the café computer; the simulator shows a drawn, labelled view). Not built yet: layer switches and staff paths in the live view, serve time, the Watch live button on Live floor, and stay after paying.
+
 All sample screens use "Sample Café" and labelled sample data. Estimates read "~N" or "about", as in the campus apps.

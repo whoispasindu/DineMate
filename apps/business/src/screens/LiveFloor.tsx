@@ -4,6 +4,8 @@ import { Banner, Button, errorText, Kpi, Page, Panel, Skeleton } from "../kit";
 import { estimateText, isSoon, LEGEND, minutesSince, tableLook, tableSummary, urgency } from "../tables";
 import { useIsWide, useVenue } from "../venue";
 
+const QUEUE_LIMIT = 5;
+
 function guests(n: number): string {
   return `${n} ${n === 1 ? "guest" : "guests"}`;
 }
@@ -78,11 +80,26 @@ function Attention({ floor, now, venueId }: { floor: VenueFloor; now: number; ve
   const toClear = floor.tables.filter((t) => t.state === "needs_clearing");
   const held = floor.tables.filter((t) => t.state === "held" && (minutesSince(t.since, now) ?? 0) >= 5);
   const blind = floor.tables.filter((t) => t.state === "unknown");
-  const empty = toClear.length + held.length + blind.length === 0;
+  const unstaffed = floor.totals.counter_staff === 0;
+  const queue = floor.totals.queue_people ?? 0;
+  const longQueue = queue > QUEUE_LIMIT;
+  const empty = toClear.length + held.length + blind.length === 0 && !unstaffed && !longQueue;
   return (
     <Panel title="Needs attention">
       {clear.isError ? <Banner tone="error">{errorText(clear.error)}</Banner> : null}
       {empty ? <p className="m-0 text-sm text-muted">Nothing needs you right now.</p> : null}
+      {unstaffed ? (
+        <div className="flex flex-col rounded-[14px] bg-crowd-bg px-3.5 py-3 text-crowd">
+          <span className="text-[15px] font-bold">Counter unstaffed</span>
+          <span className="text-[13px]">Nobody is at the counter right now</span>
+        </div>
+      ) : null}
+      {longQueue ? (
+        <div className="flex flex-col rounded-[14px] bg-busy-bg px-3.5 py-3 text-busy">
+          <span className="text-[15px] font-bold">Queue of ~{queue} at the counter</span>
+          <span className="text-[13px]">More than {QUEUE_LIMIT} people waiting</span>
+        </div>
+      ) : null}
       {toClear.map((t) => (
         <div key={t.id} className="flex items-center justify-between gap-3 rounded-[14px] bg-crowd-bg px-3.5 py-3">
           <span className="flex flex-col">
@@ -134,6 +151,14 @@ function Totals({ floor }: { floor: VenueFloor }) {
         note="Finished visits only"
       />
       <Kpi label="Turns today" value={t.turns_today.toFixed(1)} note="Visits per table" tone="ok" />
+      {t.counter_staff !== null && t.counter_staff !== undefined ? (
+        <Kpi
+          label="At the counter"
+          value={t.counter_staff}
+          note={t.queue_people !== null && t.queue_people !== undefined ? `Queue of ~${t.queue_people}` : "No queue area set"}
+          tone={t.counter_staff === 0 ? "alert" : undefined}
+        />
+      ) : null}
     </section>
   );
 }

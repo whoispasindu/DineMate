@@ -153,3 +153,46 @@ def test_seats_survive_loading_a_layout() -> None:
     zone = editor.layout()["zones"][0]
     assert [s["seat_id"] for s in zone["seats"]] == ["a1", "seat-2"]
     assert zone["capacity"] == 2
+
+
+def test_work_areas_get_their_own_keys_and_need_no_name() -> None:
+    editor = ZoneEditor(1000, 1000)
+    for key, area in (("k", "counter"), ("h", "kitchen"), ("f", "floor")):
+        square(editor)
+        press(editor, [ENTER])
+        assert "K counter" in editor.prompt()
+        press(editor, key)
+        assert editor.mode == "points"
+        assert f"Added {area} work area" in editor.prompt()
+    layout = editor.layout()
+    assert [w["area"] for w in layout["work"]] == ["counter", "kitchen", "floor"]
+    assert layout["work"][0]["points"][0] == [0.1, 0.1]
+    assert layout["zones"] == [] and layout["ignore"] == []
+
+
+def test_a_layout_with_only_work_areas_can_be_saved() -> None:
+    editor = ZoneEditor(800, 600)
+    square(editor)
+    press(editor, [ENTER])
+    press(editor, "k")
+    assert press(editor, "s") == ["save"]
+
+
+def test_work_areas_survive_loading_and_stay_out_of_ignore() -> None:
+    editor = ZoneEditor(800, 600)
+    editor.load(
+        {
+            "zones": [],
+            "ignore": [
+                {"type": "queue", "points": [[0, 0.5], [0.5, 0.5], [0.5, 1]]},
+                {"type": "work", "area": "kitchen", "points": [[0.5, 0], [1, 0], [1, 0.5]]},
+            ],
+            "work": [{"area": "counter", "points": [[0, 0], [0.5, 0], [0.5, 0.5]]}],
+        }
+    )
+    assert "2 work area(s)" in editor.prompt()
+    layout = editor.layout()
+    assert [w["area"] for w in layout["work"]] == ["counter", "kitchen"]
+    assert [a["type"] for a in layout["ignore"]] == ["queue"]
+    press(editor, "d")
+    assert [a["type"] for a in editor.layout()["ignore"]] == []

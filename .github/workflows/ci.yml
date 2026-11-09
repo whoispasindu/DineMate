@@ -124,7 +124,7 @@ jobs:
           version: "0.13.5"
       - run: uvx ruff@0.17.0 check .
       - run: uvx ruff@0.17.0 format --check .
-      - run: uv run --no-project --python 3.12 --with pytest --with numpy pytest -q
+      - run: uv run --no-project --python 3.12 --with pytest --with numpy --with httpx pytest -q
 
   compose:
     name: Docker Compose smoke test

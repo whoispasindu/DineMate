@@ -4,12 +4,14 @@ from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+from sqlalchemy import insert
 from sqlalchemy.orm import Session
 
 from app import models
-from app.business.models import TableVisit, VenueTable
+from app.business.models import QueueReading, StaffMember, StaffPresence, TableVisit, TillItem, TillOrder, VenueTable
 from app.business.service import update_tables
 from app.business.sim import CafeSim, SimTable, zone_summaries
+from app.business.staff_sim import SimWorker, StaffSim, queue_people
 from app.core.config import get_settings
 from app.core.device_auth import hash_token
 
@@ -17,6 +19,17 @@ ORG_ID = "sample-cafe-group"
 VENUE_ID = "v-sample-cafe"
 DEVICE_ID = "sim-cafe"
 HISTORY_DAYS = 28
+STAFF_DAYS = 14
+ORDER_DAYS = 7
+QUEUE_DAYS = 3
+
+STAFF = [
+    ("Barista 1", "Barista", "face", None, "B1", (7, 15)),
+    ("Barista 2", "Barista", "face", None, "B2", (11, 20)),
+    ("Cashier 1", "Cashier", "badge", 11, "C1", (8, 16)),
+    ("Kitchen 1", "Kitchen", "face", None, None, (7, 15)),
+    ("Floor 1", "Floor", "badge", 12, None, (11, 21)),
+]
 SEED = 20261120
 
 
@@ -141,16 +154,19 @@ def _seed_activity(session: Session, tables: list[VenueTable], now: datetime) ->
     start = now - timedelta(days=HISTORY_DAYS)
     sim.run_until(start.replace(second=0, microsecond=0), now)
     by_name = {t.name: t for t in tables}
-    session.add_all(
-        TableVisit(
-            table_id=by_name[v.table_id].id,
-            started_at=v.started_at,
-            last_seen_at=v.ended_at,
-            ended_at=v.ended_at,
-            party_size=v.party_size,
-            is_simulated=True,
-        )
-        for v in sim.visits
+    session.execute(
+        insert(TableVisit),
+        [
+            {
+                "table_id": by_name[v.table_id].id,
+                "started_at": v.started_at,
+                "last_seen_at": v.ended_at,
+                "ended_at": v.ended_at,
+                "party_size": v.party_size,
+                "is_simulated": True,
+            }
+            for v in sim.visits
+        ],
     )
     seats = sim.seats(now)
     for seat in seats:
@@ -182,10 +198,79 @@ def _seed_activity(session: Session, tables: list[VenueTable], now: datetime) ->
     update_tables(session, {t.zone_id for t in tables}, now, simulated=True)
 
 
+def _seed_staff(session: Session, now: datetime) -> None:
+    tz = ZoneInfo("Asia/Colombo")
+    members = []
+    for name, role, method, badge, till, _ in STAFF:
+        member = StaffMember(
+            venue_id=VENUE_ID,
+            display_name=name,
+            role_label=role,
+            method=method,
+            badge_code=badge,
+            till_code=till,
+            consent_at=now - timedelta(days=18),
+            consent_version="sample-notice-v1",
+            is_sample=True,
+            created_at=now - timedelta(days=20),
+        )
+        session.add(member)
+        members.append(member)
+    session.flush()
+    workers = [
+        SimWorker(str(m.id), role, shift, till) for m, (_, role, _, _, till, shift) in zip(members, STAFF, strict=True)
+    ]
+    sim = StaffSim(workers, tz, random.Random(SEED + 1))
+    start = (now - timedelta(days=STAFF_DAYS)).replace(second=0, microsecond=0)
+    sim.run_until(start, now)
+    session.add_all(
+        StaffPresence(
+            staff_id=uuid.UUID(p.staff_id), area=p.area, started_at=p.started_at, ended_at=p.ended_at, is_simulated=True
+        )
+        for p in sim.presence()
+    )
+    codes = {w.till_code: uuid.UUID(w.staff_id) for w in workers if w.till_code}
+    recent = [o for o in sim.orders if o.at >= now - timedelta(days=ORDER_DAYS)]
+    ids = session.scalars(
+        insert(TillOrder).returning(TillOrder.id, sort_by_parameter_order=True),
+        [
+            {
+                "venue_id": VENUE_ID,
+                "order_ref": order.order_ref,
+                "at": order.at,
+                "cashier_code": order.cashier,
+                "staff_id": codes.get(order.cashier or ""),
+                "total": sum((price * qty for _, qty, price in order.lines), start=0),
+                "is_sample": True,
+            }
+            for order in recent
+        ],
+    ).all()
+    session.execute(
+        insert(TillItem),
+        [
+            {"order_id": order_id, "name": n, "qty": q, "unit_price": p}
+            for order_id, order in zip(ids, recent, strict=True)
+            for n, q, p in order.lines
+        ],
+    )
+    rng = random.Random(SEED + 2)
+    at = now - timedelta(days=QUEUE_DAYS)
+    readings = []
+    while at <= now:
+        local = at.astimezone(tz)
+        if 7 <= local.hour < 21:
+            readings.append({"venue_id": VENUE_ID, "at": at, "people": queue_people(local, rng), "is_simulated": True})
+        at += timedelta(minutes=1)
+    if readings:
+        session.execute(insert(QueueReading), readings)
+
+
 def seed_sample_cafe(session: Session, now: datetime) -> bool:
     if session.get(models.Organization, ORG_ID) is not None:
         return False
     _, tables = _seed_place(session)
     _seed_activity(session, tables, now)
+    _seed_staff(session, now)
     session.flush()
     return True

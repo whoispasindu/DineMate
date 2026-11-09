@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.business import router as business
+from app.business import staff_router
 from app.core.config import get_settings
 from app.core.errors import install_error_handling
 from app.jobs import lifespan
@@ -61,6 +62,8 @@ def create_app() -> FastAPI:
         seats.router,
         safety.router,
         business.router,
+        staff_router.router,
+        staff_router.devices,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

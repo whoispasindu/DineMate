@@ -5,13 +5,13 @@ from statistics import median
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.business import schemas as s
 from app.business.estimate import PastVisit, remaining_range
-from app.business.models import TableVisit, VenueTable
+from app.business.models import QueueReading, StaffMember, StaffPresence, TableVisit, VenueTable
 from app.business.tables import SeatView, TableView, table_state
 from app.business.visits import OpenVisit, step
 from app.core.errors import ApiError
@@ -19,6 +19,7 @@ from app.routers.devices import current_layout
 
 HISTORY_DAYS = 28
 OFFLINE_AFTER = timedelta(minutes=2)
+QUEUE_FRESH = timedelta(minutes=2)
 SeatKey = tuple[uuid.UUID, str]
 
 
@@ -152,6 +153,25 @@ def zone_names(venue: models.Canteen) -> dict[uuid.UUID, str]:
     return {z.id: z.name for z in venue.zones}
 
 
+def counter_now(session: Session, venue_id: str, now: datetime) -> tuple[int | None, int | None]:
+    staff_ids = select(StaffMember.id).where(StaffMember.venue_id == venue_id)
+    has_staff = session.scalar(select(func.count()).select_from(StaffMember).where(StaffMember.venue_id == venue_id))
+    if not has_staff:
+        return None, None
+    on_counter = session.scalar(
+        select(func.count(func.distinct(StaffPresence.staff_id))).where(
+            StaffPresence.staff_id.in_(staff_ids), StaffPresence.area == "counter", StaffPresence.ended_at.is_(None)
+        )
+    )
+    reading = session.scalar(
+        select(QueueReading)
+        .where(QueueReading.venue_id == venue_id, QueueReading.at >= now - QUEUE_FRESH)
+        .order_by(QueueReading.at.desc())
+        .limit(1)
+    )
+    return int(on_counter or 0), reading.people if reading else None
+
+
 def floor(session: Session, venue: models.Canteen, now: datetime) -> s.VenueFloor:
     tz = tz_of(venue)
     tables = venue_tables(session, venue.id)
@@ -163,6 +183,7 @@ def floor(session: Session, venue: models.Canteen, now: datetime) -> s.VenueFloo
     start, _ = day_bounds(now.astimezone(tz).date(), tz)
     today = [v for v, _ in finished_visits(session, venue.id, start)]
     stays = [minutes(v.started_at, v.ended_at) for v in today if v.ended_at is not None]
+    counter_staff, queue_people = counter_now(session, venue.id, now)
     totals = s.FloorTotals(
         tables=len(items),
         free=sum(1 for t in items if t.state == "free"),
@@ -170,6 +191,8 @@ def floor(session: Session, venue: models.Canteen, now: datetime) -> s.VenueFloo
         visits_today=len(today),
         avg_stay_today_min=avg_min(stays),
         turns_today=round(len(today) / len(items), 1) if items else 0.0,
+        counter_staff=counter_staff,
+        queue_people=queue_people,
     )
     updated = max((seat.updated_at for seat in seats.values()), default=None)
     return s.VenueFloor(

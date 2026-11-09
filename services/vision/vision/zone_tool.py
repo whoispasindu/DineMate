@@ -14,7 +14,20 @@ from vision.zone_editor import ZoneEditor
 
 WINDOW = "DineMate zones (frame is not saved)"
 COLORS = {"seating": (69, 160, 31), "queue": (30, 140, 230), "walkway": (170, 170, 170), "ignore": (60, 60, 220)}
+WORK_COLORS = {"counter": (200, 90, 40), "kitchen": (40, 110, 200), "floor": (180, 80, 160)}
 SEAT_COLOR = (255, 255, 255)
+
+
+def shape_color(shape: dict[str, Any]) -> tuple[int, int, int]:
+    return WORK_COLORS[shape["area"]] if shape["type"] == "work" else COLORS[shape["type"]]
+
+
+def shape_name(shape: dict[str, Any], capacity: int | None) -> str:
+    if shape["type"] == "seating":
+        return f"{shape['name']} ({capacity})"
+    if shape["type"] == "work":
+        return f"work: {shape['area']}"
+    return str(shape["type"])
 
 
 def render(base: np.ndarray, editor: ZoneEditor) -> np.ndarray:
@@ -26,14 +39,14 @@ def render(base: np.ndarray, editor: ZoneEditor) -> np.ndarray:
 
     for shape in editor.shapes:
         pts = pixels(shape["points"])
-        color = COLORS[shape["type"]]
+        color = shape_color(shape)
         overlay = canvas.copy()
         cv2.fillPoly(overlay, [pts], color)
         canvas = cv2.addWeighted(overlay, 0.18, canvas, 0.82, 0)
         cv2.polylines(canvas, [pts], True, color, 2)
         seats = shape.get("seats", [])
         capacity = len(seats) or shape.get("capacity")
-        label = f"{shape['name']} ({capacity})" if shape["type"] == "seating" else shape["type"]
+        label = shape_name(shape, capacity)
         cv2.putText(canvas, label, (int(pts[0][0]) + 6, int(pts[0][1]) + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
         radius = max(round(SeatSettings().seat_radius * w), 4)
         for number, seat in enumerate(seats, start=1):
@@ -79,7 +92,9 @@ def save_layout(layout: dict[str, Any], path: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Draw seating zones on one frame and save them as a layout file.")
+    parser = argparse.ArgumentParser(
+        description="Draw seating zones and work areas on one frame and save them as a layout file."
+    )
     parser.add_argument("--source", default="0", help="webcam index (0) or a video file path")
     parser.add_argument("--at", type=float, default=0.0, help="seconds into a video to grab the frame from")
     parser.add_argument("--out", required=True, help="where to write the layout JSON, e.g. layouts/webcam.json")
@@ -100,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
     save_layout(layout, out)
     seats = sum(len(z.get("seats", [])) for z in layout["zones"])
     print(
-        f"Saved {len(layout['zones'])} seating zone(s), {seats} seat(s) and "
+        f"Saved {len(layout['zones'])} seating zone(s), {seats} seat(s), {len(layout['work'])} work area(s) and "
         f"{len(layout['ignore'])} ignored area(s) to {out}."
     )
     print("The frame itself was not saved.")

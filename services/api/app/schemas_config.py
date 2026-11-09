@@ -6,7 +6,8 @@ from pydantic import Field, StringConstraints
 from app.schemas import MealPeriod, Schema, Timestamped
 
 AlertFrom = Literal["busy", "crowded", "near_capacity"]
-PolygonType = Literal["seating", "queue", "walkway", "ignore"]
+PolygonType = Literal["seating", "queue", "walkway", "ignore", "work"]
+WorkAreaName = Literal["counter", "kitchen", "floor"]
 ZoneName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)]
 Reason = Annotated[str, StringConstraints(strip_whitespace=True, max_length=120)]
 Coordinate = Annotated[float, Field(ge=0, le=1)]
@@ -83,6 +84,7 @@ class LayoutSeat(Schema):
 class LayoutPolygon(Schema):
     type: PolygonType
     zone_id: str | None = None
+    area: WorkAreaName | None = None
     points: list[tuple[Coordinate, Coordinate]] = Field(min_length=3, max_length=32)
     seats: list[LayoutSeat] = Field(default_factory=list, max_length=200)
 

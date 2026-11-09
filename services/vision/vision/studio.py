@@ -119,6 +119,8 @@ class Player:
                     print(f"Playing {width}x{height}, detecting at {self.pipeline.imgsz} px.")
                     if self.pipeline.seat_mode:
                         print(f"Tracking {len(self.pipeline.tracker.seats)} seat(s).")
+                    if self.pipeline.work:
+                        print(f"Showing {len(self.pipeline.work)} work area(s); staff are named only by the worker.")
                 if frame.at - last_post >= float(self.settings["post_every_s"]):
                     last_post = frame.at
                     self.readings = {r["zone_id"]: r for r in self.pipeline.readings()}
@@ -140,6 +142,8 @@ class Player:
                     self.limits,
                     self.pipeline.seat_states(),
                     self.pipeline.labels(),
+                    self.pipeline.work,
+                    self.pipeline.staff_labels(),
                 )
                 cv2.imshow(WINDOW, canvas)
                 key = cv2.waitKey(1) & 0xFF

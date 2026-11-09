@@ -207,6 +207,8 @@ export function sampleFloor(venueId: string, now: number): VenueFloor | undefine
       visits_today: 64,
       avg_stay_today_min: 38,
       turns_today: 5.3,
+      counter_staff: 3,
+      queue_people: 2,
     },
     tables,
   };
@@ -309,5 +311,13 @@ export function sampleTableLayout(venueId: string, now: number) {
 }
 
 export function sampleBusinessSettings(now: number): BusinessSettings {
-  return { server_time: iso(now), organization_id: "sample-cafe-group", organization_name: "Sample Café Group", retention_days: 90 };
+  return {
+    server_time: iso(now),
+    organization_id: "sample-cafe-group",
+    organization_name: "Sample Café Group",
+    retention_days: 90,
+    staff_retention_days: 60,
+    deployment: "local",
+    faces_enabled: true,
+  };
 }

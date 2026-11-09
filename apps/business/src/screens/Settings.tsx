@@ -227,7 +227,11 @@ function Retention({ user }: { user: StaffUser }) {
           <TextInput type="number" min={7} max={730} value={current} disabled={!owner} onChange={(e) => setDays(Number(e.target.value))} />
         </Field>
         {owner ? (
-          <Button tone="primary" disabled={save.isPending || current < 7 || current > 730} onClick={() => save.mutate(current)}>
+          <Button
+            tone="primary"
+            disabled={save.isPending || current < 7 || current > 730}
+            onClick={() => save.mutate({ retention_days: current })}
+          >
             Save
           </Button>
         ) : (

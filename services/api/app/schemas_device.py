@@ -26,6 +26,11 @@ class IgnoreArea(Schema):
     points: list[Point]
 
 
+class WorkArea(Schema):
+    area: Literal["counter", "kitchen", "floor"]
+    points: list[Point]
+
+
 class WorkerSettings(Schema):
     post_every_s: float
     smoothing_s: float
@@ -57,6 +62,7 @@ class DeviceConfig(Timestamped):
     layout_version: int | None
     zones: list[ConfigZone]
     ignore: list[IgnoreArea]
+    work: list[WorkArea] = Field(default_factory=list)
     settings: WorkerSettings
     simulation: dict[str, SimulationProfile] | None
 
@@ -86,6 +92,7 @@ class HeartbeatIn(Schema):
     latency_ms: int | None = Field(default=None, ge=0)
     stream_ok: bool = True
     message: str | None = Field(default=None, max_length=500)
+    stream_url: str | None = Field(default=None, max_length=200, pattern=r"^https?://")
 
 
 class HeartbeatAccepted(Timestamped):

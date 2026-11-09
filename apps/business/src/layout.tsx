@@ -10,18 +10,18 @@ export interface NavItem {
   short: string;
   icon: IconName;
   end?: boolean;
-  later?: boolean;
+  owner?: boolean;
   phone?: boolean;
 }
 
 export const NAV: NavItem[] = [
   { to: "/", label: "Live floor", short: "Floor", icon: "grid", end: true, phone: true },
   { to: "/customers", label: "Customers", short: "Customers", icon: "users", phone: true },
-  { to: "/staff", label: "Staff", short: "Staff", icon: "badge", later: true },
-  { to: "/sales", label: "Sales", short: "Sales", icon: "coffee", later: true },
+  { to: "/staff", label: "Staff", short: "Staff", icon: "badge", owner: true },
+  { to: "/sales", label: "Sales", short: "Sales", icon: "coffee", phone: true },
   { to: "/reports", label: "Reports", short: "Reports", icon: "chart", phone: true },
   { to: "/cameras", label: "Cameras", short: "Cameras", icon: "camera" },
-  { to: "/privacy", label: "Privacy & consent", short: "Privacy", icon: "lock", later: true },
+  { to: "/privacy", label: "Privacy & consent", short: "Privacy", icon: "lock", owner: true },
   { to: "/settings", label: "Settings", short: "Settings", icon: "sliders", phone: true },
 ];
 
@@ -72,7 +72,7 @@ function VenueSwitcher({ dark }: { dark?: boolean }) {
 function Sidebar({ user }: { user: StaffUser }) {
   const queryClient = useQueryClient();
   return (
-    <aside className="sticky top-0 box-border flex h-dvh w-[248px] shrink-0 flex-col gap-5 bg-side px-[18px] py-6 text-side-ink">
+    <aside className="sticky top-0 box-border flex h-dvh print:hidden w-[248px] shrink-0 flex-col gap-5 bg-side px-[18px] py-6 text-side-ink">
       <div className="flex items-center gap-2.5 px-2">
         <BrandMark tone="sand" size={34} />
         <span className="flex flex-col">
@@ -82,7 +82,7 @@ function Sidebar({ user }: { user: StaffUser }) {
       </div>
       <VenueSwitcher dark />
       <nav aria-label="Business" className="scrollbar-none flex min-h-0 flex-col gap-1 overflow-y-auto">
-        {NAV.map((item) => (
+        {NAV.filter((item) => !item.owner || user.role === "owner").map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -99,9 +99,6 @@ function Sidebar({ user }: { user: StaffUser }) {
                 {isActive ? <span aria-hidden="true" className="absolute -left-[18px] top-2.5 bottom-2.5 w-1 rounded-r bg-purple" /> : null}
                 <Icon name={item.icon} size={19} />
                 <span className="flex-1">{item.label}</span>
-                {item.later ? (
-                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-side-muted">Phase 9</span>
-                ) : null}
               </>
             )}
           </NavLink>
@@ -137,7 +134,7 @@ function Sidebar({ user }: { user: StaffUser }) {
 function PhoneTop() {
   const { venue } = useVenue();
   return (
-    <header className="flex items-center justify-between gap-3 px-4 pt-4">
+    <header className="flex items-center justify-between gap-3 px-4 pt-4 print:hidden">
       <div className="flex items-center gap-2.5">
         <BrandMark size={32} />
         <div className="flex flex-col">
@@ -151,7 +148,7 @@ function PhoneTop() {
 
 function PhoneTabs() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 px-3 pb-[max(14px,env(safe-area-inset-bottom))] pt-2">
+    <div className="fixed inset-x-0 bottom-0 z-20 px-3 print:hidden pb-[max(14px,env(safe-area-inset-bottom))] pt-2">
       <nav aria-label="Business" className="slab flex h-[66px] items-center justify-around rounded-[22px] bg-brand">
         {NAV.filter((n) => n.phone).map((item) => (
           <NavLink

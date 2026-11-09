@@ -20,7 +20,7 @@ One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–10 from the
 | 6. Forecast, polish & demo | 9–10  | 28 Dec – 10 Jan | Forecast baseline, hardening, demo rehearsed            |
 | 7. Seat-level occupancy    | TBD   | after judging   | Every seat is free, occupied, held or unknown           |
 | 8. Business core           | Done  | after Phase 7   | DineMate Business: venues, tables, customer stays       |
-| 9. Staff and till          | TBD   | after Phase 8   | Staff recognition, work areas, till data per worker     |
+| 9. Staff and till          | Built | after Phase 8   | Staff recognition, work areas, till data per worker     |
 | 10. Deploy and sell        | TBD   | after Phase 9   | Local server, cloud plan, billing, first pilot shops    |
 
 ---
@@ -223,13 +223,15 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 
 ## Phase 9 — Staff and till
 
-- [ ] Staff enrolment: opt-in face enrolment on the local server (consent record, face template only, encrypted), badge fallback (printed code on apron or lanyard), remove a worker and their data in one step
-- [ ] Recognition in the worker: match staff faces or badges to tracks; customers are never matched; no images leave memory
-- [ ] Live view stream: the worker serves annotated frames (MJPEG or WebRTC) to the dashboard on the local network only, with customer faces blurred before encoding; owner and manager roles only; nothing written to disk
-- [ ] Work areas: mark counter, kitchen and floor areas; time per worker per area, counter coverage ("unstaffed for 6 min at 12:40"), queue length alerts
-- [ ] Till data: CSV import first, then one real till system; items sold per cashier ("coffees served per worker"), orders per hour, average order
-- [ ] Staff page: per-worker hours in each area, items served, busiest shifts; workers can see their own page
-- [ ] Privacy kit: staff notice and consent templates, data protection impact assessment template, retention settings, audit of who viewed staff reports
+- [x] Staff enrolment: opt-in face enrolment on the local server (consent record, face template only, encrypted), badge fallback (printed code on apron or lanyard), remove a worker and their data in one step — `staff_members`, `face_templates` (Fernet, `DINEMATE_TEMPLATE_KEY`, refused when `DINEMATE_DEPLOYMENT=cloud`); `vision/enrol.py` sends only a 128-number SFace template; `vision/badges.py` prints ArUco badges (codes 0–249); withdrawing consent deletes the template and presence history
+- [x] Recognition in the worker: match staff faces or badges to tracks; customers are never matched; no images leave memory — `vision/staff.py` (only tracks inside work areas, 3 consistent matches before naming), `vision/faces.py` (YuNet + SFace, fetched by `vision/fetch_models.py` with pinned checksums), `vision/identity.py`
+- [x] Live view stream: the worker serves annotated frames (MJPEG or WebRTC) to the dashboard on the local network only, with customer faces blurred before encoding; owner and manager roles only; nothing written to disk — MJPEG from `vision/stream.py` (`--stream-port`), 60 s HMAC link from `GET /business/venues/{id}/cameras/{device}/live`, frames encoded only while someone watches
+- [x] Work areas: mark counter, kitchen and floor areas; time per worker per area, counter coverage ("unstaffed for 6 min at 12:40"), queue length alerts — `work` polygons in the layout (zone tool keys K, H, F), `app/business/coverage.py`, Live floor "Counter unstaffed" and "Queue of ~N"
+- [x] Till data: CSV import first; items sold per cashier ("coffees served per worker"), orders per hour, average order — `app/business/till.py`, check-then-import on the Sales page, duplicates skipped, unknown cashier codes listed
+- [ ] One real till system, chosen with the first pilot café (no till API is guessed)
+- [x] Staff page: per-worker hours in each area, items served, busiest shifts; workers can see their own page — owner-only Staff page with coverage timeline, gaps and queue alerts; workers get a printable 7-day sheet from the owner instead of a login
+- [x] Privacy kit: staff notice and consent templates, data protection impact assessment template, retention settings, audit of who viewed staff reports — docs/business/privacy, staff retention 7–365 days (default 60), every report and sheet view audited and listed on Privacy & consent
+- [ ] Staged-clip check: enrol two people, run the worker on a clip with them behind the counter and others in front, compare items per worker with a hand-made till CSV (needs footage and consent from the people filmed)
 
 **Done when:** on staged clips, enrolled staff are recognised in their work areas, customers stay anonymous, and per-worker items served match the till file.
 

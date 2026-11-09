@@ -2,6 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
 import { serverNow } from "./clock";
 import type {
+  BusinessSettingsIn,
+  ConsentIn,
+  StaffIn,
+  StaffPatch,
   HistoryBucket,
   DeviceLayout,
   ReportRange,
@@ -46,6 +50,12 @@ export const queryKeys = {
   cameras: (venueId: string) => ["business", "cameras", venueId] as const,
   tables: (venueId: string) => ["business", "tables", venueId] as const,
   businessSettings: ["business", "settings"] as const,
+  staff: (venueId: string) => ["business", "staff", venueId] as const,
+  staffReport: (venueId: string, day: string) => ["business", "staff-report", venueId, day] as const,
+  staffSheet: (staffId: string) => ["business", "staff-sheet", staffId] as const,
+  staffAudit: ["business", "audit"] as const,
+  sales: (venueId: string, day: string) => ["business", "sales", venueId, day] as const,
+  liveLink: (venueId: string, deviceId: string) => ["business", "live", venueId, deviceId] as const,
 };
 
 export function useStudentSummary() {
@@ -356,7 +366,105 @@ export function useBusinessSettings() {
 export function useSaveBusinessSettings() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (retentionDays: number) => api.saveBusinessSettings(retentionDays),
+    mutationFn: (body: BusinessSettingsIn) => api.saveBusinessSettings(body),
     onSuccess: (settings) => client.setQueryData(queryKeys.businessSettings, settings),
+  });
+}
+
+export function useStaff(venueId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.staff(venueId ?? ""),
+    queryFn: () => api.businessStaff(venueId ?? ""),
+    enabled: enabled && venueId !== undefined,
+    retry: false,
+  });
+}
+
+function useStaffChange<A>(venueId: string, run: (args: A) => Promise<unknown>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: queryKeys.staff(venueId) });
+      void client.invalidateQueries({ queryKey: ["business", "staff-report", venueId] });
+      void client.invalidateQueries({ queryKey: queryKeys.staffAudit });
+    },
+  });
+}
+
+export function useCreateStaff(venueId: string) {
+  return useStaffChange(venueId, (body: StaffIn) => api.createStaff(venueId, body));
+}
+
+export function useUpdateStaff(venueId: string) {
+  return useStaffChange(venueId, ({ staffId, body }: { staffId: string; body: StaffPatch }) => api.updateStaff(staffId, body));
+}
+
+export function useRecordConsent(venueId: string) {
+  return useStaffChange(venueId, ({ staffId, body }: { staffId: string; body: ConsentIn }) => api.recordConsent(staffId, body));
+}
+
+export function useWithdrawConsent(venueId: string) {
+  return useStaffChange(venueId, (staffId: string) => api.withdrawConsent(staffId));
+}
+
+export function useRemoveStaff(venueId: string) {
+  return useStaffChange(venueId, (staffId: string) => api.removeStaff(staffId));
+}
+
+export function useStaffReport(venueId: string | undefined, day?: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.staffReport(venueId ?? "", day ?? "today"),
+    queryFn: () => api.staffReport(venueId ?? "", day),
+    enabled: enabled && venueId !== undefined,
+    refetchInterval: INFO_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useStaffSheet(staffId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.staffSheet(staffId ?? ""),
+    queryFn: () => api.staffSheet(staffId ?? ""),
+    enabled: staffId !== undefined,
+    retry: false,
+  });
+}
+
+export function useStaffAudit(enabled = true) {
+  return useQuery({ queryKey: queryKeys.staffAudit, queryFn: api.staffAudit, enabled, retry: false });
+}
+
+export function useSales(venueId: string | undefined, day?: string) {
+  return useQuery({
+    queryKey: queryKeys.sales(venueId ?? "", day ?? "today"),
+    queryFn: () => api.sales(venueId ?? "", day),
+    enabled: venueId !== undefined,
+    refetchInterval: INFO_POLL_MS,
+    retry: false,
+  });
+}
+
+export function useImportTill(venueId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ csv, dryRun }: { csv: string; dryRun: boolean }) => api.importTill(venueId, csv, dryRun),
+    onSuccess: (result) => {
+      if (!result.saved) return;
+      void client.invalidateQueries({ queryKey: ["business", "sales", venueId] });
+      void client.invalidateQueries({ queryKey: ["business", "staff-report", venueId] });
+    },
+  });
+}
+
+export function useLiveLink(venueId: string | undefined, deviceId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.liveLink(venueId ?? "", deviceId ?? ""),
+    queryFn: () => api.liveLink(venueId ?? "", deviceId ?? ""),
+    enabled: venueId !== undefined && deviceId !== undefined,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 }

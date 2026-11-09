@@ -1,12 +1,14 @@
 from datetime import date
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
 from app import models
 from app.business import schemas as s
 from app.business import service
 from app.business.auth import BusinessUser, OwnerUser, venue_for, visible_venues
+from app.business.templates import TemplatesUnavailable, vault_for
+from app.core.config import Settings, get_settings
 from app.core.deps import NowDep, SessionDep
 from app.core.errors import not_found
 from app.schemas import ErrorResponse
@@ -109,29 +111,53 @@ def mark_cleared(table_id: str, user: BusinessUser, session: SessionDep, now: No
     return service.floor(session, venue, now)
 
 
-def _settings(session: SessionDep, user: models.User, now: NowDep) -> s.BusinessSettings:
+def _faces_enabled(settings: Settings) -> bool:
+    try:
+        vault_for(settings)
+    except TemplatesUnavailable:
+        return False
+    return True
+
+
+def _settings(session: SessionDep, user: models.User, settings: Settings, now: NowDep) -> s.BusinessSettings:
     org = session.get(models.Organization, user.organization_id)
     if org is None:
         raise not_found("Organization", user.organization_id)
     return s.BusinessSettings(
-        server_time=now, organization_id=org.id, organization_name=org.name, retention_days=org.retention_days
+        server_time=now,
+        organization_id=org.id,
+        organization_name=org.name,
+        retention_days=org.retention_days,
+        staff_retention_days=org.staff_retention_days,
+        deployment="cloud" if settings.deployment == "cloud" else "local",
+        faces_enabled=_faces_enabled(settings),
     )
 
 
 @router.get("/settings", response_model=s.BusinessSettings, responses=RESPONSES)
-def get_settings_view(user: BusinessUser, session: SessionDep, now: NowDep) -> s.BusinessSettings:
-    return _settings(session, user, now)
+def get_settings_view(
+    user: BusinessUser, session: SessionDep, settings: Annotated[Settings, Depends(get_settings)], now: NowDep
+) -> s.BusinessSettings:
+    return _settings(session, user, settings, now)
 
 
 @router.patch("/settings", response_model=s.BusinessSettings, responses=RESPONSES)
 def patch_settings(
-    payload: s.SettingsIn, user: OwnerUser, session: SessionDep, now: NowDep, request: Request
+    payload: s.SettingsIn,
+    user: OwnerUser,
+    session: SessionDep,
+    settings: Annotated[Settings, Depends(get_settings)],
+    now: NowDep,
+    request: Request,
 ) -> s.BusinessSettings:
     org = session.get(models.Organization, user.organization_id)
     if org is None:
         raise not_found("Organization", user.organization_id)
-    before = {"retention_days": org.retention_days}
-    org.retention_days = payload.retention_days
+    before = {"retention_days": org.retention_days, "staff_retention_days": org.staff_retention_days}
+    if payload.retention_days is not None:
+        org.retention_days = payload.retention_days
+    if payload.staff_retention_days is not None:
+        org.staff_retention_days = payload.staff_retention_days
     record(
         session,
         now,
@@ -140,8 +166,8 @@ def patch_settings(
         org.id,
         user=user,
         before=before,
-        after={"retention_days": org.retention_days},
+        after={"retention_days": org.retention_days, "staff_retention_days": org.staff_retention_days},
         request=request,
     )
     session.commit()
-    return _settings(session, user, now)
+    return _settings(session, user, settings, now)
