@@ -34,8 +34,12 @@ services:
       <<: *api-env
       DINEMATE_MIGRATE_ON_START: "true"
       DINEMATE_SEED_IF_EMPTY: ${DINEMATE_SEED_IF_EMPTY:-true}
+      DINEMATE_HUB_TOKEN: ${DINEMATE_HUB_TOKEN:-dev-hub-token-for-test-videos}
+      DINEMATE_TEST_VIDEOS_DIR: /data/test-videos
     ports:
       - "${API_PORT:-8000}:8000"
+    volumes:
+      - test-videos:/data/test-videos
     depends_on:
       db:
         condition: service_healthy
@@ -68,5 +72,29 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  hub:
+    profiles: ["cameras"]
+    build: ../services/vision
+    environment:
+      DINEMATE_API_URL: http://api:8000/api/v1
+      DINEMATE_HUB_ID: hub-dev
+      DINEMATE_HUB_TOKEN: ${DINEMATE_HUB_TOKEN:-dev-hub-token-for-test-videos}
+      DINEMATE_STREAM_HOST: ${DINEMATE_STREAM_HOST:-localhost}
+      DINEMATE_STREAM_FIRST_PORT: "8100"
+      DINEMATE_TEST_VIDEOS_DIR: /data/test-videos
+      DINEMATE_MODEL: ${DINEMATE_MODEL:-models/yolo11s.pt}
+      DINEMATE_POSE_MODEL: ${DINEMATE_POSE_MODEL:-models/yolo11s-pose.pt}
+    ports:
+      - "8100-8107:8100-8107"
+    volumes:
+      - hub-models:/app/models
+      - test-videos:/data/test-videos:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   db-data:
+  hub-models:
+  test-videos:

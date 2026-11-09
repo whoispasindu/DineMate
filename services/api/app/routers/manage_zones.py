@@ -150,12 +150,12 @@ def list_managed_devices(user: StaffUser, session: SessionDep, now: NowDep) -> M
     names = {cid: name for cid, name in session.execute(select(models.Canteen.id, models.Canteen.name))}
     devices = session.scalars(
         select(models.Device)
-        .where(models.Device.canteen_id.in_(models.campus_canteen_ids()))
+        .where(models.Device.canteen_id.in_(models.campus_canteen_ids()), models.Device.kind != "hub")
         .order_by(models.Device.canteen_id, models.Device.id)
     )
     items = []
     for d in devices:
-        if not can_manage_canteen(user, d.canteen_id):
+        if not can_manage_canteen(user, d.canteen_id) or (d.config or {}).get("removed"):
             continue
         layout = current_layout(session, d.id)
         items.append(
@@ -167,6 +167,7 @@ def list_managed_devices(user: StaffUser, session: SessionDep, now: NowDep) -> M
                 layout_version=layout.version if layout else None,
                 last_heartbeat_at=d.last_heartbeat_at,
                 is_enabled=d.is_enabled,
+                label=(d.config or {}).get("label"),
             )
         )
     return ManagedDeviceList(server_time=now, items=items)

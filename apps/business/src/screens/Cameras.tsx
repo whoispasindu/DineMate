@@ -10,11 +10,19 @@ import {
   type CameraHealth,
   type VenueFloor,
 } from "@dinemate/api-client";
-import { cx, formatAgo, Icon } from "@dinemate/ui";
+import { cx, formatAgo, Icon, reachableStream } from "@dinemate/ui";
 import { useState } from "react";
 import { Link } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Skeleton, TextInput } from "../kit";
-import { reachableStream } from "../live";
+import {
+  hasTestVideo,
+  isTestHint,
+  labelFromFile,
+  NO_TEST_VIDEO,
+  TestVideoInput,
+  useTestVideoSource,
+  type TestVideoChoice,
+} from "../testVideo";
 import { useVenue } from "../venue";
 
 const SOURCE_HELP = "rtsp://user:password@192.168.1.50:554/stream1 · http://192.168.1.20:8080/video · 0 for a USB camera";
@@ -214,38 +222,87 @@ function statusLine(c: CameraHealth): { label: string; dot: string; text: string
 
 function AddCamera({ venueId }: { venueId: string }) {
   const add = useAddCamera(venueId);
+  const video = useTestVideoSource();
   const [label, setLabel] = useState("");
   const [source, setSource] = useState("");
+  const [testing, setTesting] = useState(false);
+  const [clip, setClip] = useState<TestVideoChoice>(NO_TEST_VIDEO);
+  const [problem, setProblem] = useState<string | null>(null);
+  const ready = label.trim() !== "" && (testing ? hasTestVideo(clip) : source.trim() !== "");
+  const busy = add.isPending || video.uploading;
   return (
     <Panel title="Add a camera">
       <form
         className="flex flex-col gap-3"
         onSubmit={(e) => {
           e.preventDefault();
-          add.mutate(
-            { label: label.trim(), source: source.trim() },
-            {
-              onSuccess: () => {
-                setLabel("");
-                setSource("");
-              },
-            },
-          );
+          setProblem(null);
+          void (async () => {
+            try {
+              const chosen = testing ? await video.resolve(clip) : source.trim();
+              await add.mutateAsync({ label: label.trim(), source: chosen });
+              setLabel("");
+              setSource("");
+              setClip(NO_TEST_VIDEO);
+            } catch (error) {
+              setProblem(errorText(error));
+            }
+          })();
         }}
       >
+        <span className="flex flex-wrap gap-1.5" role="group" aria-label="Camera type">
+          {[
+            { on: false, text: "Camera" },
+            { on: true, text: "Test video" },
+          ].map((choice) => (
+            <button
+              key={choice.text}
+              type="button"
+              aria-pressed={testing === choice.on}
+              onClick={() => setTesting(choice.on)}
+              className={cx(
+                "min-h-8 rounded-full px-3 text-[13px] font-semibold",
+                testing === choice.on ? "bg-brand text-on-dark" : "bg-chip text-neutral-ink hover:bg-line-soft",
+              )}
+            >
+              {choice.text}
+            </button>
+          ))}
+        </span>
         <Field label="Name">
-          <TextInput value={label} maxLength={40} placeholder="Counter camera" onChange={(e) => setLabel(e.target.value)} />
+          <TextInput
+            value={label}
+            maxLength={40}
+            placeholder={testing ? "Lunch rush clip" : "Counter camera"}
+            onChange={(e) => setLabel(e.target.value)}
+          />
         </Field>
-        <Field label="Camera address" hint={SOURCE_HELP}>
-          <TextInput value={source} maxLength={500} placeholder="rtsp://…" onChange={(e) => setSource(e.target.value)} autoComplete="off" />
-        </Field>
-        {add.isError ? <Banner tone="error">{errorText(add.error)}</Banner> : null}
-        {add.isSuccess ? (
+        {testing ? (
+          <TestVideoInput
+            value={clip}
+            onChange={(next) => {
+              setClip(next);
+              if (next.file && !label.trim()) setLabel(labelFromFile(next.file));
+            }}
+          />
+        ) : (
+          <Field label="Camera address" hint={SOURCE_HELP}>
+            <TextInput
+              value={source}
+              maxLength={500}
+              placeholder="rtsp://…"
+              onChange={(e) => setSource(e.target.value)}
+              autoComplete="off"
+            />
+          </Field>
+        )}
+        {problem ? <Banner tone="error">{problem}</Banner> : null}
+        {add.isSuccess && !problem ? (
           <Banner tone="ok">Added. The camera computer picks it up within a minute; then press Set up to draw its zones.</Banner>
         ) : null}
         <div>
-          <Button type="submit" tone="primary" disabled={!label.trim() || !source.trim() || add.isPending}>
-            Add camera
+          <Button type="submit" tone="primary" disabled={!ready || busy}>
+            {video.uploading ? "Uploading video…" : testing ? "Add test video" : "Add camera"}
           </Button>
         </div>
         <p className="m-0 text-xs text-muted">
@@ -275,6 +332,9 @@ function CameraRow({ camera, venueId, now, first }: { camera: CameraHealth; venu
               {camera.label ?? camera.id}
               {camera.kind === "simulator" ? (
                 <span className="ml-2 rounded-full bg-chip px-2 py-0.5 text-xs font-semibold text-neutral-ink">Simulated</span>
+              ) : null}
+              {isTestHint(camera.source_hint) ? (
+                <span className="ml-2 rounded-full bg-busy-bg px-2 py-0.5 text-xs font-semibold text-busy">Test video</span>
               ) : null}
             </span>
             <span className="text-[13px] text-muted">

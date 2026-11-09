@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { Button } from "./kit";
 import { ConsoleShell, navFor } from "./layout";
+import { DevicesScreen } from "./screens/Devices";
 import { OverviewScreen } from "./screens/Overview";
 import { OccupancyScreen } from "./screens/Occupancy";
 import { PlannedScreen } from "./screens/Planned";
@@ -22,6 +23,7 @@ const BUILT: Record<string, () => React.JSX.Element> = {
   "/safety": SafetyScreen,
   "/occupancy": OccupancyScreen,
   "/seats": SeatsScreen,
+  "/devices": DevicesScreen,
 };
 
 function BusinessAccount() {

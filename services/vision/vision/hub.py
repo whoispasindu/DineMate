@@ -20,6 +20,9 @@ from vision.envfile import load_env_file
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_DIR / ".env"
 DEFAULT_MODEL = PROJECT_DIR / "models" / "yolo11s.pt"
+DEFAULT_VIDEOS = PROJECT_DIR.parent / "api" / "test-videos"
+VIDEO_PREFIX = "video:"
+VIDEO_NAME = re.compile(r"^[a-z0-9][a-z0-9._-]{0,120}$")
 DEFAULT_API = "http://localhost:8000/api/v1"
 POLL_S = 15.0
 TICK_S = 1.0
@@ -75,6 +78,7 @@ class HubSettings:
     first_port: int = 8090
     max_cameras: int = MAX_CAMERAS
     model: str = str(DEFAULT_MODEL)
+    videos_dir: str = str(DEFAULT_VIDEOS)
 
 
 class Process(Protocol):
@@ -169,6 +173,15 @@ def tokens_from_response(data: Any) -> dict[str, str]:
     }
 
 
+def worker_source(source: str, videos_dir: str) -> str:
+    if not source.startswith(VIDEO_PREFIX):
+        return source
+    name = source[len(VIDEO_PREFIX) :]
+    if not VIDEO_NAME.match(name):
+        raise ValueError(f"unsafe test video name {name!r}")
+    return str(Path(videos_dir) / name)
+
+
 def worker_command(settings: HubSettings, camera: Camera, port: int) -> list[str]:
     return [
         sys.executable,
@@ -184,6 +197,7 @@ def worker_command(settings: HubSettings, camera: Camera, port: int) -> list[str
         settings.stream_host,
         "--model",
         settings.model,
+        "--loop",
     ]
 
 
@@ -384,10 +398,10 @@ class Hub:
         try:
             process = self.spawn(
                 worker_command(self.settings, camera, port),
-                worker_env(self.environ, token, camera.source),
+                worker_env(self.environ, token, worker_source(camera.source, self.settings.videos_dir)),
                 camera.device_id,
             )
-        except OSError as exc:
+        except (OSError, ValueError) as exc:
             record_exit(running, now)
             log.warning("could not start %s (%s): %s", camera.device_id, camera.label, exc)
             return
@@ -431,6 +445,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--first-port", type=int, default=int(os.environ.get("DINEMATE_STREAM_FIRST_PORT", "8090")))
     parser.add_argument("--max-cameras", type=int, default=MAX_CAMERAS)
     parser.add_argument("--model", default=os.environ.get("DINEMATE_MODEL", str(DEFAULT_MODEL)))
+    parser.add_argument(
+        "--videos-dir",
+        default=os.environ.get("DINEMATE_TEST_VIDEOS_DIR", str(DEFAULT_VIDEOS)),
+        help="folder holding test videos uploaded from the dashboards",
+    )
     args = parser.parse_args(argv)
     if not args.token:
         parser.error("set --token or DINEMATE_HUB_TOKEN to the hub token")
@@ -444,7 +463,7 @@ def main(argv: list[str] | None = None) -> int:
     logging.getLogger("httpx").setLevel(logging.WARNING)
     load_env_file(ENV_FILE)
     args = parse_args(argv)
-    settings = HubSettings(args.api, args.stream_host, args.first_port, args.max_cameras, args.model)
+    settings = HubSettings(args.api, args.stream_host, args.first_port, args.max_cameras, args.model, args.videos_dir)
     client = HubClient(args.api, args.hub_id, args.token)
     hub = Hub(client, settings, args.hub_id)
     signal.signal(signal.SIGINT, hub.request_stop)

@@ -2,6 +2,8 @@ import re
 from typing import Any
 from urllib.parse import urlsplit
 
+from app.testfeeds.videos import check_video_source, is_video_source, video_hint
+
 SCHEMES = ("rtsp", "rtsps", "http", "https")
 USB = re.compile(r"^\d{1,2}$")
 WAITING = "waiting for zones"
@@ -9,6 +11,8 @@ WAITING = "waiting for zones"
 
 def check_source(source: str) -> str:
     value = source.strip()
+    if is_video_source(value):
+        return check_video_source(value)
     if USB.match(value):
         return value
     parts = urlsplit(value)
@@ -20,6 +24,8 @@ def check_source(source: str) -> str:
 def source_hint(source: str | None) -> str | None:
     if not source:
         return None
+    if is_video_source(source):
+        return video_hint(source)
     if USB.match(source):
         return f"USB camera {source}"
     parts = urlsplit(source)

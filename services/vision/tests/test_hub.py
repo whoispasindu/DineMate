@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Iterable
+from pathlib import Path
 
 import httpx
 import pytest
@@ -7,6 +8,7 @@ import pytest
 from vision.client import ApiError
 from vision.hub import (
     BACKOFF_S,
+    DEFAULT_VIDEOS,
     HEALTHY_S,
     Camera,
     Hub,
@@ -20,6 +22,7 @@ from vision.hub import (
     tokens_from_response,
     worker_command,
     worker_env,
+    worker_source,
 )
 
 RTSP = "rtsp://admin:s3cret@192.168.1.20:554/stream1"
@@ -145,6 +148,20 @@ def test_worker_gets_token_and_source_only_through_its_environment() -> None:
     env = worker_env({"PATH": "/bin", "DINEMATE_HUB_TOKEN": "hub-secret"}, "secret-token", RTSP)
     assert env["DINEMATE_DEVICE_TOKEN"] == "secret-token" and env["DINEMATE_SOURCE"] == RTSP
     assert "DINEMATE_HUB_TOKEN" not in env and env["PATH"] == "/bin"
+
+
+def test_test_videos_play_from_the_shared_folder_on_a_loop() -> None:
+    expected = str(Path("/data/test-videos") / "lunch-abcdef.mp4")
+    assert worker_source("video:lunch-abcdef.mp4", "/data/test-videos") == expected
+    assert worker_source(RTSP, "/data/test-videos") == RTSP
+    for bad in ("video:../x.mp4", "video:", "video:.hidden.mp4", "video:a/b.mp4", "video:a\\b.mp4", "video:C:x.mp4"):
+        with pytest.raises(ValueError):
+            worker_source(bad, "/data/test-videos")
+    assert "--loop" in worker_command(HubSettings("http://api/api/v1"), cam("a", RTSP), 8090)
+    hub, _, spawn = make_hub([cam("a", "video:../../etc/passwd"), cam("b", "video:clip-abcdef.mp4")])
+    hub.tick(0.0)
+    assert [env["DINEMATE_SOURCE"] for _, env, _ in spawn.started] == [str(Path(DEFAULT_VIDEOS) / "clip-abcdef.mp4")]
+    assert hub.running["a"].exited_at == 0.0
 
 
 class FakeProcess:

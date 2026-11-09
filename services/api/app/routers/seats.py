@@ -13,7 +13,7 @@ from app.core.auth import StaffUser, can_manage_canteen, forbidden_scope
 from app.core.deps import NowDep, SessionDep
 from app.core.device_auth import DeviceDep, RealNowDep
 from app.core.errors import ApiError, not_found
-from app.routers.devices import AUTH_RESPONSES, MAX_FUTURE_SKEW, current_layout
+from app.routers.devices import AUTH_RESPONSES, MAX_FUTURE_SKEW, camera_zones, current_layout
 from app.schemas import ErrorResponse
 from app.schemas_seats import (
     CanteenSeats,
@@ -65,6 +65,10 @@ def post_seats(
         raise ApiError(422, "validation_error", "Seats are not in this device's layout.", {"seat_ids": stray})
     captured_at = now - max(timedelta(0), real_now - payload.captured_at)
     simulated = device.kind == "simulator"
+    if simulated:
+        taken = camera_zones(session, now)
+        payload.zones = [z for z in payload.zones if z.zone_id not in taken]
+        payload.seats = [s for s in payload.seats if s.zone_id not in taken]
     for zone in payload.zones:
         session.merge(
             models.ZoneSeatStatus(

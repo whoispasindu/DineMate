@@ -7,6 +7,7 @@ import {
   useLayoutMutation,
   useManagedDevices,
   useServerNow,
+  useTestFeeds,
   type DeviceLayout,
   type EditableZone,
   type LayoutPolygon,
@@ -15,7 +16,9 @@ import {
 import { clampUnit as clamp, cx, formatAgo, formatClock, LayoutCanvas, nextSeatId } from "@dinemate/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput, useUnsavedGuard } from "../kit";
+import { LiveBackdrop } from "../testVideo";
 
 const TYPE_LABEL: Record<PolygonType, string> = {
   seating: "Seating",
@@ -195,12 +198,14 @@ function ZoneList({ layout }: { layout: DeviceLayout }) {
   );
 }
 
-function LayoutEditor({ layout }: { layout: DeviceLayout }) {
+function LayoutEditor({ layout, live }: { layout: DeviceLayout; live: boolean }) {
   const saved = useMemo(() => layout.polygons.map((p) => ({ ...p, zone_id: p.zone_id ?? null })), [layout]);
   const [polygons, setPolygons] = useState<LayoutPolygon[]>(saved);
   const [selected, setSelected] = useState<number | null>(null);
   const [backdrop, setBackdrop] = useState<string | null>(null);
   const [seatMode, setSeatMode] = useState(false);
+  const [showLive, setShowLive] = useState(true);
+  const onLive = live && showLive;
   const now = useServerNow(30_000);
   const client = useQueryClient();
   const save = useLayoutMutation(layout.device_id, (body: { base_version: number | null; polygons: LayoutPolygon[] }) =>
@@ -295,36 +300,49 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
             />
           </label>
           {backdrop ? <Button onClick={() => setBackdrop(null)}>Clear backdrop</Button> : null}
+          {live ? (
+            <Button aria-pressed={showLive} onClick={() => setShowLive((on) => !on)}>
+              {showLive ? "Hide live picture" : "Show live picture"}
+            </Button>
+          ) : null}
         </div>
         <p className="m-0 text-xs text-muted">
           The backdrop stays in this browser and is never uploaded. Frames are never stored. The worker picks up a saved version within 30
           s.
         </p>
-        <LayoutCanvas
-          shapes={polygons}
-          labelOf={(polygon) => {
-            const zone = polygon.zone_id ? zones.get(polygon.zone_id) : undefined;
-            return polygon.type === "seating" ? (zone ? `${zone.name} · ${zone.capacity}` : "Unlinked seating") : TYPE_LABEL[polygon.type];
-          }}
-          colorOf={(polygon) => TYPE_COLOR[polygon.type]}
-          selected={selected}
-          onSelect={setSelected}
-          backdrop={backdrop}
-          onMove={(polygon, vertex, point) =>
-            setPolygons((all) =>
-              all.map((p, i) => (i === polygon ? { ...p, points: p.points.map((pt, j) => (j === vertex ? point : pt)) } : p)),
-            )
-          }
-          seatMode={seatMode}
-          onAddSeat={(polygon, [x, y]) =>
-            setPolygons((all) =>
-              all.map((p, i) => (i === polygon ? { ...p, seats: [...(p.seats ?? []), { seat_id: nextSeatId(all), x, y }] } : p)),
-            )
-          }
-          onRemoveSeat={(polygon, seat) =>
-            setPolygons((all) => all.map((p, i) => (i === polygon ? { ...p, seats: (p.seats ?? []).filter((_, k) => k !== seat) } : p)))
-          }
-        />
+        <div className={onLive ? "relative aspect-video w-full" : "contents"}>
+          {onLive ? <LiveBackdrop deviceId={layout.device_id} /> : null}
+          <LayoutCanvas
+            overlay={onLive}
+            shapes={polygons}
+            labelOf={(polygon) => {
+              const zone = polygon.zone_id ? zones.get(polygon.zone_id) : undefined;
+              return polygon.type === "seating"
+                ? zone
+                  ? `${zone.name} · ${zone.capacity}`
+                  : "Unlinked seating"
+                : TYPE_LABEL[polygon.type];
+            }}
+            colorOf={(polygon) => TYPE_COLOR[polygon.type]}
+            selected={selected}
+            onSelect={setSelected}
+            backdrop={backdrop}
+            onMove={(polygon, vertex, point) =>
+              setPolygons((all) =>
+                all.map((p, i) => (i === polygon ? { ...p, points: p.points.map((pt, j) => (j === vertex ? point : pt)) } : p)),
+              )
+            }
+            seatMode={seatMode}
+            onAddSeat={(polygon, [x, y]) =>
+              setPolygons((all) =>
+                all.map((p, i) => (i === polygon ? { ...p, seats: [...(p.seats ?? []), { seat_id: nextSeatId(all), x, y }] } : p)),
+              )
+            }
+            onRemoveSeat={(polygon, seat) =>
+              setPolygons((all) => all.map((p, i) => (i === polygon ? { ...p, seats: (p.seats ?? []).filter((_, k) => k !== seat) } : p)))
+            }
+          />
+        </div>
         {current && selected !== null ? (
           <ShapeTools
             polygon={current}
@@ -387,10 +405,13 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
 
 export function ZonesScreen() {
   const devices = useManagedDevices();
+  const feeds = useTestFeeds(apiMode() === "api");
+  const [params] = useSearchParams();
   const items = devices.data?.items ?? [];
-  const [picked, setPicked] = useState<string | undefined>();
+  const [picked, setPicked] = useState<string | undefined>(params.get("device") ?? undefined);
   const deviceId = picked ?? items[0]?.id;
   const layout = useDeviceLayout(deviceId);
+  const live = (feeds.data?.items ?? []).some((f) => f.id === deviceId);
   return (
     <Page title="Zones" sub="Draw seating zones per camera or simulator. Each save is a new version you can roll back.">
       {apiMode() === "sample" ? (
@@ -410,7 +431,7 @@ export function ZonesScreen() {
                 d.id === deviceId ? "border-brand bg-brand text-white" : "border-line bg-card text-ink hover:bg-page",
               )}
             >
-              {d.id}
+              {d.label ?? d.id}
               <span className="text-xs opacity-80">
                 {d.canteen_name} · {d.kind}
                 {d.layout_version ? ` · v${d.layout_version}` : ""}
@@ -421,7 +442,7 @@ export function ZonesScreen() {
       ) : null}
       {layout.isError ? <Banner tone="error">{errorText(layout.error)}</Banner> : null}
       {layout.data ? (
-        <LayoutEditor key={layout.data.device_id} layout={layout.data} />
+        <LayoutEditor key={layout.data.device_id} layout={layout.data} live={live} />
       ) : layout.isPending && deviceId ? (
         <div aria-busy="true" className="aspect-video w-full rounded-[20px] bg-line-soft motion-safe:animate-pulse" />
       ) : null}

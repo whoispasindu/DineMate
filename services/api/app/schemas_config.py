@@ -132,6 +132,7 @@ class ManagedDevice(Schema):
     layout_version: int | None
     last_heartbeat_at: datetime | None
     is_enabled: bool
+    label: str | None = None
 
 
 class ManagedDeviceList(Timestamped):

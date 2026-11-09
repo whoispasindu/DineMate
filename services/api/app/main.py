@@ -23,6 +23,7 @@ from app.routers import (
     student,
 )
 from app.safety import router as safety
+from app.testfeeds import router as testfeeds
 
 API_PREFIX = "/api/v1"
 
@@ -66,6 +67,7 @@ def create_app() -> FastAPI:
         staff_router.devices,
         camera_router.router,
         camera_router.devices,
+        testfeeds.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

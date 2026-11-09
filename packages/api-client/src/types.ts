@@ -431,6 +431,7 @@ export interface ManagedDevice {
   layout_version: number | null;
   last_heartbeat_at: string | null;
   is_enabled: boolean;
+  label?: string | null;
 }
 
 export interface ManagedDeviceList extends Timestamped {
@@ -768,6 +769,43 @@ export interface CameraRemoved extends Timestamped {
 
 export interface AreaResult extends Timestamped {
   zone: EditableZone;
+}
+
+export interface UploadedVideo extends Timestamped {
+  source: string;
+  name: string;
+  size_mb: number;
+}
+
+export interface VideoFeedIn {
+  label: string;
+  source: string;
+}
+
+export interface VideoFeed {
+  id: string;
+  canteen_id: string;
+  canteen_name: string;
+  label: string;
+  source_hint: string | null;
+  status: "ok" | "waiting_for_zones" | "starting" | "offline";
+  last_seen_at: string | null;
+  fps: number | null;
+  zones: string[];
+  has_layout: boolean;
+}
+
+export interface VideoFeedList extends Timestamped {
+  items: VideoFeed[];
+  max_feeds: number;
+}
+
+export interface VideoFeedResult extends Timestamped {
+  feed: VideoFeed;
+}
+
+export interface VideoFeedRemoved extends Timestamped {
+  device_id: string;
 }
 
 export interface VenueCameras extends Timestamped {

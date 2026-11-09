@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     demo_password: str | None = None
     cookie_secure: bool | None = None
     max_cameras: int = 8
+    test_videos_dir: str = "test-videos"
+    test_video_max_mb: int = 1024
 
     @field_validator("demo_clock_start", mode="before")
     @classmethod

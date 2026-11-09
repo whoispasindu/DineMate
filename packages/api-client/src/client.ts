@@ -28,6 +28,11 @@ import type {
   BusinessSettingsIn,
   ConsentIn,
   LiveLink,
+  UploadedVideo,
+  VideoFeedIn,
+  VideoFeedList,
+  VideoFeedRemoved,
+  VideoFeedResult,
   SalesDay,
   StaffIn,
   StaffList,
@@ -119,17 +124,19 @@ interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   staff?: boolean;
   body?: unknown;
+  upload?: Blob;
 }
 
 async function send(path: string, options: RequestOptions, token: string | null): Promise<Response> {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (options.upload) headers["Content-Type"] = options.upload.type || "application/octet-stream";
   try {
     return await fetch(`${baseUrl}${path}`, {
       method: options.method ?? "GET",
       headers,
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      body: options.upload ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
       credentials: path.startsWith("/auth/") ? "include" : "same-origin",
     });
   } catch {
@@ -403,6 +410,13 @@ export const api = {
     staffOnly(`/business/cameras/${enc(deviceId)}/layout`, { method: "PUT", body }),
   addArea: (venueId: string, name: string): Promise<AreaResult> =>
     staffOnly(`/business/venues/${enc(venueId)}/areas`, { method: "POST", body: { name } }),
+  uploadTestVideo: (file: File): Promise<UploadedVideo> =>
+    staffOnly(`/test-videos?filename=${enc(file.name)}`, { method: "POST", upload: file }),
+  testFeeds: (): Promise<VideoFeedList> => staffOnly("/manage/test-feeds"),
+  addTestFeed: (canteenId: string, body: VideoFeedIn): Promise<VideoFeedResult> =>
+    staffOnly(`/manage/canteens/${enc(canteenId)}/test-feeds`, { method: "POST", body }),
+  removeTestFeed: (deviceId: string): Promise<VideoFeedRemoved> => staffOnly(`/manage/test-feeds/${enc(deviceId)}`, { method: "DELETE" }),
+  testFeedLive: (deviceId: string): Promise<LiveLink> => staffOnly(`/manage/test-feeds/${enc(deviceId)}/live`),
   liveLink: (venueId: string, deviceId: string): Promise<LiveLink> =>
     baseUrl === null
       ? Promise.reject(new ApiError(409, "not_streaming", "Sample data has no real camera stream. Live view needs the café computer."))

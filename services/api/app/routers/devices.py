@@ -1,7 +1,7 @@
 import hashlib
 import json
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Header, Response
@@ -28,6 +28,7 @@ from app.schemas_device import (
 router = APIRouter(tags=["devices"])
 
 MAX_FUTURE_SKEW = timedelta(seconds=60)
+CAMERA_LIVE_FOR = timedelta(minutes=2)
 DEFAULT_SETTINGS: dict[str, Any] = {
     "post_every_s": 15.0,
     "smoothing_s": 60.0,
@@ -58,6 +59,17 @@ def seating_zone_ids(layout: models.ZoneLayout | None) -> list[str]:
     if layout is None:
         return []
     return [str(p["zone_id"]) for p in layout.polygons if p.get("type") == "seating" and p.get("zone_id")]
+
+
+def camera_zones(session: SessionDep, now: datetime) -> set[str]:
+    cameras = session.scalars(
+        select(models.Device.id).where(
+            models.Device.kind == "camera",
+            models.Device.is_enabled,
+            models.Device.last_heartbeat_at >= now - CAMERA_LIVE_FOR,
+        )
+    )
+    return {zone_id for device_id in cameras for zone_id in seating_zone_ids(current_layout(session, device_id))}
 
 
 def build_config(session: SessionDep, device: models.Device) -> dict[str, Any]:
@@ -146,6 +158,9 @@ def post_occupancy(
         raise ApiError(
             422, "validation_error", "Readings include zones this device does not cover.", {"zone_ids": unknown}
         )
+    if device.kind == "simulator":
+        taken = camera_zones(session, now)
+        payload.readings = [r for r in payload.readings if r.zone_id not in taken]
     zones = {
         str(z.id): z
         for z in session.scalars(
