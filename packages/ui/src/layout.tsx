@@ -166,6 +166,7 @@ export function LayoutCanvas<T extends LayoutShape>({
                 fillOpacity={0.9}
                 stroke={color}
                 strokeWidth={4}
+                role="img"
                 aria-label={`Seat ${seat.seat_id}`}
                 className={seatMode && active ? "cursor-pointer" : undefined}
                 pointerEvents={seatMode && active ? "all" : "none"}

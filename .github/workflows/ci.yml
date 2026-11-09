@@ -139,3 +139,30 @@ jobs:
         run: docker compose -f infra/docker-compose.yml logs api simulator
       - if: always()
         run: docker compose -f infra/docker-compose.yml down -v
+
+  business-compose:
+    name: Business local server smoke test
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_PASSWORD: ci-postgres-password
+      DINEMATE_JWT_SECRET: ci-only-jwt-secret-for-the-business-smoke-test
+      DINEMATE_TEMPLATE_KEY: 7Qn1W1n3V2aJ6o4m0cQy7hYk3m9pHk2kCq0yWn3Jg2E=
+      DINEMATE_LIVE_LINK_SECRET: ci-live-link-secret
+      DINEMATE_SIMULATOR_TOKEN: ci-simulator-token
+      DINEMATE_HUB_TOKEN: ci-hub-token
+      DINEMATE_SETUP_PASSWORD: ci-owner-password
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -f infra/docker-compose.business.yml up -d --build --wait
+      - run: >-
+          docker compose -f infra/docker-compose.business.yml exec -T -e DINEMATE_SETUP_PASSWORD -e DINEMATE_HUB_TOKEN api
+          python -m app.business.setup create --org "CI Cafe Group" --venue "CI Cafe" --owner-email owner@ci.test
+          --password-env DINEMATE_SETUP_PASSWORD --hub-token-env DINEMATE_HUB_TOKEN
+      - run: curl --fail --silent --show-error http://localhost:8080/ | grep -q '<div id="root">'
+      - run: curl --fail --silent --show-error http://localhost:8080/cameras | grep -q '<div id="root">'
+      - run: 'curl --fail --silent --show-error -X POST -H ''Content-Type: application/json'' -d ''{"email":"owner@ci.test","password":"ci-owner-password"}'' http://localhost:8080/api/v1/auth/login | grep -q access_token'
+      - run: 'curl --fail --silent --show-error -H "Authorization: Device ci-hub-token" http://localhost:8080/api/v1/devices/hub-local/hub/cameras | grep -q ''"cameras":\[\]'''
+      - if: always()
+        run: docker compose -f infra/docker-compose.business.yml logs api web
+      - if: always()
+        run: docker compose -f infra/docker-compose.business.yml down -v

@@ -21,7 +21,7 @@ One developer, seven phases, Week 0 → 10 Jan 2027, then Phases 7–10 from the
 | 7. Seat-level occupancy    | TBD   | after judging   | Every seat is free, occupied, held or unknown           |
 | 8. Business core           | Done  | after Phase 7   | DineMate Business: venues, tables, customer stays       |
 | 9. Staff and till          | Built | after Phase 8   | Staff recognition, work areas, till data per worker     |
-| 10. Deploy and sell        | TBD   | after Phase 9   | Local server, cloud plan, billing, first pilot shops    |
+| 10. Deploy and sell        | Built | after Phase 9   | Local server, cloud plan, billing, first pilot shops    |
 
 ---
 
@@ -237,9 +237,9 @@ Layout: `apps/business` (owner and manager dashboard), later `apps/venue` (publi
 
 ## Phase 10 — Deploy and sell
 
-- [ ] Local server: one-command install of the business stack on a small PC (`docker-compose.business.yml`), cameras added from the dashboard
-- [ ] Cloud plan: multi-tenant hosting for shops that pay extra; cameras still run locally and send only counts and events
-- [ ] Plans and billing switches (per venue per month, per camera, cloud add-on); pricing left as `[__]` until pilot shops are interviewed
+- [x] Local server: one-command install of the business stack on a small PC (`docker-compose.business.yml`), cameras added from the dashboard — Windows with Docker Desktop: `infra/install-business.ps1` (random secrets in git-ignored `infra/.env.business`, first-run `app.business.setup`), `infra/business.ps1` (start, stop, status, logs, backup, update); db, API, nginx dashboard on :8080 and the camera hub (`vision.hub`, one worker per camera, live views on 8090–8097); cameras are added, edited and removed on the Cameras page, and zones, seats and work areas are drawn on the live picture (`/cameras/:id/setup`); owner guide in docs/business/INSTALL.md
+- [ ] Cloud plan: multi-tenant hosting for shops that pay extra; cameras still run locally and send only counts and events — not built; described to the judges as the next step
+- [ ] Plans and billing switches (per venue per month, per camera, cloud add-on); pricing left as `[__]` until pilot shops are interviewed — not built; described to the judges as the next step
 - [ ] Pilot with one or two shops, with written agreements and staff consent
 
 ---
