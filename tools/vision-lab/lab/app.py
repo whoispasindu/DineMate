@@ -34,6 +34,19 @@ class RunIn(BaseModel):
     smoothing_s: float = Field(default=15.0, ge=1, le=300)
     fps: float = Field(default=4.0, ge=0.5, le=15)
     blur: bool = True
+    min_gap_s: float = Field(default=30.0, ge=1, le=3600)
+
+
+class BadgeIn(BaseModel):
+    name: str = Field(min_length=1, max_length=40)
+    code: int = Field(ge=0, le=249)
+
+
+class EnrolIn(BaseModel):
+    name: str = Field(min_length=1, max_length=40)
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+    consent: bool = False
 
 
 class MarkIn(BaseModel):
@@ -107,7 +120,7 @@ def create_app(lab: Lab) -> FastAPI:
 
     @app.post("/api/run")
     def run(body: RunIn) -> dict[str, Any]:
-        lab.start(RunSettings(body.dwell_s, body.smoothing_s, body.fps, body.blur))
+        lab.start(RunSettings(body.dwell_s, body.smoothing_s, body.fps, body.blur, body.min_gap_s))
         return lab.state()
 
     @app.post("/api/pause")
@@ -128,6 +141,20 @@ def create_app(lab: Lab) -> FastAPI:
     @app.get("/api/state")
     def state() -> dict[str, Any]:
         return lab.state()
+
+    @app.post("/api/staff/badge")
+    def badge(body: BadgeIn) -> dict[str, Any]:
+        lab.add_badge(body.name, body.code)
+        return {"staff": lab.staff_view()}
+
+    @app.post("/api/staff/enrol")
+    def enrol(body: EnrolIn) -> dict[str, Any]:
+        return {"note": lab.request_enrol(body.name, body.x, body.y, body.consent)}
+
+    @app.delete("/api/staff/{staff_id}")
+    def remove_staff(staff_id: str) -> dict[str, Any]:
+        lab.remove_staff(staff_id)
+        return {"staff": lab.staff_view()}
 
     @app.post("/api/mark")
     def mark(body: MarkIn) -> dict[str, Any]:

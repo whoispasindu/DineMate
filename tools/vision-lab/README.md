@@ -21,6 +21,7 @@ It opens http://127.0.0.1:8765 in your browser and listens on this computer only
 2. **Zones:** click points on the frame where people's feet are, then double-click, press Enter or press **Finish zone**. Pick the kind:
    - **Seating** counts seated people after the dwell time.
    - **Queue** counts everyone in it, standing or not.
+   - **Work area** (counter, kitchen or floor) tracks the workers inside it. Its card counts the people in it, so you can hand-count staff at the counter too.
 
    Save the zones to reuse them. They go to `services/vision/layouts/test-lab-*.json`, which is git-ignored.
 
@@ -33,7 +34,22 @@ It opens http://127.0.0.1:8765 in your browser and listens on this computer only
 
    Our count lags a change by about the dwell plus half the smoothing, so use "Ignore the first (s)" to skip the warm-up. **Download CSV** saves `t_s, zone, ours, yours` for docs/RESULTS.md.
 
-Counting only: never use the lab to recognise anyone. Keep "Blur faces" on for footage of the public.
+## Workers
+
+Everyone whose feet are inside a work area is tracked as **Worker 1**, **Worker 2** and so on, without being identified. The live view shows each worker's area and time. The Workers panel shows:
+
+- who is in a work area now
+- how much of the run the counter was staffed
+- counter gaps longer than "Counter gap (s)"
+
+The results list time per area for each worker. Sightings under 3 s are hidden, because they are usually a track that broke for a moment.
+
+**Named workers** are optional and last for this session only. Nothing is written to disk.
+
+- **Badge:** type a name and an ArUco badge code (print one with `uv run python -m vision.badges 11` in services/vision). The worker is named when the badge is seen inside a work area.
+- **Face:** only for footage where the people filmed agreed to be recognised. Tick the consent box, type a name, press **Enrol by face**, then click that worker in the live view (pause first if they move a lot). The lab takes 5 shots of their face over a few seconds and averages them. It needs the face models: `uv run python -m vision.fetch_models` in services/vision.
+
+Never enrol customers or people in public footage. Keep "Blur faces" on; named workers are the only faces left unblurred.
 
 ## Tests
 
