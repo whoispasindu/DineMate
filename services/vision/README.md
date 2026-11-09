@@ -143,6 +143,27 @@ It asks for the owner's password, lists consented workers set to Face, and takes
 
 **Live view** (`vision/stream.py`): start the worker with `--stream-port 8090` (or `DINEMATE_STREAM_PORT`). It serves `http://<this computer>:8090/live` on the café network and reports that URL in its heartbeat (`--stream-host` sets the address if the automatic one is wrong). The Cameras page asks the API for a link signed with the device token that is valid for 60 s; the worker checks the signature and expiry before streaming, and one viewing lasts at most 10 minutes. Frames are drawn with zones, tables and named staff, every other person's face is pixelated before encoding, frames are only encoded while someone is watching, and nothing is written to disk. Browsers block an `http` stream inside an `https` page, so open the business app over `http` on the café network or put the worker behind a local TLS proxy.
 
+## Camera hub (local server, Phase 10)
+
+`vision/hub.py` runs every camera the owner adds in DineMate Business (RTSP cameras, phone camera app URLs, a USB webcam index, or a YouTube link for demos). Every 15 s it reads the camera list from `GET /devices/{hub_id}/hub/cameras` and keeps one worker per enabled camera. Each worker gets a stable live-view port (`8090`, `8091`, … up to 8 cameras), so the owner can open it and draw zones. A worker whose layout has no zones yet runs in setup mode: it serves the live view, sends heartbeats with "waiting for zones", posts nothing, and starts counting as soon as zones are saved. A worker that exits is restarted after 5 s, 15 s, then every 60 s; one whose source changes restarts at once; removed or turned-off cameras stop. Ctrl+C or `docker stop` stops them all.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `DINEMATE_API_URL` | `http://localhost:8000/api/v1` | API the hub and its workers talk to |
+| `DINEMATE_HUB_ID` | `hub-local` | the hub's device ID |
+| `DINEMATE_HUB_TOKEN` | (required) | the hub's device token |
+| `DINEMATE_STREAM_HOST` | `localhost` | address owners' browsers use to reach the live views |
+| `DINEMATE_STREAM_FIRST_PORT` | `8090` | first live-view port |
+| `DINEMATE_MODEL` | `models/yolo11n.pt` | detector; downloaded on first run if missing |
+
+In Docker the image (`services/vision/Dockerfile`) starts the hub by default. USB webcams cannot reach a Docker container on Windows, so for a webcam run the hub natively on the café PC instead (stop the Docker hub first so the ports are free):
+
+```bash
+uv run python -m vision.hub --api http://localhost:8000/api/v1 --token <hub token>
+```
+
+`DINEMATE_HUB_TOKEN` can also go in `services/vision/.env`. The hub asks the API for a fresh token for a camera only when it (re)starts that camera's worker, which invalidates the previous one. Tokens reach workers through their environment, never the command line, and are never logged; camera passwords in source URLs are shown as `***` in all hub and worker output.
+
 ## Checking accuracy against your own counts (plan Section 7.6)
 
 1. Draw zones for each video with the studio (names matter: they go in the CSV).

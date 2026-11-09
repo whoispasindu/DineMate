@@ -26,7 +26,7 @@ from app.models.base import Base
 
 class Device(Base):
     __tablename__ = "devices"
-    __table_args__ = (CheckConstraint("kind IN ('camera', 'simulator')", name="kind"),)
+    __table_args__ = (CheckConstraint("kind IN ('camera', 'simulator', 'hub')", name="kind"),)
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     canteen_id: Mapped[str] = mapped_column(ForeignKey("canteens.id"), index=True)

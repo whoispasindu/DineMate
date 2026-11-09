@@ -276,8 +276,30 @@ export function sampleReport(venueId: string, range: ReportRange, now: number): 
 export function sampleCameras(venueId: string, now: number): VenueCameras | undefined {
   if (venueId !== SAMPLE_VENUE_ID) return undefined;
   const items: CameraHealth[] = [
-    { id: "sim-cafe", kind: "simulator", zones: ["Window side", "Main floor"], status: "ok", fps: null, last_seen_at: iso(now - 4_000) },
-    { id: "cam-entrance", kind: "camera", zones: [], status: "offline", fps: null, last_seen_at: iso(now - 2 * MIN) },
+    {
+      id: "sim-cafe",
+      kind: "simulator",
+      zones: ["Window side", "Main floor"],
+      status: "ok",
+      fps: null,
+      last_seen_at: iso(now - 4_000),
+      label: null,
+      source_hint: null,
+      has_layout: true,
+      waiting_for_zones: false,
+    },
+    {
+      id: "cam-entrance",
+      kind: "camera",
+      zones: [],
+      status: "offline",
+      fps: null,
+      last_seen_at: iso(now - 2 * MIN),
+      label: "Entrance",
+      source_hint: "rtsp://192.168.1.60:554/…",
+      has_layout: false,
+      waiting_for_zones: false,
+    },
   ];
   return { server_time: iso(now), venue_id: SAMPLE_VENUE_ID, items };
 }

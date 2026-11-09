@@ -19,6 +19,11 @@ import { sampleAudit, sampleSales, sampleStaff, sampleStaffReport, sampleStaffSh
 import { iso, sampleNow } from "./sample/time";
 import { sampleUser } from "./sample/users";
 import type {
+  AreaResult,
+  CameraIn,
+  CameraPatch,
+  CameraRemoved,
+  CameraResult,
   AuditList,
   BusinessSettingsIn,
   ConsentIn,
@@ -388,6 +393,16 @@ export const api = {
       (now) => sampleSales(venueId, now),
       "Venue not found",
     ),
+  addCamera: (venueId: string, body: CameraIn): Promise<CameraResult> =>
+    staffOnly(`/business/venues/${enc(venueId)}/cameras`, { method: "POST", body }),
+  updateCamera: (deviceId: string, body: CameraPatch): Promise<CameraResult> =>
+    staffOnly(`/business/cameras/${enc(deviceId)}`, { method: "PATCH", body }),
+  removeCamera: (deviceId: string): Promise<CameraRemoved> => staffOnly(`/business/cameras/${enc(deviceId)}`, { method: "DELETE" }),
+  cameraLayout: (deviceId: string): Promise<DeviceLayout> => staffOnly(`/business/cameras/${enc(deviceId)}/layout`),
+  saveCameraLayout: (deviceId: string, body: { base_version: number | null; polygons: LayoutPolygon[] }): Promise<DeviceLayout> =>
+    staffOnly(`/business/cameras/${enc(deviceId)}/layout`, { method: "PUT", body }),
+  addArea: (venueId: string, name: string): Promise<AreaResult> =>
+    staffOnly(`/business/venues/${enc(venueId)}/areas`, { method: "POST", body: { name } }),
   liveLink: (venueId: string, deviceId: string): Promise<LiveLink> =>
     baseUrl === null
       ? Promise.reject(new ApiError(409, "not_streaming", "Sample data has no real camera stream. Live view needs the café computer."))

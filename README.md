@@ -16,14 +16,14 @@
 
 ## What it does
 
-| Students (installable PWA)                                              | Campus staff (console)                                                                  | Cafés and restaurants (DineMate Business)                                              |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| "About N seats free" per canteen and zone, with a range                 | Overview: free seats, live zones, crowding alerts with acknowledge, device health       | **Live floor**: table map with free, seated, held by a bag and needs clearing          |
-| Occupancy bar that shows taken, **held by bags**, hidden and free seats | **Seats**: per-zone taken, held, hidden and free-soon counts, seat maps, stay times     | **Likely free in about X–Y min** per table (experimental, from the café's own history) |
-| **Best spot now** and **Less crowded nearby** with walking time         | **Shops & menus**: hours, exceptions, closures, menu drafts → Publish, one-tap sold out | **Customers**: anonymous visits, average stay, turns per table, busiest hours          |
-| Food tab: shops open now, menus by meal, sold out in real time          | **Meal schedules**, **Thresholds**, **Zones** editor with seat placing and rollback     | **Reports**: day and week totals, weekday × hour grid                                  |
-| Meal countdown on the server clock; experimental **next hour** forecast | **Occupancy** history; **Safety** desk with a labelled simulator                        | **Settings**: group camera seats into tables, data retention                           |
-| Safety banner; "status unknown" if the connection drops                 | Roles: admin, canteen manager, shop manager, safety officer                             | Roles: owner and venue manager; Staff, Sales and Privacy arrive in Phase 9             |
+| Students (installable PWA)                                              | Campus staff (console)                                                                  | Cafés and restaurants (DineMate Business)                                                                  |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| "About N seats free" per canteen and zone, with a range                 | Overview: free seats, live zones, crowding alerts with acknowledge, device health       | **Live floor**: table map with free, seated, held by a bag and needs clearing                              |
+| Occupancy bar that shows taken, **held by bags**, hidden and free seats | **Seats**: per-zone taken, held, hidden and free-soon counts, seat maps, stay times     | **Likely free in about X–Y min** per table (experimental, from the café's own history)                     |
+| **Best spot now** and **Less crowded nearby** with walking time         | **Shops & menus**: hours, exceptions, closures, menu drafts → Publish, one-tap sold out | **Customers**: anonymous visits, average stay, turns per table, busiest hours                              |
+| Food tab: shops open now, menus by meal, sold out in real time          | **Meal schedules**, **Thresholds**, **Zones** editor with seat placing and rollback     | **Reports**: day and week totals, weekday × hour grid                                                      |
+| Meal countdown on the server clock; experimental **next hour** forecast | **Occupancy** history; **Safety** desk with a labelled simulator                        | **Settings**: group camera seats into tables, data retention                                               |
+| Safety banner; "status unknown" if the connection drops                 | Roles: admin, canteen manager, shop manager, safety officer                             | Roles: owner and venue manager; Staff, Sales, Privacy & consent; cameras added and set up in the dashboard |
 
 Seats are counted by a small vision worker (YOLO11n + ByteTrack, plus pose for sitting vs standing). It runs on a laptop with a webcam or a recorded video and **posts numbers only**: no frames are stored and customers are never identified. Places without a camera are fed by labelled simulators.
 
@@ -162,6 +162,16 @@ docker compose -f infra/docker-compose.yml exec api python -m app.seed_history -
 
 This adds three weeks of **simulated** history. The Sample Café already comes with 28 days of simulated visits.
 
+### DineMate Business on a café PC
+
+One command installs the business edition on a Windows PC with Docker Desktop: database, API, dashboard on http://localhost:8080 and the camera service. It asks for the business name and the owner account.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File infra\install-business.ps1
+```
+
+Cameras are then added and set up in the dashboard. See [docs/business/INSTALL.md](docs/business/INSTALL.md).
+
 ## Checks
 
 | Command                                       | What it runs                                                                                                               |
@@ -189,4 +199,4 @@ Campus apps: forest, sand and purple, with Bricolage Grotesque for headings and 
 
 ## Status
 
-Built phase by phase from [docs/ROADMAP.md](docs/ROADMAP.md). Phases 1–8 are done, including seat-level occupancy (Phase 7) and the DineMate Business core (Phase 8). Next: staff recognition with consent, till data and the live camera view (Phase 9), then deployment and pilot cafés (Phase 10). Real-world work also remains: hand-count accuracy on canteen videos, the seat-search survey and demo rehearsals. Results go in [docs/RESULTS.md](docs/RESULTS.md).
+Built phase by phase from [docs/ROADMAP.md](docs/ROADMAP.md). Phases 1–10 are built, including seat-level occupancy (Phase 7), the DineMate Business core (Phase 8), staff and till with consent (Phase 9) and the one-command local server (Phase 10). Cloud hosting, billing and pilot cafés come next. Real-world work also remains: hand-count accuracy on canteen videos, the seat-search survey and demo rehearsals. Results go in [docs/RESULTS.md](docs/RESULTS.md).

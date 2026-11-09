@@ -1,6 +1,6 @@
 import pytest
 
-from vision.youtube import is_youtube, pick
+from vision.youtube import is_network_stream, is_youtube, pick
 
 
 @pytest.mark.parametrize(
@@ -21,6 +21,19 @@ def test_youtube_links_are_recognised(link: str) -> None:
 )
 def test_other_sources_are_not_youtube(spec: str) -> None:
     assert not is_youtube(spec)
+
+
+@pytest.mark.parametrize(
+    "spec",
+    ["rtsp://user:pass@192.168.1.20:554/stream1", "http://192.168.1.31:8080/video", "HTTPS://cam.local/live.m3u8"],
+)
+def test_camera_urls_are_network_streams(spec: str) -> None:
+    assert is_network_stream(spec)
+
+
+@pytest.mark.parametrize("spec", ["0", "data/videos/canteen.mp4", "https://youtu.be/vls4DGvdqgM"])
+def test_files_webcams_and_youtube_are_not_network_streams(spec: str) -> None:
+    assert not is_network_stream(spec)
 
 
 def test_pick_uses_the_direct_url_or_the_video_part_of_a_split_format() -> None:

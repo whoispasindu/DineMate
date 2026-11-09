@@ -733,6 +733,41 @@ export interface CameraHealth {
   status: "ok" | "not_reporting" | "offline";
   fps: number | null;
   last_seen_at: string | null;
+  label?: string | null;
+  source_hint?: string | null;
+  has_layout?: boolean;
+  waiting_for_zones?: boolean;
+}
+
+export interface CameraIn {
+  label: string;
+  source: string;
+}
+
+export interface CameraPatch {
+  label?: string;
+  source?: string;
+  enabled?: boolean;
+}
+
+export interface CameraOut {
+  id: string;
+  venue_id: string;
+  label: string;
+  source_hint: string | null;
+  enabled: boolean;
+}
+
+export interface CameraResult extends Timestamped {
+  camera: CameraOut;
+}
+
+export interface CameraRemoved extends Timestamped {
+  device_id: string;
+}
+
+export interface AreaResult extends Timestamped {
+  zone: EditableZone;
 }
 
 export interface VenueCameras extends Timestamped {

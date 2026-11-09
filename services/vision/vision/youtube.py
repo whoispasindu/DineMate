@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 YOUTUBE = re.compile(r"^https?://(www\.|m\.)?(youtube\.com/(watch|live/|shorts/)|youtu\.be/)", re.IGNORECASE)
+NETWORK = re.compile(r"^(rtsps?|rtmps?|https?)://", re.IGNORECASE)
 FORMAT = (
     "bestvideo[height<=720][vcodec^=avc1]/best[height<=720][vcodec^=avc1]/bestvideo[height<=720]/best[height<=720]/best"
 )
@@ -17,6 +18,10 @@ class RemoteStream:
 
 def is_youtube(spec: str) -> bool:
     return bool(YOUTUBE.match(spec.strip()))
+
+
+def is_network_stream(spec: str) -> bool:
+    return bool(NETWORK.match(spec.strip())) and not is_youtube(spec)
 
 
 def pick(info: dict[str, Any]) -> RemoteStream:

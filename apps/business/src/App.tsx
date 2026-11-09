@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Route, Routes } from "react-router";
 import { Button } from "./kit";
 import { BusinessShell } from "./layout";
+import { CameraSetupScreen } from "./screens/CameraSetup";
 import { CamerasScreen } from "./screens/Cameras";
 import { CustomersScreen } from "./screens/Customers";
 import { LiveFloorScreen } from "./screens/LiveFloor";
@@ -49,6 +50,7 @@ export function App() {
           <Route path="privacy" element={<PrivacyScreen user={user} />} />
           <Route path="reports" element={<ReportsScreen />} />
           <Route path="cameras" element={<CamerasScreen />} />
+          <Route path="cameras/:deviceId/setup" element={<CameraSetupScreen />} />
           <Route path="settings" element={<SettingsScreen user={user} />} />
           <Route path="*" element={<NotFoundScreen />} />
         </Route>

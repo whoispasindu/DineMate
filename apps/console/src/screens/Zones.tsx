@@ -12,14 +12,11 @@ import {
   type LayoutPolygon,
   type PolygonType,
 } from "@dinemate/api-client";
-import { cx, formatAgo, formatClock } from "@dinemate/ui";
+import { clampUnit as clamp, cx, formatAgo, formatClock, LayoutCanvas, nextSeatId } from "@dinemate/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput, useUnsavedGuard } from "../kit";
 
-const W = 1600;
-const H = 900;
-const NUDGE = 0.005;
 const TYPE_LABEL: Record<PolygonType, string> = {
   seating: "Seating",
   queue: "Queue",
@@ -35,155 +32,6 @@ const TYPE_COLOR: Record<PolygonType, string> = {
   ignore: "#c2410c",
   work: "#5b34c9",
 };
-
-type Point = [number, number];
-
-const clamp = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 1000) / 1000;
-const nextSeatId = (polygons: LayoutPolygon[]): string => {
-  const used = new Set(polygons.flatMap((p) => (p.seats ?? []).map((seat) => seat.seat_id)));
-  let n = used.size + 1;
-  while (used.has(`seat-${n}`)) n += 1;
-  return `seat-${n}`;
-};
-const centroid = (points: Point[]): Point => [
-  points.reduce((s, p) => s + p[0], 0) / points.length,
-  points.reduce((s, p) => s + p[1], 0) / points.length,
-];
-
-function Canvas({
-  polygons,
-  zones,
-  selected,
-  onSelect,
-  onMove,
-  backdrop,
-  seatMode,
-  onAddSeat,
-  onRemoveSeat,
-}: {
-  polygons: LayoutPolygon[];
-  zones: Map<string, EditableZone>;
-  selected: number | null;
-  onSelect: (index: number | null) => void;
-  onMove: (polygon: number, vertex: number, point: Point) => void;
-  backdrop: string | null;
-  seatMode: boolean;
-  onAddSeat: (polygon: number, point: Point) => void;
-  onRemoveSeat: (polygon: number, seat: number) => void;
-}) {
-  const svg = useRef<SVGSVGElement>(null);
-  const [drag, setDrag] = useState<{ polygon: number; vertex: number } | null>(null);
-  const toPoint = (event: PointerEvent): Point | null => {
-    const matrix = svg.current?.getScreenCTM();
-    if (!svg.current || !matrix) return null;
-    const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
-    return [clamp(p.x / W), clamp(p.y / H)];
-  };
-  const nudge = (event: KeyboardEvent, polygon: number, vertex: number) => {
-    const step = event.shiftKey ? NUDGE * 4 : NUDGE;
-    const delta = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[event.key];
-    const point = polygons[polygon]?.points[vertex];
-    if (!delta || !point) return;
-    event.preventDefault();
-    onMove(polygon, vertex, [clamp(point[0] + (delta[0] ?? 0)), clamp(point[1] + (delta[1] ?? 0))]);
-  };
-  return (
-    <svg
-      ref={svg}
-      viewBox={`0 0 ${W} ${H}`}
-      role="application"
-      aria-label="Zone layout canvas. Select a shape, then drag its corners or move a focused corner with the arrow keys."
-      className="aspect-video w-full touch-none select-none rounded-xl border border-line bg-[#1b2420]"
-      onPointerMove={(e) => {
-        if (!drag) return;
-        const point = toPoint(e);
-        if (point) onMove(drag.polygon, drag.vertex, point);
-      }}
-      onPointerUp={() => setDrag(null)}
-      onPointerLeave={() => setDrag(null)}
-      onPointerDown={(e) => {
-        if (e.target === svg.current) onSelect(null);
-      }}
-    >
-      {backdrop ? <image href={backdrop} x={0} y={0} width={W} height={H} preserveAspectRatio="none" opacity={0.85} /> : null}
-      {Array.from({ length: 9 }, (_, i) => (
-        <line key={`v${i}`} x1={((i + 1) * W) / 10} y1={0} x2={((i + 1) * W) / 10} y2={H} stroke="#ffffff" strokeOpacity={0.06} />
-      ))}
-      {Array.from({ length: 4 }, (_, i) => (
-        <line key={`h${i}`} x1={0} y1={((i + 1) * H) / 5} x2={W} y2={((i + 1) * H) / 5} stroke="#ffffff" strokeOpacity={0.06} />
-      ))}
-      {polygons.map((polygon, index) => {
-        const color = TYPE_COLOR[polygon.type];
-        const zone = polygon.zone_id ? zones.get(polygon.zone_id) : undefined;
-        const [cx_, cy_] = centroid(polygon.points);
-        const active = index === selected;
-        return (
-          <g key={index}>
-            <polygon
-              points={polygon.points.map(([x, y]) => `${x * W},${y * H}`).join(" ")}
-              fill={color}
-              fillOpacity={active ? 0.35 : 0.2}
-              stroke={color}
-              strokeWidth={active ? 6 : 4}
-              className={seatMode && active ? "cursor-crosshair" : "cursor-pointer"}
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                const point = seatMode && active ? toPoint(e) : null;
-                if (point) onAddSeat(index, point);
-                else onSelect(index);
-              }}
-            />
-            <text x={cx_ * W} y={cy_ * H} textAnchor="middle" fill="#ffffff" fontSize={34} fontWeight={700} pointerEvents="none">
-              {polygon.type === "seating" ? (zone ? `${zone.name} · ${zone.capacity}` : "Unlinked seating") : TYPE_LABEL[polygon.type]}
-            </text>
-            {(polygon.seats ?? []).map((seat, k) => (
-              <circle
-                key={seat.seat_id}
-                cx={seat.x * W}
-                cy={seat.y * H}
-                r={12}
-                fill="#ffffff"
-                fillOpacity={0.9}
-                stroke={color}
-                strokeWidth={4}
-                aria-label={`Seat ${seat.seat_id}`}
-                className={seatMode && active ? "cursor-pointer" : undefined}
-                pointerEvents={seatMode && active ? "all" : "none"}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  onRemoveSeat(index, k);
-                }}
-              />
-            ))}
-            {active && !seatMode
-              ? polygon.points.map(([x, y], vertex) => (
-                  <circle
-                    key={vertex}
-                    cx={x * W}
-                    cy={y * H}
-                    r={16}
-                    fill="#ffffff"
-                    stroke={color}
-                    strokeWidth={5}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`Corner ${vertex + 1} at ${Math.round(x * 100)}%, ${Math.round(y * 100)}%`}
-                    className="cursor-grab focus:outline-none"
-                    onKeyDown={(e) => nudge(e, index, vertex)}
-                    onPointerDown={(e) => {
-                      e.stopPropagation();
-                      (e.target as Element).setPointerCapture?.(e.pointerId);
-                      setDrag({ polygon: index, vertex });
-                    }}
-                  />
-                ))
-              : null}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 function ShapeTools({
   polygon,
@@ -452,9 +300,13 @@ function LayoutEditor({ layout }: { layout: DeviceLayout }) {
           The backdrop stays in this browser and is never uploaded. Frames are never stored. The worker picks up a saved version within 30
           s.
         </p>
-        <Canvas
-          polygons={polygons}
-          zones={zones}
+        <LayoutCanvas
+          shapes={polygons}
+          labelOf={(polygon) => {
+            const zone = polygon.zone_id ? zones.get(polygon.zone_id) : undefined;
+            return polygon.type === "seating" ? (zone ? `${zone.name} · ${zone.capacity}` : "Unlinked seating") : TYPE_LABEL[polygon.type];
+          }}
+          colorOf={(polygon) => TYPE_COLOR[polygon.type]}
           selected={selected}
           onSelect={setSelected}
           backdrop={backdrop}

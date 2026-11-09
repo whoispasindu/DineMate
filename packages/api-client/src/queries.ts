@@ -2,6 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
 import { serverNow } from "./clock";
 import type {
+  CameraIn,
+  CameraPatch,
+  LayoutPolygon,
   BusinessSettingsIn,
   ConsentIn,
   StaffIn,
@@ -56,6 +59,7 @@ export const queryKeys = {
   staffAudit: ["business", "audit"] as const,
   sales: (venueId: string, day: string) => ["business", "sales", venueId, day] as const,
   liveLink: (venueId: string, deviceId: string) => ["business", "live", venueId, deviceId] as const,
+  cameraLayout: (deviceId: string) => ["business", "camera-layout", deviceId] as const,
 };
 
 export function useStudentSummary() {
@@ -466,5 +470,58 @@ export function useLiveLink(venueId: string | undefined, deviceId: string | unde
     gcTime: 0,
     refetchOnWindowFocus: false,
     retry: false,
+  });
+}
+
+function useCameraChange<A, R>(venueId: string, run: (args: A) => Promise<R>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: queryKeys.cameras(venueId) });
+      void client.invalidateQueries({ queryKey: queryKeys.venues });
+    },
+  });
+}
+
+export function useAddCamera(venueId: string) {
+  return useCameraChange(venueId, (body: CameraIn) => api.addCamera(venueId, body));
+}
+
+export function useUpdateCamera(venueId: string) {
+  return useCameraChange(venueId, ({ deviceId, body }: { deviceId: string; body: CameraPatch }) => api.updateCamera(deviceId, body));
+}
+
+export function useRemoveCamera(venueId: string) {
+  return useCameraChange(venueId, (deviceId: string) => api.removeCamera(deviceId));
+}
+
+export function useCameraLayout(deviceId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.cameraLayout(deviceId ?? ""),
+    queryFn: () => api.cameraLayout(deviceId ?? ""),
+    enabled: deviceId !== undefined,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSaveCameraLayout(venueId: string, deviceId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { base_version: number | null; polygons: LayoutPolygon[] }) => api.saveCameraLayout(deviceId, body),
+    onSuccess: (layout) => {
+      client.setQueryData(queryKeys.cameraLayout(deviceId), layout);
+      void client.invalidateQueries({ queryKey: queryKeys.cameras(venueId) });
+      void client.invalidateQueries({ queryKey: queryKeys.tables(venueId) });
+    },
+  });
+}
+
+export function useAddArea(venueId: string, deviceId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.addArea(venueId, name),
+    onSuccess: () => void client.invalidateQueries({ queryKey: queryKeys.cameraLayout(deviceId) }),
   });
 }
