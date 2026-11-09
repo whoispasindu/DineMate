@@ -1,8 +1,23 @@
-import { useCameras, useFloor, useLiveLink, useServerNow, type CameraHealth, type VenueFloor } from "@dinemate/api-client";
+import {
+  apiMode,
+  useAddCamera,
+  useCameras,
+  useFloor,
+  useLiveLink,
+  useRemoveCamera,
+  useServerNow,
+  useUpdateCamera,
+  type CameraHealth,
+  type VenueFloor,
+} from "@dinemate/api-client";
 import { cx, formatAgo, Icon } from "@dinemate/ui";
 import { useState } from "react";
-import { Banner, Button, errorText, Page, Panel, Skeleton } from "../kit";
+import { Link } from "react-router";
+import { Banner, Button, errorText, Field, Page, Panel, Skeleton, TextInput } from "../kit";
+import { reachableStream } from "../live";
 import { useVenue } from "../venue";
+
+const SOURCE_HELP = "rtsp://user:password@192.168.1.50:554/stream1 · http://192.168.1.20:8080/video · 0 for a USB camera";
 
 const STATUS: Record<CameraHealth["status"], { label: string; dot: string; text: string }> = {
   ok: { label: "Online", dot: "bg-ok-mark", text: "text-ok" },
@@ -134,7 +149,7 @@ function LiveStream({ venueId, camera }: { venueId: string; camera: CameraHealth
         </Banner>
       ) : (
         <img
-          src={link.data.url}
+          src={reachableStream(link.data.url)}
           alt={`Live view from ${camera.id} with tracking boxes; customer faces blurred`}
           className="aspect-video w-full rounded-[14px] bg-[#1d232b] object-contain"
           onError={() => setBroken(true)}
@@ -187,6 +202,151 @@ function LiveView({ venueId, cameras }: { venueId: string; cameras: CameraHealth
   );
 }
 
+function statusLine(c: CameraHealth): { label: string; dot: string; text: string } {
+  if (c.kind === "camera" && c.status === "offline" && !c.last_seen_at) {
+    return { label: "Waiting for the camera computer", dot: "bg-dash", text: "text-muted" };
+  }
+  if (c.waiting_for_zones || (c.kind === "camera" && c.status !== "offline" && !c.has_layout)) {
+    return { label: "Waiting for zones", dot: "bg-busy-mark", text: "text-busy" };
+  }
+  return STATUS[c.status];
+}
+
+function AddCamera({ venueId }: { venueId: string }) {
+  const add = useAddCamera(venueId);
+  const [label, setLabel] = useState("");
+  const [source, setSource] = useState("");
+  return (
+    <Panel title="Add a camera">
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          add.mutate(
+            { label: label.trim(), source: source.trim() },
+            {
+              onSuccess: () => {
+                setLabel("");
+                setSource("");
+              },
+            },
+          );
+        }}
+      >
+        <Field label="Name">
+          <TextInput value={label} maxLength={40} placeholder="Counter camera" onChange={(e) => setLabel(e.target.value)} />
+        </Field>
+        <Field label="Camera address" hint={SOURCE_HELP}>
+          <TextInput value={source} maxLength={500} placeholder="rtsp://…" onChange={(e) => setSource(e.target.value)} autoComplete="off" />
+        </Field>
+        {add.isError ? <Banner tone="error">{errorText(add.error)}</Banner> : null}
+        {add.isSuccess ? (
+          <Banner tone="ok">Added. The camera computer picks it up within a minute; then press Set up to draw its zones.</Banner>
+        ) : null}
+        <div>
+          <Button type="submit" tone="primary" disabled={!label.trim() || !source.trim() || add.isPending}>
+            Add camera
+          </Button>
+        </div>
+        <p className="m-0 text-xs text-muted">
+          The address stays on this computer. DineMate only shows the camera's network address, never its password.
+        </p>
+      </form>
+    </Panel>
+  );
+}
+
+function CameraRow({ camera, venueId, now, first }: { camera: CameraHealth; venueId: string; now: number; first: boolean }) {
+  const update = useUpdateCamera(venueId);
+  const remove = useRemoveCamera(venueId);
+  const [editing, setEditing] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [label, setLabel] = useState(camera.label ?? "");
+  const [source, setSource] = useState("");
+  const look = statusLine(camera);
+  const real = camera.kind === "camera";
+  return (
+    <li className={cx("flex flex-col gap-2 py-3", !first && "border-t border-line-soft")}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-3">
+          <span aria-hidden="true" className={cx("h-2.5 w-2.5 shrink-0 rounded-full", look.dot)} />
+          <span className="flex flex-col">
+            <span className="text-[15px] font-bold">
+              {camera.label ?? camera.id}
+              {camera.kind === "simulator" ? (
+                <span className="ml-2 rounded-full bg-chip px-2 py-0.5 text-xs font-semibold text-neutral-ink">Simulated</span>
+              ) : null}
+            </span>
+            <span className="text-[13px] text-muted">
+              {camera.source_hint ? `${camera.source_hint} · ` : ""}
+              {camera.zones.length > 0 ? camera.zones.join(" · ") : "No zones yet"}
+            </span>
+          </span>
+        </span>
+        <span className="flex flex-col items-end">
+          <span className={cx("text-right text-sm font-bold", look.text)}>{look.label}</span>
+          <span className="text-xs text-muted">
+            {camera.last_seen_at ? `seen ${formatAgo(camera.last_seen_at, now)}` : "never seen"}
+            {camera.fps !== null ? ` · ${camera.fps.toFixed(0)} fps` : ""}
+          </span>
+        </span>
+      </div>
+      {real ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to={`/cameras/${camera.id}/setup`}
+            className="inline-flex min-h-9 items-center rounded-xl bg-brand px-3 text-sm font-bold text-on-dark no-underline hover:bg-brand-mid"
+          >
+            Set up zones<span className="sr-only"> for {camera.label ?? camera.id}</span>
+          </Link>
+          <Button className="min-h-9" onClick={() => setEditing((on) => !on)}>
+            {editing ? "Cancel" : "Edit"}
+            <span className="sr-only"> {camera.label ?? camera.id}</span>
+          </Button>
+          {confirm ? (
+            <>
+              <Button className="min-h-9" disabled={remove.isPending} onClick={() => remove.mutate(camera.id)}>
+                Remove {camera.label ?? camera.id}
+              </Button>
+              <Button className="min-h-9" onClick={() => setConfirm(false)}>
+                Keep
+              </Button>
+            </>
+          ) : (
+            <Button className="min-h-9" onClick={() => setConfirm(true)}>
+              Remove<span className="sr-only"> {camera.label ?? camera.id}</span>
+            </Button>
+          )}
+        </div>
+      ) : null}
+      {editing ? (
+        <form
+          className="flex flex-wrap items-end gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            update.mutate(
+              { deviceId: camera.id, body: { label: label.trim() || undefined, source: source.trim() || undefined } },
+              { onSuccess: () => setEditing(false) },
+            );
+          }}
+        >
+          <Field label="Name" className="w-[160px]">
+            <TextInput value={label} maxLength={40} onChange={(e) => setLabel(e.target.value)} />
+          </Field>
+          <Field label="New address (leave empty to keep)" className="min-w-[220px] flex-1">
+            <TextInput value={source} maxLength={500} onChange={(e) => setSource(e.target.value)} autoComplete="off" />
+          </Field>
+          <Button type="submit" tone="primary" disabled={update.isPending}>
+            Save
+          </Button>
+        </form>
+      ) : null}
+      {update.isError ? <span className="text-[13px] text-crowd">{errorText(update.error)}</span> : null}
+      {remove.isError ? <span className="text-[13px] text-crowd">{errorText(remove.error)}</span> : null}
+    </li>
+  );
+}
+
 export function CamerasScreen() {
   const { venue } = useVenue();
   const cameras = useCameras(venue?.id);
@@ -197,38 +357,16 @@ export function CamerasScreen() {
       {cameras.isError ? <Banner tone="error">{errorText(cameras.error)}</Banner> : null}
       <div className="flex flex-wrap items-start gap-4">
         {venue && cameras.data ? <LiveView venueId={venue.id} cameras={items} /> : <Skeleton className="h-[360px] flex-[1.6_1_560px]" />}
-        <Panel title="Cameras" className="flex-[1_1_320px]">
-          {!cameras.data ? <Skeleton className="h-[160px]" /> : null}
-          {cameras.data && items.length === 0 ? <p className="m-0 text-sm text-muted">No cameras are set up for this venue.</p> : null}
-          <ul className="m-0 flex list-none flex-col p-0">
-            {items.map((c, i) => {
-              const look = STATUS[c.status];
-              return (
-                <li key={c.id} className={cx("flex items-center justify-between gap-3 py-3", i > 0 && "border-t border-line-soft")}>
-                  <span className="flex items-center gap-3">
-                    <span aria-hidden="true" className={cx("h-2.5 w-2.5 shrink-0 rounded-full", look.dot)} />
-                    <span className="flex flex-col">
-                      <span className="text-[15px] font-bold">
-                        {c.id}
-                        {c.kind === "simulator" ? (
-                          <span className="ml-2 rounded-full bg-chip px-2 py-0.5 text-xs font-semibold text-neutral-ink">Simulated</span>
-                        ) : null}
-                      </span>
-                      <span className="text-[13px] text-muted">{c.zones.length > 0 ? c.zones.join(" · ") : "No zones yet"}</span>
-                    </span>
-                  </span>
-                  <span className="flex flex-col items-end">
-                    <span className={cx("text-sm font-bold", look.text)}>{look.label}</span>
-                    <span className="text-xs text-muted">
-                      {c.last_seen_at ? `seen ${formatAgo(c.last_seen_at, now)}` : "never seen"}
-                      {c.fps !== null ? ` · ${c.fps.toFixed(0)} fps` : ""}
-                    </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </Panel>
+        <div className="flex min-w-[320px] flex-[1_1_360px] flex-col gap-4">
+          <Panel title="Cameras">
+            {!cameras.data ? <Skeleton className="h-[160px]" /> : null}
+            {cameras.data && items.length === 0 ? <p className="m-0 text-sm text-muted">No cameras yet. Add one below.</p> : null}
+            <ul className="m-0 flex list-none flex-col p-0">
+              {venue ? items.map((c, i) => <CameraRow key={c.id} camera={c} venueId={venue.id} now={now} first={i === 0} />) : null}
+            </ul>
+          </Panel>
+          {venue && apiMode() === "api" ? <AddCamera venueId={venue.id} /> : null}
+        </div>
       </div>
     </Page>
   );
