@@ -28,6 +28,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
+      - run: pnpm test:web
       - run: pnpm build
 
   api:
@@ -125,6 +126,20 @@ jobs:
       - run: uvx ruff@0.17.0 check .
       - run: uvx ruff@0.17.0 format --check .
       - run: uv run --no-project --python 3.12 --with pytest --with numpy --with httpx pytest -q
+
+  hub-image:
+    name: Camera hub image (build, detect on a blank frame)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t dinemate-hub services/vision
+      - name: Models load and detection runs
+        run: >-
+          docker run --rm dinemate-hub python -c
+          "import numpy as np; import vision.hub, vision.worker;
+          from vision.detector import YoloDetector;
+          found = YoloDetector('models/yolo11s.pt').detect(np.zeros((360, 640, 3), dtype=np.uint8));
+          assert found == [], found; print('hub image ok')"
 
   compose:
     name: Docker Compose smoke test

@@ -273,11 +273,28 @@ PIPELINE_CONFIG = {
 
 def test_pipeline_staff_mode_needs_work_areas_and_staff() -> None:
     no_staff = Pipeline(PIPELINE_CONFIG, Models("d.pt", "p.pt"), FakePeople(), identity=FakeReader())
-    assert not no_staff.staff_mode
-    assert no_staff.staff_snapshot(0.0) is None
+    assert not no_staff.staff_mode and no_staff.watches_work
     no_work = {**PIPELINE_CONFIG, "work": []}
     p = Pipeline(no_work, Models("d.pt", "p.pt"), FakePeople(), identity=FakeReader(), staff=list(STAFF))
     assert not p.staff_mode
+    nothing = Pipeline({**no_work, "ignore": []}, Models("d.pt", "p.pt"), FakePeople())
+    assert not nothing.watches_work and nothing.staff_snapshot(0.0) is None
+
+
+def test_workers_are_tracked_and_counted_without_anyone_enrolled() -> None:
+    people, reader = FakePeople(), FakeReader()
+    p = Pipeline(PIPELINE_CONFIG, Models("d.pt", "p.pt"), people, identity=reader)
+    people.people = [person(1, 0.2, 0.3), person(4, 0.25, 0.35), person(2, 0.2, 0.8), person(3, 0.3, 0.9)]
+    for t in range(5):
+        p.process(IMAGE, float(t))
+    assert reader.asked == []
+    assert sorted((d.track_id, text) for d, text in p.staff_labels()) == [
+        (1, "worker (counter)"),
+        (4, "worker (counter)"),
+    ]
+    assert p.staff_tracks() == set()
+    snapshot = p.staff_snapshot(1_700_000_000.0)
+    assert snapshot == {"presence": [], "queue": {"people": 2}, "counter": {"people": 2}}
 
 
 def test_pipeline_names_workers_counts_the_queue_and_reads_only_work_areas() -> None:
@@ -295,4 +312,5 @@ def test_pipeline_names_workers_counts_the_queue_and_reads_only_work_areas() -> 
     assert snapshot["queue"] == {"people": 2}
     assert [(r["staff_id"], r["area"], r["ended_at"]) for r in snapshot["presence"]] == [("ana", "counter", None)]
     p.set_staff([])
-    assert not p.staff_mode and p.staff_labels() == []
+    assert not p.staff_mode
+    assert [(d.track_id, text) for d, text in p.staff_labels()] == [(1, "worker (counter)")]

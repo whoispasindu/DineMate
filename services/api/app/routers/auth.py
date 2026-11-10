@@ -13,12 +13,14 @@ from app.core.errors import ApiError
 from app.core.security import (
     REFRESH_COOKIE,
     REFRESH_COOKIE_PATH,
+    after_failure,
     create_access_token,
     hash_password,
     hash_refresh_token,
     login_limiter,
     needs_rehash,
     new_refresh_token,
+    throttle_key,
     verify_password,
 )
 from app.schemas import ErrorResponse
@@ -67,6 +69,19 @@ def _issue(session: SessionDep, user: models.User, response: Response, settings:
     return Session(access_token=token, token_type="bearer", expires_in=expires_in, user=me_schema(user))
 
 
+def _failed(session: SessionDep, key: str, settings: Settings, now: datetime) -> ApiError:
+    lock = timedelta(minutes=settings.login_lock_minutes)
+    row = session.get(models.LoginThrottle, key)
+    if row is None:
+        row = models.LoginThrottle(key=key, failures=0, first_failed_at=now)
+        session.add(row)
+    row.failures, row.first_failed_at, row.locked_until = after_failure(
+        row.failures, row.first_failed_at, now, settings.login_failures_before_lock, lock
+    )
+    session.commit()
+    return ApiError(401, "invalid_credentials", "Email or password is incorrect.")
+
+
 def _clear_cookie(response: Response) -> None:
     response.delete_cookie(REFRESH_COOKIE, path=REFRESH_COOKIE_PATH)
 
@@ -77,14 +92,21 @@ def login(
 ) -> Session:
     if not login_limiter.allow(client_ip(request) or "unknown", settings.login_attempts_per_minute):
         raise ApiError(429, "rate_limited", "Too many sign-in attempts. Wait a minute and try again.")
+    key = throttle_key(payload.email)
+    throttle = session.get(models.LoginThrottle, key)
+    if throttle is not None and throttle.locked_until is not None and throttle.locked_until > now:
+        minutes = settings.login_lock_minutes
+        raise ApiError(429, "locked", f"Too many wrong passwords for this account. Try again in {minutes} minutes.")
     user = session.scalars(
         select(models.User).where(func.lower(models.User.email) == payload.email.strip().lower())
     ).first()
     if user is None or not user.is_active:
         verify_password(payload.password, DUMMY_HASH)
-        raise ApiError(401, "invalid_credentials", "Email or password is incorrect.")
+        raise _failed(session, key, settings, now)
     if not verify_password(payload.password, user.password_hash):
-        raise ApiError(401, "invalid_credentials", "Email or password is incorrect.")
+        raise _failed(session, key, settings, now)
+    if throttle is not None:
+        session.delete(throttle)
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(payload.password)
     user.last_login_at = now

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.business.seed import VENUE_ID
 from app.core.config import Settings, get_settings
+from app.core.device_auth import hash_token
 from app.main import app
 from app.seed import reset, seed
 from app.testfeeds.hub_setup import ensure_hub
@@ -166,3 +167,30 @@ def test_a_zone_drawn_on_a_camera_becomes_monitored(client: TestClient) -> None:
     saved = client.put(f"/api/v1/devices/{feed}/layout", headers=admin, json=body)
     assert saved.status_code == 200, saved.text
     assert next(z for z in saved.json()["zones"] if z["id"] == zone["id"])["is_monitored"] is True
+
+
+def test_detection_detail_is_set_per_camera(client: TestClient, seeded: Engine) -> None:
+    admin = login(client, "admin@dinemate.test")
+    body = {"label": "Busy hall", "source": YOUTUBE, "detail": "high"}
+    feed = client.post("/api/v1/manage/canteens/a/test-feeds", headers=admin, json=body).json()["feed"]
+    assert feed["detail"] == "high"
+    owner = login(client, "owner@dinemate.test")
+    added = client.post(
+        f"/api/v1/business/venues/{VENUE_ID}/cameras", headers=owner, json={"label": "Cafe", "source": "0"}
+    ).json()["camera"]
+    assert added["detail"] == "auto"
+    patched = client.patch(f"/api/v1/business/cameras/{added['id']}", headers=owner, json={"detail": "high"})
+    assert patched.json()["camera"]["detail"] == "high"
+    listed = client.get(f"/api/v1/business/venues/{VENUE_ID}/cameras", headers=owner).json()["items"]
+    assert next(c for c in listed if c["id"] == added["id"])["detail"] == "high"
+    with Session(seeded) as session:
+        device = session.get(models.Device, added["id"])
+        assert device is not None
+        device.token_hash = hash_token("detail-token")
+        session.commit()
+    config = client.get(f"/api/v1/devices/{added['id']}/config", headers={"Authorization": "Device detail-token"})
+    assert config.json()["settings"]["imgsz"] == 1280
+    back = client.patch(f"/api/v1/business/cameras/{added['id']}", headers=owner, json={"detail": "auto"})
+    assert back.json()["camera"]["detail"] == "auto"
+    bad = client.patch(f"/api/v1/business/cameras/{added['id']}", headers=owner, json={"detail": "huge"})
+    assert bad.status_code == 422

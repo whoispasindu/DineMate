@@ -212,10 +212,15 @@ class QueueIn(Schema):
     people: int = Field(ge=0, le=500)
 
 
+class CounterIn(Schema):
+    people: int = Field(ge=0, le=100)
+
+
 class StaffSnapshotIn(Schema):
     captured_at: AwareDatetime
     presence: list[PresenceIn] = Field(default_factory=list, max_length=200)
     queue: QueueIn | None = None
+    counter: CounterIn | None = None
 
 
 class StaffAccepted(Timestamped):

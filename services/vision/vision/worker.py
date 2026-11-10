@@ -209,7 +209,7 @@ def start_live(args: argparse.Namespace) -> tuple[LiveServer | None, str | None]
 
 
 def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
-    if not pipeline.work:
+    if not pipeline.watches_work:
         pipeline.set_staff([])
         return True
     was_on = pipeline.staff_mode
@@ -275,7 +275,7 @@ def run(args: argparse.Namespace) -> int:
     if stream_url or waiting:
         last_beat -= HEARTBEAT_S
     last_post: float | None = None
-    sized = False
+    sized: int | None = None
     fps = 0.0
     latency_ms = 0
     shown: dict[str, dict[str, Any]] = {}
@@ -292,9 +292,10 @@ def run(args: argparse.Namespace) -> int:
             height, width = frame.image.shape[:2]
             if last_post is None:
                 last_post = frame.at
-            if not sized and pipeline.imgsz is not None:
-                sized = True
-                chosen = "set by --imgsz" if args.imgsz else f"auto for a {width}px-wide source"
+            if pipeline.imgsz is not None and pipeline.imgsz != sized:
+                sized = pipeline.imgsz
+                picked = "set for this camera" if pipeline.wanted_imgsz() else f"auto for a {width}px-wide source"
+                chosen = "set by --imgsz" if args.imgsz else picked
                 log.info("Source is %dx%d; detecting at %s px (%s)", width, height, pipeline.imgsz, chosen)
             if not waiting and frame.at - last_post >= float(settings["post_every_s"]):
                 readings = pipeline.readings()

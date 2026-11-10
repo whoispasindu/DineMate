@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Header, Response
+from fastapi import APIRouter, Depends, Header, Response
 from sqlalchemy import select
 
 from app import models
+from app.core.config import Settings, get_settings
 from app.core.deps import NowDep, SessionDep
 from app.core.device_auth import DeviceDep, RealNowDep
 from app.core.errors import ApiError
@@ -24,6 +25,7 @@ from app.schemas_device import (
     SimulationProfile,
     WorkerSettings,
 )
+from app.services.livehosts import live_url_allowed
 
 router = APIRouter(tags=["devices"])
 
@@ -45,6 +47,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "abandoned_s": 300.0,
     "seat_radius": 0.06,
     "objects_every_s": 5.0,
+    "imgsz": None,
 }
 AUTH_RESPONSES: dict[int | str, dict[str, Any]] = {401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}}
 
@@ -196,7 +199,21 @@ def post_occupancy(
 
 
 @router.post("/devices/{device_id}/heartbeat", response_model=HeartbeatAccepted, responses=AUTH_RESPONSES)
-def post_heartbeat(payload: HeartbeatIn, device: DeviceDep, session: SessionDep, now: NowDep) -> HeartbeatAccepted:
+def post_heartbeat(
+    payload: HeartbeatIn,
+    device: DeviceDep,
+    session: SessionDep,
+    now: NowDep,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> HeartbeatAccepted:
+    if payload.stream_url and (
+        device.kind != "camera" or not live_url_allowed(payload.stream_url, settings.live_hosts)
+    ):
+        raise ApiError(
+            422,
+            "validation_error",
+            "Live view must be served from this network, at /live. Add other hosts to DINEMATE_LIVE_HOSTS.",
+        )
     session.add(
         models.DeviceHeartbeat(
             device_id=device.id,

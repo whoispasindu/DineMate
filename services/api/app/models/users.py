@@ -68,6 +68,15 @@ class RefreshToken(Base):
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class LoginThrottle(Base):
+    __tablename__ = "login_throttles"
+
+    key: Mapped[str] = mapped_column(Text, primary_key=True)
+    failures: Mapped[int] = mapped_column(BigInteger, server_default=text("0"))
+    first_failed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class AuditLog(Base):
     __tablename__ = "audit_log"
     __table_args__ = (Index("ix_audit_log_at", text("at DESC")),)

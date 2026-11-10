@@ -1,6 +1,6 @@
-import { useUploadTestVideo } from "@dinemate/api-client";
+import { useUploadTestVideo, type CameraDetail } from "@dinemate/api-client";
 import { useCallback } from "react";
-import { Field, TextInput } from "./kit";
+import { Field, Select, TextInput } from "./kit";
 
 export interface TestVideoChoice {
   link: string;
@@ -28,6 +28,18 @@ export function useTestVideoSource() {
     [upload],
   );
   return { resolve, uploading: upload.isPending };
+}
+
+export function DetailSelect({ value, onChange }: { value: CameraDetail; onChange: (next: CameraDetail) => void }) {
+  return (
+    <Field label="Detail" hint="High finds more people in big, crowded rooms but needs a faster computer.">
+      <Select value={value} onChange={(e) => onChange(e.target.value as CameraDetail)}>
+        <option value="auto">Auto</option>
+        <option value="standard">Standard</option>
+        <option value="high">High</option>
+      </Select>
+    </Field>
+  );
 }
 
 export function TestVideoInput({ value, onChange }: { value: TestVideoChoice; onChange: (next: TestVideoChoice) => void }) {

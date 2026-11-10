@@ -9,6 +9,7 @@
     "dev:business": "pnpm --filter business dev",
     "dev:business:api": "pnpm --filter business dev --mode api",
     "dev:api": "uv run --directory services/api uvicorn app.main:app --reload --port 8000",
+    "test:web": "vitest run",
     "test:api": "uv run --directory services/api pytest -q",
     "stack:up": "docker compose -f infra/docker-compose.yml up -d --build --wait",
     "stack:down": "docker compose -f infra/docker-compose.yml --profile cameras down",
@@ -31,6 +32,7 @@
     "globals": "^17.13.0",
     "prettier": "^3.9.10",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.71.2"
+    "typescript-eslint": "8.71.2",
+    "vitest": "^5.1.0"
   }
 }

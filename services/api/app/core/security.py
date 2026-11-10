@@ -57,6 +57,19 @@ def hash_refresh_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
+def throttle_key(email: str) -> str:
+    return hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()
+
+
+def after_failure(
+    failures: int, first_failed_at: datetime, now: datetime, limit: int, lock: timedelta
+) -> tuple[int, datetime, datetime | None]:
+    if now - first_failed_at > lock:
+        failures, first_failed_at = 0, now
+    failures += 1
+    return failures, first_failed_at, now + lock if failures >= limit else None
+
+
 class RateLimiter:
     def __init__(self) -> None:
         self._hits: dict[str, deque[float]] = defaultdict(deque)

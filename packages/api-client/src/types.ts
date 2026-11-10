@@ -738,17 +738,22 @@ export interface CameraHealth {
   source_hint?: string | null;
   has_layout?: boolean;
   waiting_for_zones?: boolean;
+  detail?: CameraDetail;
 }
+
+export type CameraDetail = "auto" | "standard" | "high";
 
 export interface CameraIn {
   label: string;
   source: string;
+  detail?: CameraDetail;
 }
 
 export interface CameraPatch {
   label?: string;
   source?: string;
   enabled?: boolean;
+  detail?: CameraDetail;
 }
 
 export interface CameraOut {
@@ -757,6 +762,7 @@ export interface CameraOut {
   label: string;
   source_hint: string | null;
   enabled: boolean;
+  detail?: CameraDetail;
 }
 
 export interface CameraResult extends Timestamped {
@@ -780,6 +786,7 @@ export interface UploadedVideo extends Timestamped {
 export interface VideoFeedIn {
   label: string;
   source: string;
+  detail?: CameraDetail;
 }
 
 export interface VideoFeed {
@@ -793,6 +800,7 @@ export interface VideoFeed {
   fps: number | null;
   zones: string[];
   has_layout: boolean;
+  detail?: CameraDetail;
 }
 
 export interface VideoFeedList extends Timestamped {
