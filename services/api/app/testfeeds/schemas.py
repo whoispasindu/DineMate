@@ -12,9 +12,13 @@ class UploadedVideo(Timestamped):
     size_mb: float
 
 
+Detail = Literal["auto", "standard", "high"]
+
+
 class VideoFeedIn(Schema):
     label: str = Field(min_length=1, max_length=40)
     source: str = Field(min_length=1, max_length=500)
+    detail: Detail | None = None
 
 
 class VideoFeed(Schema):
@@ -28,6 +32,7 @@ class VideoFeed(Schema):
     fps: float | None
     zones: list[str]
     has_layout: bool
+    detail: Detail = "auto"
 
 
 class VideoFeedList(Timestamped):

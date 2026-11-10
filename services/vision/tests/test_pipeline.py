@@ -94,3 +94,23 @@ def test_objects_are_detected_on_their_own_schedule() -> None:
     for t in range(0, 11):
         p.process(IMAGE, float(t))
     assert objects.calls == 3
+
+
+class SizedPeople(FakePeople):
+    def __init__(self) -> None:
+        super().__init__()
+        self.requested_imgsz: int | None = None
+        self.imgsz: int | None = 640
+
+
+def test_detection_size_follows_the_camera_setting_unless_the_command_line_sets_it() -> None:
+    people = SizedPeople()
+    p = Pipeline(CONFIG, Models("detect.pt", "pose.pt"), people, FakeObjects())
+    assert p.wanted_imgsz() is None and people.imgsz == 640
+    p.configure({**CONFIG, "settings": {**CONFIG["settings"], "imgsz": 1280}})
+    assert p.wanted_imgsz() == 1280 and people.requested_imgsz == 1280 and people.imgsz is None
+    p.configure(CONFIG)
+    assert people.requested_imgsz is None
+    fixed = Pipeline(CONFIG, Models("detect.pt", "pose.pt", 960), SizedPeople(), FakeObjects())
+    fixed.configure({**CONFIG, "settings": {**CONFIG["settings"], "imgsz": 1280}})
+    assert fixed.wanted_imgsz() == 960

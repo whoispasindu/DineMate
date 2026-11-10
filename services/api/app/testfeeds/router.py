@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select
 
 from app import models
-from app.business.cameras import WAITING, check_source, is_removed, label_of, source_hint
+from app.business.cameras import WAITING, check_source, detail_of, is_removed, label_of, source_hint, with_detail
 from app.business.service import OFFLINE_AFTER
 from app.business.staff_schemas import LiveLink
 from app.business.staff_service import live_link
@@ -142,6 +142,7 @@ def feed_out(session: SessionDep, device: models.Device, now: datetime) -> s.Vid
         fps=beat.fps if beat else None,
         zones=[names[z] for z in zone_ids if z in names],
         has_layout=layout is not None,
+        detail=detail_of(device.config),  # type: ignore[arg-type]
     )
 
 
@@ -188,7 +189,7 @@ def add_feed(
         id=f"cam-test-{secrets.token_hex(3)}",
         canteen_id=canteen_id,
         kind="camera",
-        config={"label": payload.label.strip(), "source": source, "test": True},
+        config=with_detail({"label": payload.label.strip(), "source": source, "test": True}, payload.detail),
     )
     session.add(device)
     session.flush()

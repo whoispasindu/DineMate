@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from app import models
 from app.business import camera_schemas as cs
 from app.business.auth import BusinessUser, venue_for
-from app.business.cameras import check_source, is_removed, label_of, source_hint
+from app.business.cameras import check_source, detail_of, is_removed, label_of, source_hint, with_detail
 from app.business.router import RESPONSES
 from app.core.config import Settings, get_settings
 from app.core.deps import NowDep, SessionDep
@@ -43,6 +43,7 @@ def camera_out(device: models.Device) -> cs.CameraOut:
         label=label_of(device.config, device.id),
         source_hint=source_hint((device.config or {}).get("source")),
         enabled=device.is_enabled,
+        detail=detail_of(device.config),  # type: ignore[arg-type]
     )
 
 
@@ -105,7 +106,7 @@ def add_camera(
         id=f"cam-{secrets.token_hex(3)}",
         canteen_id=venue.id,
         kind="camera",
-        config={"label": payload.label.strip(), "source": source},
+        config=with_detail({"label": payload.label.strip(), "source": source}, payload.detail),
     )
     session.add(device)
     session.flush()
@@ -145,7 +146,8 @@ def update_camera(
         config.pop("stream_url", None)
     if payload.enabled is not None:
         device.is_enabled = payload.enabled
-    device.config = config
+    device.config = with_detail(config, payload.detail)
+    config = device.config
     session.flush()
     if config.get("source") != old_source:
         forget_video(session, settings, old_source)

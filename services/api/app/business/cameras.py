@@ -36,6 +36,23 @@ def source_hint(source: str | None) -> str | None:
     return f"{parts.scheme}://{parts.hostname}{port}{tail}"
 
 
+DETAIL_SIZES: dict[str, int | None] = {"auto": None, "standard": 640, "high": 1280}
+
+
+def detail_of(config: dict[str, Any] | None) -> str:
+    size = (config or {}).get("imgsz")
+    return next((name for name, value in DETAIL_SIZES.items() if value == size), "auto")
+
+
+def with_detail(config: dict[str, Any], detail: str | None) -> dict[str, Any]:
+    if detail is None:
+        return config
+    updated = {key: value for key, value in config.items() if key != "imgsz"}
+    if DETAIL_SIZES[detail] is not None:
+        updated["imgsz"] = DETAIL_SIZES[detail]
+    return updated
+
+
 def is_removed(config: dict[str, Any] | None) -> bool:
     return bool((config or {}).get("removed"))
 

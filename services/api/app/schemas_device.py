@@ -47,6 +47,7 @@ class WorkerSettings(Schema):
     abandoned_s: float = 300.0
     seat_radius: float = 0.06
     objects_every_s: float = 5.0
+    imgsz: int | None = None
 
 
 class SimulationProfile(Schema):

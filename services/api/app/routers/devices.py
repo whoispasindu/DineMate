@@ -47,6 +47,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "abandoned_s": 300.0,
     "seat_radius": 0.06,
     "objects_every_s": 5.0,
+    "imgsz": None,
 }
 AUTH_RESPONSES: dict[int | str, dict[str, Any]] = {401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}}
 

@@ -7,6 +7,7 @@ import {
   useRemoveCamera,
   useServerNow,
   useUpdateCamera,
+  type CameraDetail,
   type CameraHealth,
   type VenueFloor,
 } from "@dinemate/api-client";
@@ -15,6 +16,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Skeleton, TextInput } from "../kit";
 import {
+  DetailSelect,
   hasTestVideo,
   isTestHint,
   labelFromFile,
@@ -228,6 +230,7 @@ function AddCamera({ venueId }: { venueId: string }) {
   const [testing, setTesting] = useState(false);
   const [clip, setClip] = useState<TestVideoChoice>(NO_TEST_VIDEO);
   const [problem, setProblem] = useState<string | null>(null);
+  const [detail, setDetail] = useState<CameraDetail>("auto");
   const ready = label.trim() !== "" && (testing ? hasTestVideo(clip) : source.trim() !== "");
   const busy = add.isPending || video.uploading;
   return (
@@ -240,7 +243,7 @@ function AddCamera({ venueId }: { venueId: string }) {
           void (async () => {
             try {
               const chosen = testing ? await video.resolve(clip) : source.trim();
-              await add.mutateAsync({ label: label.trim(), source: chosen });
+              await add.mutateAsync({ label: label.trim(), source: chosen, detail });
               setLabel("");
               setSource("");
               setClip(NO_TEST_VIDEO);
@@ -296,6 +299,7 @@ function AddCamera({ venueId }: { venueId: string }) {
             />
           </Field>
         )}
+        <DetailSelect value={detail} onChange={setDetail} />
         {problem ? <Banner tone="error">{problem}</Banner> : null}
         {add.isSuccess && !problem ? (
           <Banner tone="ok">Added. The camera computer picks it up within a minute; then press Set up to draw its zones.</Banner>
@@ -320,6 +324,7 @@ function CameraRow({ camera, venueId, now, first }: { camera: CameraHealth; venu
   const [confirm, setConfirm] = useState(false);
   const [label, setLabel] = useState(camera.label ?? "");
   const [source, setSource] = useState("");
+  const [detail, setDetail] = useState<CameraDetail>(camera.detail ?? "auto");
   const look = statusLine(camera);
   const real = camera.kind === "camera";
   return (
@@ -385,7 +390,7 @@ function CameraRow({ camera, venueId, now, first }: { camera: CameraHealth; venu
           onSubmit={(e) => {
             e.preventDefault();
             update.mutate(
-              { deviceId: camera.id, body: { label: label.trim() || undefined, source: source.trim() || undefined } },
+              { deviceId: camera.id, body: { label: label.trim() || undefined, source: source.trim() || undefined, detail } },
               { onSuccess: () => setEditing(false) },
             );
           }}
@@ -396,6 +401,7 @@ function CameraRow({ camera, venueId, now, first }: { camera: CameraHealth; venu
           <Field label="New address (leave empty to keep)" className="min-w-[220px] flex-1">
             <TextInput value={source} maxLength={500} onChange={(e) => setSource(e.target.value)} autoComplete="off" />
           </Field>
+          <DetailSelect value={detail} onChange={setDetail} />
           <Button type="submit" tone="primary" disabled={update.isPending}>
             Save
           </Button>

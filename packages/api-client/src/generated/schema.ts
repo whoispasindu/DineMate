@@ -1557,6 +1557,12 @@ export interface components {
              * @default false
              */
             waiting_for_zones: boolean;
+            /**
+             * Detail
+             * @default auto
+             * @enum {string}
+             */
+            detail: "auto" | "standard" | "high";
         };
         /** CameraIn */
         CameraIn: {
@@ -1564,6 +1570,8 @@ export interface components {
             label: string;
             /** Source */
             source: string;
+            /** Detail */
+            detail?: ("auto" | "standard" | "high") | null;
         };
         /** CameraOut */
         CameraOut: {
@@ -1577,6 +1585,12 @@ export interface components {
             source_hint: string | null;
             /** Enabled */
             enabled: boolean;
+            /**
+             * Detail
+             * @default auto
+             * @enum {string}
+             */
+            detail: "auto" | "standard" | "high";
         };
         /** CameraPatch */
         CameraPatch: {
@@ -1586,6 +1600,8 @@ export interface components {
             source?: string | null;
             /** Enabled */
             enabled?: boolean | null;
+            /** Detail */
+            detail?: ("auto" | "standard" | "high") | null;
         };
         /** CameraRemoved */
         CameraRemoved: {
@@ -3954,6 +3970,12 @@ export interface components {
             zones: string[];
             /** Has Layout */
             has_layout: boolean;
+            /**
+             * Detail
+             * @default auto
+             * @enum {string}
+             */
+            detail: "auto" | "standard" | "high";
         };
         /** VideoFeedIn */
         VideoFeedIn: {
@@ -3961,6 +3983,8 @@ export interface components {
             label: string;
             /** Source */
             source: string;
+            /** Detail */
+            detail?: ("auto" | "standard" | "high") | null;
         };
         /** VideoFeedList */
         VideoFeedList: {
@@ -4124,6 +4148,8 @@ export interface components {
              * @default 5
              */
             objects_every_s: number;
+            /** Imgsz */
+            imgsz: number | null;
         };
         /** ZoneHistory */
         ZoneHistory: {

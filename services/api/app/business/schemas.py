@@ -132,6 +132,7 @@ class CameraHealth(Schema):
     source_hint: str | None = None
     has_layout: bool = False
     waiting_for_zones: bool = False
+    detail: Literal["auto", "standard", "high"] = "auto"
 
 
 class VenueCameras(Timestamped):

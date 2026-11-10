@@ -5,6 +5,7 @@ import {
   useRemoveTestFeed,
   useServerNow,
   useTestFeeds,
+  type CameraDetail,
   type ManagedDevice,
   type VideoFeed,
 } from "@dinemate/api-client";
@@ -12,7 +13,15 @@ import { cx, formatAgo } from "@dinemate/ui";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Banner, Button, errorText, Field, Page, Panel, Select, TextInput } from "../kit";
-import { hasTestVideo, labelFromFile, NO_TEST_VIDEO, TestVideoInput, useTestVideoSource, type TestVideoChoice } from "../testVideo";
+import {
+  DetailSelect,
+  hasTestVideo,
+  labelFromFile,
+  NO_TEST_VIDEO,
+  TestVideoInput,
+  useTestVideoSource,
+  type TestVideoChoice,
+} from "../testVideo";
 
 const ONLINE_MS = 120_000;
 
@@ -44,6 +53,7 @@ function AddTestVideo({ canteens }: { canteens: { id: string; name: string }[] }
   const [label, setLabel] = useState("");
   const [clip, setClip] = useState<TestVideoChoice>(NO_TEST_VIDEO);
   const [problem, setProblem] = useState<string | null>(null);
+  const [detail, setDetail] = useState<CameraDetail>("auto");
   const canteenId = canteen || canteens[0]?.id || "";
   const busy = add.isPending || video.uploading;
   return (
@@ -59,7 +69,7 @@ function AddTestVideo({ canteens }: { canteens: { id: string; name: string }[] }
           void (async () => {
             try {
               const source = await video.resolve(clip);
-              await add.mutateAsync({ canteenId, body: { label: label.trim(), source } });
+              await add.mutateAsync({ canteenId, body: { label: label.trim(), source, detail } });
               setLabel("");
               setClip(NO_TEST_VIDEO);
             } catch (error) {
@@ -89,6 +99,7 @@ function AddTestVideo({ canteens }: { canteens: { id: string; name: string }[] }
             if (next.file && !label.trim()) setLabel(labelFromFile(next.file));
           }}
         />
+        <DetailSelect value={detail} onChange={setDetail} />
         {problem ? <Banner tone="error">{problem}</Banner> : null}
         {add.isSuccess && !problem ? (
           <Banner tone="ok">Added. The camera computer starts it within a minute. Then press Open in Zones.</Banner>

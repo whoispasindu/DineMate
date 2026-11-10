@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.business import schemas as s
-from app.business.cameras import WAITING, is_removed, label_of, source_hint
+from app.business.cameras import WAITING, detail_of, is_removed, label_of, source_hint
 from app.business.estimate import PastVisit, remaining_range
 from app.business.models import QueueReading, StaffMember, StaffPresence, TableVisit, VenueTable
 from app.business.tables import SeatView, TableView, table_state
@@ -330,6 +330,7 @@ def cameras(session: Session, venue: models.Canteen, now: datetime) -> s.VenueCa
                 label=label_of(device.config, device.id) if device.kind == "camera" else None,
                 source_hint=source_hint((device.config or {}).get("source")),
                 has_layout=layout is not None,
+                detail=detail_of(device.config),  # type: ignore[arg-type]
                 waiting_for_zones=status != "offline" and beat is not None and beat.message == WAITING,
             )
         )

@@ -108,12 +108,23 @@ class Pipeline:
         from vision.detector import ObjectDetector, YoloDetector
 
         confidence = float(self.settings.get("min_confidence", 0.25))
+        size = self.wanted_imgsz()
         if self.fixed_people is None and (self.people is None or self.uses_pose != self.seat_mode):
             path = self.models.pose if self.seat_mode else self.models.detect
-            self.people = YoloDetector(path, imgsz=self.models.imgsz, confidence=confidence)
+            self.people = YoloDetector(path, imgsz=size, confidence=confidence)
             self.uses_pose = self.seat_mode
         if self.fixed_objects is None and self.seat_mode and self.objects is None:
-            self.objects = ObjectDetector(self.models.detect, imgsz=self.models.imgsz, confidence=confidence)
+            self.objects = ObjectDetector(self.models.detect, imgsz=size, confidence=confidence)
+        for detector in (self.people, self.objects):
+            if detector is not None and getattr(detector, "requested_imgsz", size) != size:
+                detector.requested_imgsz = size
+                detector.imgsz = None
+
+    def wanted_imgsz(self) -> int | None:
+        if self.models.imgsz is not None:
+            return self.models.imgsz
+        chosen = self.settings.get("imgsz")
+        return int(chosen) if chosen else None
 
     def process(self, image: np.ndarray, at: float) -> list[Assignment]:
         if self.people is None:

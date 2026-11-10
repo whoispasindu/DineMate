@@ -1,18 +1,24 @@
+from typing import Literal
+
 from pydantic import Field
 
 from app.schemas import Schema, Timestamped
 from app.schemas_config import EditableZone
 
+Detail = Literal["auto", "standard", "high"]
+
 
 class CameraIn(Schema):
     label: str = Field(min_length=1, max_length=40)
     source: str = Field(min_length=1, max_length=500)
+    detail: Detail | None = None
 
 
 class CameraPatch(Schema):
     label: str | None = Field(default=None, min_length=1, max_length=40)
     source: str | None = Field(default=None, min_length=1, max_length=500)
     enabled: bool | None = None
+    detail: Detail | None = None
 
 
 class CameraOut(Schema):
@@ -21,6 +27,7 @@ class CameraOut(Schema):
     label: str
     source_hint: str | None
     enabled: bool
+    detail: Detail = "auto"
 
 
 class CameraResult(Timestamped):
