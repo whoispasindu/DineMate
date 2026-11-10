@@ -153,3 +153,16 @@ def test_a_live_camera_takes_a_zone_over_from_the_simulator(client: TestClient, 
     assert accepted() == 0
     seen(timedelta(minutes=5))
     assert accepted() == 1
+
+
+def test_a_zone_drawn_on_a_camera_becomes_monitored(client: TestClient) -> None:
+    admin = login(client, "admin@dinemate.test")
+    created = client.post("/api/v1/canteens/a/zones", headers=admin, json={"name": "Upper hall", "capacity": 80})
+    zone = created.json()["zone"]
+    assert zone["is_monitored"] is False
+    feed = add_feed(client, admin, "a")
+    polygons = [{"type": "seating", "zone_id": zone["id"], "points": [[0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9]]}]
+    body = {"base_version": None, "polygons": polygons}
+    saved = client.put(f"/api/v1/devices/{feed}/layout", headers=admin, json=body)
+    assert saved.status_code == 200, saved.text
+    assert next(z for z in saved.json()["zones"] if z["id"] == zone["id"])["is_monitored"] is True
