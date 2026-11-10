@@ -201,7 +201,11 @@ def worker_command(settings: HubSettings, camera: Camera, port: int) -> list[str
     ]
 
 
-def worker_env(base: Mapping[str, str], token: str, source: str) -> dict[str, str]:
+def worker_threads(cpus: int, cameras: int) -> int:
+    return max(1, cpus // max(1, cameras))
+
+
+def worker_env(base: Mapping[str, str], token: str, source: str, threads: int | None = None) -> dict[str, str]:
     env = {key: value for key, value in base.items() if key not in HUB_ONLY_ENV}
     env.update(
         DINEMATE_DEVICE_TOKEN=token,
@@ -209,6 +213,8 @@ def worker_env(base: Mapping[str, str], token: str, source: str) -> dict[str, st
         PYTHONUNBUFFERED="1",
         PYTHONIOENCODING="utf-8",
     )
+    if threads is not None and "OMP_NUM_THREADS" not in base:
+        env["OMP_NUM_THREADS"] = str(threads)
     return env
 
 
@@ -398,7 +404,12 @@ class Hub:
         try:
             process = self.spawn(
                 worker_command(self.settings, camera, port),
-                worker_env(self.environ, token, worker_source(camera.source, self.settings.videos_dir)),
+                worker_env(
+                    self.environ,
+                    token,
+                    worker_source(camera.source, self.settings.videos_dir),
+                    worker_threads(os.cpu_count() or 1, len(active_cameras(self.wanted))),
+                ),
                 camera.device_id,
             )
         except (OSError, ValueError) as exc:
