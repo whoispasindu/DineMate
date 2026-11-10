@@ -1836,6 +1836,11 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
         };
+        /** CounterIn */
+        CounterIn: {
+            /** People */
+            people: number;
+        };
         /** CoverageOut */
         CoverageOut: {
             /** Open Min */
@@ -3616,6 +3621,7 @@ export interface components {
             /** Presence */
             presence?: components["schemas"]["PresenceIn"][];
             queue?: components["schemas"]["QueueIn"] | null;
+            counter?: components["schemas"]["CounterIn"] | null;
         };
         /** StaffTemplates */
         StaffTemplates: {

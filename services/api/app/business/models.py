@@ -141,7 +141,8 @@ class QueueReading(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     venue_id: Mapped[str] = mapped_column(ForeignKey("canteens.id", ondelete="CASCADE"))
     at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    people: Mapped[int] = mapped_column(Integer)
+    people: Mapped[int | None] = mapped_column(Integer)
+    counter_people: Mapped[int | None] = mapped_column(Integer)
     is_simulated: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
 
 

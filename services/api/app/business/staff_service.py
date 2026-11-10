@@ -222,9 +222,13 @@ def report(session: Session, venue: models.Canteen, day: date, now: datetime) ->
         QueuePoint(r.at, r.people)
         for r in session.scalars(
             select(QueueReading).where(
-                QueueReading.venue_id == venue.id, QueueReading.at >= start, QueueReading.at < end
+                QueueReading.venue_id == venue.id,
+                QueueReading.at >= start,
+                QueueReading.at < end,
+                QueueReading.people.is_not(None),
             )
         )
+        if r.people is not None
     ]
     orders = orders_between(session, venue.id, start, end)
     items = items_of(session, [o.id for o in orders])
@@ -489,10 +493,14 @@ def accept_staff(
             session.add(row)
         row.ended_at = ended_at
         stored += 1
-    if payload.queue is not None:
+    if payload.queue is not None or payload.counter is not None:
         session.add(
             QueueReading(
-                venue_id=device.canteen_id, at=captured_at, people=payload.queue.people, is_simulated=simulated
+                venue_id=device.canteen_id,
+                at=captured_at,
+                people=payload.queue.people if payload.queue is not None else None,
+                counter_people=payload.counter.people if payload.counter is not None else None,
+                is_simulated=simulated,
             )
         )
     return stored, payload.queue is not None

@@ -209,7 +209,7 @@ def start_live(args: argparse.Namespace) -> tuple[LiveServer | None, str | None]
 
 
 def refresh_staff(client: DeviceClient, pipeline: Pipeline) -> bool:
-    if not pipeline.work:
+    if not pipeline.watches_work:
         pipeline.set_staff([])
         return True
     was_on = pipeline.staff_mode

@@ -8916,6 +8916,21 @@
         ],
         "title": "ConsoleZone"
       },
+      "CounterIn": {
+        "properties": {
+          "people": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "people"
+        ],
+        "title": "CounterIn"
+      },
       "CoverageOut": {
         "properties": {
           "open_min": {
@@ -14019,6 +14034,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/QueueIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CounterIn"
               },
               {
                 "type": "null"

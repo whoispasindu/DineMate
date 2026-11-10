@@ -154,23 +154,29 @@ def zone_names(venue: models.Canteen) -> dict[uuid.UUID, str]:
     return {z.id: z.name for z in venue.zones}
 
 
+def latest_reading(session: Session, venue_id: str, now: datetime, column: Any) -> int | None:
+    value = session.scalar(
+        select(column)
+        .where(QueueReading.venue_id == venue_id, QueueReading.at >= now - QUEUE_FRESH, column.is_not(None))
+        .order_by(QueueReading.at.desc())
+        .limit(1)
+    )
+    return int(value) if value is not None else None
+
+
 def counter_now(session: Session, venue_id: str, now: datetime) -> tuple[int | None, int | None]:
     staff_ids = select(StaffMember.id).where(StaffMember.venue_id == venue_id)
     has_staff = session.scalar(select(func.count()).select_from(StaffMember).where(StaffMember.venue_id == venue_id))
-    if not has_staff:
+    queue = latest_reading(session, venue_id, now, QueueReading.people)
+    seen_at_counter = latest_reading(session, venue_id, now, QueueReading.counter_people)
+    if not has_staff and queue is None and seen_at_counter is None:
         return None, None
-    on_counter = session.scalar(
+    named = session.scalar(
         select(func.count(func.distinct(StaffPresence.staff_id))).where(
             StaffPresence.staff_id.in_(staff_ids), StaffPresence.area == "counter", StaffPresence.ended_at.is_(None)
         )
     )
-    reading = session.scalar(
-        select(QueueReading)
-        .where(QueueReading.venue_id == venue_id, QueueReading.at >= now - QUEUE_FRESH)
-        .order_by(QueueReading.at.desc())
-        .limit(1)
-    )
-    return int(on_counter or 0), reading.people if reading else None
+    return max(int(named or 0), seen_at_counter or 0), queue
 
 
 def floor(session: Session, venue: models.Canteen, now: datetime) -> s.VenueFloor:
