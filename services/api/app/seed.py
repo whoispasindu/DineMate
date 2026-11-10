@@ -230,6 +230,7 @@ TABLES = [
     *SAFETY_TABLES,
     "audit_log",
     "refresh_tokens",
+    "login_throttles",
     "users",
     "occupancy_readings",
     "zone_layouts",

@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     demo_password: str | None = None
     cookie_secure: bool | None = None
     max_cameras: int = 8
+    login_failures_before_lock: int = 10
+    login_lock_minutes: int = 15
+    readings_retention_days: int = 90
+    heartbeat_retention_days: int = 7
+    retention_interval_s: float = 3600.0
+    live_hosts: list[str] = []
     test_videos_dir: str = "test-videos"
     test_video_max_mb: int = 1024
 

@@ -16,7 +16,7 @@ from app.models.organization import CAMPUS_ORG, Organization
 from app.models.schedule import MealSchedule, ScheduleOverride
 from app.models.seats import SeatSession, SeatState, ZoneSeatStatus
 from app.models.shop import MenuItem, MenuItemPeriod, Shop, ShopHourException, ShopHours
-from app.models.users import AuditLog, RefreshToken, User, UserCanteenScope, UserShopScope
+from app.models.users import AuditLog, LoginThrottle, RefreshToken, User, UserCanteenScope, UserShopScope
 
 __all__ = [
     "CAMPUS_ORG",
@@ -30,6 +30,7 @@ __all__ = [
     "CrowdingThreshold",
     "Device",
     "DeviceHeartbeat",
+    "LoginThrottle",
     "MealSchedule",
     "MenuItem",
     "MenuItemPeriod",

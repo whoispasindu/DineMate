@@ -170,17 +170,26 @@ def test_presence_till_and_report_with_audit(client: TestClient, seeded: Engine)
         assert order.staff_id is None and order.cashier_code == "RB"
 
 
-def test_live_link_is_signed_with_the_device_token(client: TestClient) -> None:
+def test_live_link_is_signed_with_the_device_token(client: TestClient, seeded: Engine) -> None:
     headers = owner(client)
-    url = f"{BASE}/venues/{VENUE_ID}/cameras/{DEVICE_ID}/live"
+    added = client.post(f"{BASE}/venues/{VENUE_ID}/cameras", headers=headers, json={"label": "Till", "source": "0"})
+    camera = added.json()["camera"]["id"]
+    with Session(seeded) as session:
+        device = session.get(models.Device, camera)
+        assert device is not None
+        device.token_hash = hash_token("cafe-camera-token")
+        session.commit()
+    url = f"{BASE}/venues/{VENUE_ID}/cameras/{camera}/live"
     assert client.get(url, headers=headers).status_code == 409
     beat = {"status": "ok", "stream_url": "http://192.168.1.20:8090/live"}
-    assert client.post(f"/api/v1/devices/{DEVICE_ID}/heartbeat", headers=DEVICE, json=beat).status_code == 200
+    assert client.post(f"/api/v1/devices/{camera}/heartbeat", headers=CAMERA, json=beat).status_code == 200
+    away = {"status": "ok", "stream_url": "http://evil.example/live"}
+    assert client.post(f"/api/v1/devices/{camera}/heartbeat", headers=CAMERA, json=away).status_code == 422
     link = client.get(url, headers=headers).json()
     parsed = urlparse(link["url"])
     query = {k: v[0] for k, v in parse_qs(parsed.query).items()}
     expected = hmac.new(
-        hash_token(SIM_TOKEN).encode(), f"{DEVICE_ID}:{query['exp']}".encode(), hashlib.sha256
+        hash_token("cafe-camera-token").encode(), f"{camera}:{query['exp']}".encode(), hashlib.sha256
     ).hexdigest()
     assert parsed.netloc == "192.168.1.20:8090"
     assert query["sig"] == expected
