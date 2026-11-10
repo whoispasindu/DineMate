@@ -13,6 +13,9 @@ __pycache__/
 .ruff_cache/
 
 data/videos/
+test videos/
+*.webm
+*.m4v
 data/frames/
 *.mp4
 *.mov

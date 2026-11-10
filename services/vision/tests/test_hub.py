@@ -1,4 +1,5 @@
 import logging
+import os
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from vision.hub import (
     worker_command,
     worker_env,
     worker_source,
+    worker_threads,
 )
 
 RTSP = "rtsp://admin:s3cret@192.168.1.20:554/stream1"
@@ -162,6 +164,16 @@ def test_test_videos_play_from_the_shared_folder_on_a_loop() -> None:
     hub.tick(0.0)
     assert [env["DINEMATE_SOURCE"] for _, env, _ in spawn.started] == [str(Path(DEFAULT_VIDEOS) / "clip-abcdef.mp4")]
     assert hub.running["a"].exited_at == 0.0
+
+
+def test_workers_share_the_cpu_threads() -> None:
+    assert [worker_threads(12, n) for n in (0, 1, 3, 8, 20)] == [12, 12, 4, 1, 1]
+    assert worker_env({}, "t", RTSP, 4)["OMP_NUM_THREADS"] == "4"
+    assert worker_env({"OMP_NUM_THREADS": "2"}, "t", RTSP, 4)["OMP_NUM_THREADS"] == "2"
+    assert "OMP_NUM_THREADS" not in worker_env({}, "t", RTSP)
+    hub, _, spawn = make_hub([cam("a"), cam("b"), cam("c")])
+    hub.tick(0.0)
+    assert {env["OMP_NUM_THREADS"] for _, env, _ in spawn.started} == {str(max(1, (os.cpu_count() or 1) // 3))}
 
 
 class FakeProcess:

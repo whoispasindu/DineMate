@@ -142,6 +142,9 @@ def save_version(session: SessionDep, device: models.Device, polygons: list[dict
     version = (session.scalar(select(func.max(zl.version)).where(zl.device_id == device.id)) or 0) + 1
     session.execute(update(zl).where(zl.device_id == device.id).values(is_current=False))
     session.add(zl(device_id=device.id, version=version, polygons=polygons, is_current=True))
+    seating = [uuid.UUID(str(p["zone_id"])) for p in polygons if p.get("type") == "seating" and p.get("zone_id")]
+    if seating:
+        session.execute(update(models.SeatingZone).where(models.SeatingZone.id.in_(seating)).values(is_monitored=True))
     return version
 
 
